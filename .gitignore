@@ -57,3 +57,17 @@ docs/agent_onboarding_prompt.md
 docs/notes_from_video_sessions.md
 docs/SESSION_HANDOFF.md
 docs/demo_runbook.md
+
+# ---------------------------------------------------------------------------
+# The public web viewer. Its secret is a private key, and this repository is
+# public, so both the key and every local env file are excluded before the
+# directory exists rather than after.
+# ---------------------------------------------------------------------------
+web/node_modules/
+web/.next/
+web/out/
+web/.vercel/
+.env.local
+.env*.local
+*.p8
+*.pem

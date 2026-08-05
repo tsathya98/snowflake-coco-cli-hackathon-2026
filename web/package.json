@@ -1,0 +1,25 @@
+{
+  "name": "warrant-web",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Public, read-only viewer for the Warrant agent. Authenticates as WARRANT_PUBLIC, which holds no privilege that can change anything.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "probe": "node --env-file=.env.local scripts/probe.mjs",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "next": "^16.3.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "snowflake-sdk": "^2.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "@types/react": "^19.0.7",
+    "typescript": "^5.7.3"
+  }
+}
