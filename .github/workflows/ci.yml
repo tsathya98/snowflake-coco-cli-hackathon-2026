@@ -1,0 +1,78 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+
+      # 3.11 is what Snowflake's Python stored procedures run, so the runtime the
+      # tests pass against is the runtime the pipeline executes on.
+      - name: Set up Python
+        run: uv python install 3.11
+
+      - name: Install dependencies
+        run: uv sync --all-extras --frozen
+
+      - name: Lint
+        run: uv run ruff check .
+
+      - name: Format check
+        run: uv run ruff format --check .
+
+      - name: Type check
+        run: uv run mypy
+
+      # The security claim Warrant makes about prompt injection, enforced rather
+      # than asserted: no module may compose SQL from runtime data.
+      - name: SQL boundary
+        run: uv run python tools/lint_sql_boundary.py
+
+      # corpus/pdf/*.pdf are generated and committed, so they can drift from the
+      # Markdown they came from. Rendering is byte-deterministic; this re-renders
+      # in memory and compares, so an unrendered edit fails the build rather than
+      # shipping a document whose text no longer matches its source.
+      - name: Corpus is current
+        run: uv run python tools/build_corpus.py --check
+
+      # CI has no Snowflake account, so this verifies the committed scorecard rather than
+      # re-measuring: every case in eval/cases.json must appear in it, and every dimension
+      # must meet its threshold. Adding a case without re-running --live fails here, which
+      # stops the scorecard describing a smaller problem than the one being solved.
+      - name: Reasoning eval meets threshold
+        run: uv run python tools/evaluate_reasoning.py --check
+
+      # Every counted claim in the README, the rubric alignment and the walkthrough is compared
+      # against what the project's own tools print. Prose cannot be linted; "230 tests" can, and
+      # that figure had already gone stale three times before this gate existed.
+      - name: Documentation claims match the repository
+        run: uv run python tools/check_doc_claims.py
+
+      # Integration tests are excluded by addopts; they need a warehouse.
+      - name: Test
+        run: uv run pytest --cov --cov-report=term-missing
+
+  secrets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Scan for committed secrets
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,52 @@
+[
+  {
+    "doc_id": "RB-001",
+    "title": "Supplier on-time delivery degradation",
+    "category": "supplier",
+    "revision": "7",
+    "effective": "2025-11-03",
+    "owner": "Procurement Operations",
+    "file": "RB-001.pdf",
+    "source": "RB-001-supplier-otd-degradation.md"
+  },
+  {
+    "doc_id": "RB-002",
+    "title": "Projected stockout response",
+    "category": "inventory",
+    "revision": "5",
+    "effective": "2026-02-20",
+    "owner": "Supply Planning",
+    "file": "RB-002.pdf",
+    "source": "RB-002-projected-stockout-response.md"
+  },
+  {
+    "doc_id": "RB-003",
+    "title": "Aging quality hold escalation",
+    "category": "quality",
+    "revision": "4",
+    "effective": "2026-01-15",
+    "owner": "Quality Assurance",
+    "file": "RB-003.pdf",
+    "source": "RB-003-aging-quality-hold-escalation.md"
+  },
+  {
+    "doc_id": "RB-004",
+    "title": "Expedite authorisation thresholds",
+    "category": "logistics",
+    "revision": "3",
+    "effective": "2025-09-11",
+    "owner": "Logistics",
+    "file": "RB-004.pdf",
+    "source": "RB-004-expedite-authorisation-thresholds.md"
+  },
+  {
+    "doc_id": "RB-005",
+    "title": "Duplicate exception suppression",
+    "category": "operations",
+    "revision": "2",
+    "effective": "2025-06-30",
+    "owner": "Operations Excellence",
+    "file": "RB-005.pdf",
+    "source": "RB-005-duplicate-exception-suppression.md"
+  }
+]

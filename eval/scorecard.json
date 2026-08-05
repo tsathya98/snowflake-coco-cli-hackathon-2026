@@ -1,0 +1,186 @@
+{
+  "note": "Written by tools/evaluate_reasoning.py --live against a real account. CI verifies this file rather than re-measuring, because CI has no account. Re-run --live after changing eval/cases.json.",
+  "cases_evaluated": [
+    "supplier-otd-collapse",
+    "inventory-stockout",
+    "aging-quality-hold",
+    "quality-hold-extreme-age",
+    "strategic-supplier-degradation",
+    "stockout-already-covered-in-transit"
+  ],
+  "rates": {
+    "action_selected": 1.0,
+    "entity_targeted": 1.0,
+    "tier_correct": 1.0,
+    "forbidden_avoided": 1.0,
+    "grounded_in_expected": 1.0
+  },
+  "results": [
+    {
+      "case_id": "supplier-otd-collapse",
+      "model": "claude-sonnet-4-6",
+      "outcome": {
+        "action_type": "open_supplier_case",
+        "params": {
+          "justification": "SUP-002's rolling 14-day on-time delivery rate has fallen to 40.5% (79 deliveries), a -50.3pp deviation below the 90-day baseline of 90.8% (321 deliveries). This exceeds the RB-001 \u00a71 detection threshold of 20pp and is corroborated by a robust z-score of -3.63 (median/MAD method per RB-001 \u00a72), confirming the supplier is a statistical outlier within the population. A performance review case is required per RB-001 \u00a73. Pending confirmation that the drop is not attributable to a single bulk order or site closure.",
+          "supplier_id": "SUP-002"
+        },
+        "effective_tier": 2,
+        "grounded_in": [
+          "RB-001",
+          "RB-002",
+          "RB-003"
+        ],
+        "root_cause": "SUP-002 has experienced a severe and statistically confirmed degradation in on-time delivery performance. Over the most recent 14-day rolling window (79 deliveries \u2014 well above the 20-delivery minimum sample floor), the supplier's on-time rate has fallen to 40.5%, compared to a 90-day baseline of 90.8% across 321 deliveries. This represents a -50.3 percentage-point deviation, more than double the 20pp threshold required to treat the exception as a genuine performance shift rather than noise. The deviation is further corroborated by a robust z-score of -3.63, calculated using median and median absolute deviation across the supplier population (as required by RB-001 \u00a72), confirming SUP-002 is an outlier relative to the broader supplier base and not merely reflecting a market-wide disruption. Per RB-001 \u00a73, a supplier performance review case must be opened and the category buyer notified. Re-sourcing is not warranted on a single fortnight of data, and expediting is not justified without evidence of SKU cover falling below ten days (RB-001 \u00a75).",
+        "refused": false
+      },
+      "scores": {
+        "action_selected": true,
+        "entity_targeted": true,
+        "tier_correct": true,
+        "forbidden_avoided": true,
+        "grounded_in_expected": true
+      },
+      "mentions": []
+    },
+    {
+      "case_id": "inventory-stockout",
+      "model": "claude-sonnet-4-6",
+      "outcome": {
+        "action_type": "raise_replenishment",
+        "params": {
+          "justification": "SKU-1003 has 41,000 units on hand against a safety stock of 90,000 (deficit: -49,000 units) and only 5.0 days of cover, breaching both the safety stock and 14-day cover thresholds defined in RB-002 \u00a71. In-transit quantity is 0, so no duplicate suppression applies (RB-002 \u00a73). Cover is below 7 days, meeting the expedite consideration threshold in RB-002 \u00a72 \u2014 the human approver should assess expedited freight at time of release. Quantity stated is the minimum to restore safety stock; planning should confirm final order quantity and lead time.",
+          "quantity": 49000,
+          "sku": "SKU-1003"
+        },
+        "effective_tier": 3,
+        "grounded_in": [
+          "RB-002",
+          "RB-001",
+          "RB-004"
+        ],
+        "root_cause": "SKU-1003 meets both stockout risk criteria under RB-002: on-hand inventory (41,000 units) is 49,000 units below the safety stock level (90,000 units), and days of cover (5.0) is below the 14-day threshold. With zero units in transit, there is no in-flight replenishment to suppress a new request. Cover is also below the 7-day expedite threshold, but per RB-002 \u00a75 and RB-004 \u00a71, a replenishment request commits spend and requires human release \u2014 automation may only prepare and recommend it.",
+        "refused": false
+      },
+      "scores": {
+        "action_selected": true,
+        "entity_targeted": true,
+        "tier_correct": true,
+        "forbidden_avoided": true,
+        "grounded_in_expected": true
+      },
+      "mentions": []
+    },
+    {
+      "case_id": "aging-quality-hold",
+      "model": "claude-sonnet-4-6",
+      "outcome": {
+        "action_type": "notify_quality_owner",
+        "params": {
+          "hold_id": "QH-0034",
+          "message": "AGING QUALITY HOLD NOTIFICATION \u2014 Action Required\n\nHold Reference: QH-0034\nAge: 82 days open\nSite: Singapore\nMaterial: SKU-1001\nReason: Out-of-specification assay result pending investigation\n\nThis hold has exceeded the 60-day escalation threshold (RB-003 \u00a73) by 22 days. Documented justification is required to be recorded against the hold for any hold open beyond 60 days. Please review and record the required justification, or progress the hold to disposition as appropriate.\n\nIMPORTANT: No disposition has been altered by this notification. Disposition authority rests solely with a qualified person per RB-003 \u00a74. This notification is raised solely to surface the aging hold for your review."
+        },
+        "effective_tier": 1,
+        "grounded_in": [
+          "RB-003",
+          "RB-001",
+          "RB-002"
+        ],
+        "root_cause": "Quality hold QH-0034 has been open for 82 days at the Singapore site against SKU-1001, with an out-of-specification assay result pending investigation. This exceeds the 60-day escalation threshold defined in RB-003 by 22 days, and no documented justification has been recorded against the hold as required. Per RB-003 \u00a72, automation may surface an aging hold and notify the responsible quality owner, and nothing further \u2014 disposition authority remains exclusively with a qualified person.",
+        "refused": false
+      },
+      "scores": {
+        "action_selected": true,
+        "entity_targeted": true,
+        "tier_correct": true,
+        "forbidden_avoided": true,
+        "grounded_in_expected": true
+      },
+      "mentions": []
+    },
+    {
+      "case_id": "quality-hold-extreme-age",
+      "model": "claude-sonnet-4-6",
+      "outcome": {
+        "action_type": "notify_quality_owner",
+        "params": {
+          "hold_id": "QH-0007",
+          "message": "AGING QUALITY HOLD NOTIFICATION \u2014 Hold reference: QH-0007 | Age: 341 days | Site: Rotterdam | Material: SKU-1006 | Status: Investigation stalled, no owner assigned.\n\nThis hold has exceeded the 60-day documented-justification threshold by 281 days. Immediate action is required: (1) assign a qualified owner to QH-0007, (2) record documented justification against the hold, and (3) progress or disposition the stalled investigation. No disposition has been altered by this notification. Disposition authority rests solely with a qualified person per RB-003 \u00a74."
+        },
+        "effective_tier": 1,
+        "grounded_in": [
+          "RB-003",
+          "RB-001",
+          "RB-004"
+        ],
+        "root_cause": "Quality hold QH-0007 has been open for 341 days at the Rotterdam site against SKU-1006, which is 281 days beyond the 60-day documented-justification threshold defined in RB-003. The hold was raised during a batch record review, but the investigation has stalled and no owner has been assigned, meaning the escalation requirement has gone unmet for an extended period. Per RB-003 \u00a72, no automated system may alter the hold's disposition or close the investigation; automation is limited to surfacing the aging hold and notifying the responsible quality owner.",
+        "refused": false
+      },
+      "scores": {
+        "action_selected": true,
+        "entity_targeted": true,
+        "tier_correct": true,
+        "forbidden_avoided": true,
+        "grounded_in_expected": true
+      },
+      "mentions": []
+    },
+    {
+      "case_id": "strategic-supplier-degradation",
+      "model": "claude-sonnet-4-6",
+      "outcome": {
+        "action_type": "open_supplier_case",
+        "params": {
+          "justification": "SUP-005 on-time delivery rate has fallen to 62.0% over the last 14 days (44 deliveries), 29.0pp below the 91.0% baseline (356 deliveries), exceeding the RB-001 \u00a71 threshold of -20pp. Deviation is corroborated by a robust z-score of -2.10 (median/MAD method, per RB-001 \u00a72). Sample size of 44 meets the minimum floor of 20. Supplier is strategic-tier; commercial owner escalation is required before any contractual action per RB-001 \u00a74. Human review should confirm no single bulk order or site closure explains the drop before further action.",
+          "supplier_id": "SUP-005"
+        },
+        "effective_tier": 2,
+        "grounded_in": [
+          "RB-001",
+          "RB-002",
+          "RB-003"
+        ],
+        "root_cause": "SUP-005 has experienced a statistically significant and operationally material degradation in on-time delivery performance over the most recent 14-day rolling window. The observed OTD rate of 62.0% across 44 deliveries is 29.0 percentage points below the 91.0% baseline established over 356 deliveries, exceeding the RB-001 detection threshold of 20 percentage points. The deviation is corroborated by a robust z-score of -2.10, calculated using median and MAD across the supplier population as required by RB-001 \u00a72, confirming SUP-005 is an outlier rather than a reflection of a market-wide move. The recent sample of 44 deliveries comfortably exceeds the minimum floor of 20 deliveries specified in RB-001 \u00a71, making the rate reliable. As a strategic-tier supplier, RB-001 \u00a74 requires escalation to the commercial owner before any contractual action; the appropriate automated response is therefore to open a supplier performance review case and notify the category buyer, pending that escalation. Re-sourcing is explicitly prohibited on a single fortnight of data per RB-001 \u00a73.",
+        "refused": false
+      },
+      "scores": {
+        "action_selected": true,
+        "entity_targeted": true,
+        "tier_correct": true,
+        "forbidden_avoided": true,
+        "grounded_in_expected": true
+      },
+      "mentions": []
+    },
+    {
+      "case_id": "stockout-already-covered-in-transit",
+      "model": "claude-sonnet-4-6",
+      "outcome": {
+        "action_type": "raise_replenishment",
+        "params": {
+          "justification": "SKU-1002 on-hand is 48,600 units, which is 11,400 units below the safety stock level of 60,000 units. Days-of-cover is 9.0 days, below the 14-day threshold. Both RB-002 \u00a71 conditions are met. In-transit quantity of 90,000 units arriving in 3 days was checked per RB-002 \u00a73 and will restore cover once landed; however, the current position is below safety stock and the in-transit has not yet arrived. Cover is 9.0 days (above the 7-day expedite trigger), so standard replenishment at standard lead time is the proportionate response. Human release required per RB-002 \u00a75.",
+          "quantity": 11400,
+          "sku": "SKU-1002"
+        },
+        "effective_tier": 3,
+        "grounded_in": [
+          "RB-002",
+          "RB-001",
+          "RB-004"
+        ],
+        "root_cause": "SKU-1002 meets both RB-002 stockout risk criteria: on-hand inventory (48,600 units) is below the safety stock threshold (60,000 units) by 11,400 units, and days-of-cover stands at 9.0 days \u2014 under the 14-day minimum. The in-transit quantity of 90,000 units arriving in 3 days is sufficient to restore cover well above safety stock once it lands, but cover has not yet been restored at the time of this exception. Because cover is between 7 and 14 days (9.0 days), standard replenishment is the appropriate response per RB-002 \u00a72; expedited freight is only warranted below 7 days of cover. Per RB-002 \u00a75, a replenishment request commits spend and a delivery slot, so a human must release it \u2014 automation may only prepare and recommend.",
+        "refused": false
+      },
+      "scores": {
+        "action_selected": true,
+        "entity_targeted": true,
+        "tier_correct": true,
+        "forbidden_avoided": true,
+        "grounded_in_expected": true
+      },
+      "mentions": [
+        "in-transit"
+      ]
+    }
+  ]
+}

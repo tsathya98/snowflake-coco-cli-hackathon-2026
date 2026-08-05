@@ -1,0 +1,15 @@
+# Normalise text to LF in the repository, so a Windows checkout cannot introduce a
+# whitespace-only diff that CI's `ruff format --check` then reports as a formatting failure.
+* text=auto eol=lf
+
+# The corpus PDFs are generated, committed, and byte-compared in CI by
+# tools/build_corpus.py --check. If git ever decided one of them was text and normalised its line
+# endings, the comparison would fail on a checkout rather than on a real change — and the failure
+# would look like a stale document. So git is told explicitly never to touch their bytes.
+#
+# This rule comes AFTER the wildcard on purpose: in .gitattributes the LAST matching rule wins, so
+# with the order reversed `*` re-enables text conversion for PDFs and silently undoes this.
+*.pdf -text -diff
+
+# Screenshots of the running console, for the same reason and with the same ordering caveat.
+*.png -text -diff

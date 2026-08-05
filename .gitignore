@@ -1,0 +1,59 @@
+
+.DS_Store
+*.pyc
+__pycache__/
+.env
+# Secrets — never commit
+*.pem
+*.p8
+connections.toml
+secrets/
+
+# Python
+*.py[cod]
+.venv/
+# A second env dir is normal here: the Snowflake CLI lives in WSL and creates a POSIX .venv,
+# which Windows uv rejects. Keep the toolchains apart with UV_PROJECT_ENVIRONMENT.
+.venv-*/
+venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+dist/
+build/
+
+# Tooling
+.idea/
+.vscode/
+.cortex/cache/
+.cortex/logs/
+.cortex/conversations/
+
+# Submission Template
+submission_template/output/
+
+# snow CLI build artefacts
+output/
+
+# ---------------------------------------------------------------------------
+# Working material, deliberately untracked rather than deleted.
+#
+# These are useful to *build* the submission and unpublishable *as* the
+# submission: they carry the account locator, the escalation address, notes on
+# the employer-IP boundary, and an assessment of other teams' repositories.
+# They remain on disk (and are archived to ~/coco-archive) so the work can
+# continue; git simply stops carrying them to a repository that goes public.
+#
+# Untracking does not rewrite history. The commits that already contain them
+# are still reachable, which is why the go-public step squashes to a single
+# orphan commit rather than relying on this file.
+# ---------------------------------------------------------------------------
+PRE_SUBMISSION.md
+docs/research/
+docs/submission_template/
+docs/agent_onboarding_prompt.md
+docs/notes_from_video_sessions.md
+docs/SESSION_HANDOFF.md
+docs/demo_runbook.md
