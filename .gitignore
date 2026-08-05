@@ -71,3 +71,5 @@ web/.vercel/
 .env*.local
 *.p8
 *.pem
+web/*.tsbuildinfo
+web/next-env.d.ts

@@ -68,6 +68,26 @@ GRANT SELECT ON TABLE WARRANT.CORE.PENDING_ACTIONS  TO ROLE WARRANT_PUBLIC;
 GRANT SELECT ON TABLE WARRANT.AUDIT.ACTION_AUDIT    TO ROLE WARRANT_PUBLIC;
 GRANT SELECT ON TABLE WARRANT.DATA.QUALITY_HOLDS    TO ROLE WARRANT_PUBLIC;
 
+-- The remaining operational tables.
+--
+-- Needed not to display their rows but to read their *tags*: SYSTEM$GET_TAG will
+-- not disclose a tag on an object the role holds no privilege on, and answers
+-- "does not exist or not authorized" instead. The governance panel is the one
+-- place this viewer has to prove the classification live, so it must be able to
+-- ask. ACCOUNT_USAGE.TAG_REFERENCES would avoid the grant and is deliberately not
+-- used anywhere in this project — it lags by up to two hours, and a governance
+-- change that takes two hours to appear is not the claim being made.
+--
+-- The data is synthetic, and this widens what the role may *see*, never what it
+-- may do. The masking policy on QUALITY_HOLDS.lot_ref still applies: it is
+-- attached to the column and follows the role.
+GRANT SELECT ON TABLE WARRANT.DATA.SHIPMENTS        TO ROLE WARRANT_PUBLIC;
+GRANT SELECT ON TABLE WARRANT.DATA.SUPPLIERS        TO ROLE WARRANT_PUBLIC;
+GRANT SELECT ON TABLE WARRANT.DATA.SKUS             TO ROLE WARRANT_PUBLIC;
+GRANT SELECT ON TABLE WARRANT.DATA.INVENTORY        TO ROLE WARRANT_PUBLIC;
+GRANT SELECT ON TABLE WARRANT.DATA.OPS_REQUESTS     TO ROLE WARRANT_PUBLIC;
+GRANT SELECT ON TABLE WARRANT.DATA.RUNBOOKS         TO ROLE WARRANT_PUBLIC;
+
 -- The semantic view, so the public app reads the same metric definitions the
 -- agent answers from rather than re-deriving on-time rate in its own SQL.
 GRANT SELECT ON SEMANTIC VIEW WARRANT.CORE.OPS_ANALYSIS TO ROLE WARRANT_PUBLIC;

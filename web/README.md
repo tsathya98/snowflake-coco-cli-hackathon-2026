@@ -1,0 +1,81 @@
+# Warrant — public read-only viewer
+
+The governed console lives in Snowflake, where a reviewer signs in as themselves and an approval
+is attributable to a person. Streamlit in Snowflake [cannot be shared with anyone who does not
+have a Snowflake account][sharing], so this exists: a public surface that can read what the agent
+decided and why, and cannot decide anything.
+
+That limit is not a UI convention. It is enforced in grants — see
+[`sql/50_public_viewer.sql`](../sql/50_public_viewer.sql). `WARRANT_PUBLIC` holds `SELECT` on the
+operational tables and `USAGE` on the two procedures that only compute. It has no grant on
+`EXECUTE_ACTION`, `EXECUTE_APPROVED`, `RUN_LOOP` or `GENERATE_AUDIT_PACK`. A missing button is a
+decision a bug can undo; a missing grant is Snowflake refusing the statement.
+
+Approving is a governed act, so it belongs to the surface that has an identity. This is the same
+reason the Cortex Agent is given no tool bound to the executor.
+
+[sharing]: https://docs.snowflake.com/en/developer-guide/streamlit/features/sharing-streamlit-apps
+
+## Running it locally
+
+```bash
+cd web
+npm install
+npm run probe      # connectivity + the read-only boundary, before anything else
+npm run dev
+```
+
+`npm run probe` is worth running first and worth reading. It proves four things cheapest-first, so
+a failure names its own cause: the key is accepted, the session is the role and warehouse
+intended, a real query returns rows, and **`EXECUTE_ACTION` is refused**. That last assertion is
+the point — a regression in the grants shows up here rather than as an action nobody authorised.
+
+## Configuration
+
+Four variables. Nothing else is read.
+
+| Variable | Value |
+|---|---|
+| `SNOWFLAKE_ACCOUNT` | `<org>-<account>`, the same identifier the `snow` CLI uses |
+| `SNOWFLAKE_USER` | `WARRANT_PUBLIC_SVC` |
+| `SNOWFLAKE_PRIVATE_KEY` | the PKCS#8 private key, PEM including header and footer |
+| `SNOWFLAKE_ROLE` / `SNOWFLAKE_WAREHOUSE` | optional; default to `WARRANT_PUBLIC` / `WARRANT_PUBLIC_WH` |
+
+Generate the pair and register the public half:
+
+```bash
+openssl genrsa 2048 | openssl pkcs8 -topk8 -inform PEM -out warrant_public.p8 -nocrypt
+openssl rsa -in warrant_public.p8 -pubout -out warrant_public.pub
+snow sql -c <conn> -q "ALTER USER WARRANT_PUBLIC_SVC SET RSA_PUBLIC_KEY = '<key, header and footer stripped>';"
+```
+
+Keep the private key outside the repository — this repository is public, and `*.p8`, `*.pem` and
+`.env*.local` are ignored so a stray copy cannot be committed by accident.
+
+**Newlines are the one trap.** Some deployment platforms store a multi-line secret with literal
+`\n` two-character sequences rather than real newlines. `lib/snowflake.ts` accepts both, because
+the failure otherwise is an opaque `ERR_OSSL_UNSUPPORTED` at connect time that reads like a broken
+key rather than a mangled one.
+
+## Deploying to Vercel
+
+Root directory `web`. Framework preset Next.js, everything else default. Add the four variables
+above. The build needs no Snowflake access — every page is `force-dynamic` and queries at request
+time.
+
+## How it is built
+
+- **Next.js 16, App Router, server components.** The page queries Snowflake directly during the
+  render; there is no API layer to secure separately and no client-side credential.
+- **No cache, anywhere.** `force-dynamic` and `revalidate = 0`. The central claim is that
+  reclassifying a table changes the agent's authority immediately, and a cached tag read would
+  hide precisely that. It costs a warehouse resume on a cold request and is worth it.
+- **Statements are module constants** in `lib/queries.ts`, values bind with `?`. That is the same
+  boundary `tools/lint_sql_boundary.py` enforces on the Python side, extended to the web tier.
+- **One connection per serverless instance**, cached as a promise so two requests arriving during
+  the handshake wait on one attempt rather than opening two sessions.
+- **The visual vocabulary matches the Streamlit console** — same tier names, same outcome names,
+  same chips and tiles — so a reader moving between the two surfaces is not asked to learn a
+  second language for the same ideas.
+- **Colour never carries meaning alone.** Every chip prints its label, every tile its caption. The
+  pointer-reactive lighting is decorative and disabled under `prefers-reduced-motion`.
