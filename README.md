@@ -148,6 +148,47 @@ The two dotted edges are the whole idea: authority is read from the governance t
 time **and read again at execution time**, so an approval cannot outlive the policy it was
 granted under.
 
+### The same claim, in order
+
+A flowchart shows what connects to what. It cannot show *when* — and the entire argument here is
+about ordering. This is the escalated action from the run above, with a governance change landing
+between the approval and the write:
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Reviewer
+    participant C as Console<br/>(Streamlit in Snowflake)
+    participant X as EXECUTE_ACTION
+    participant T as SENSITIVITY tag
+    participant D as WARRANT.DATA
+    participant A as ACTION_AUDIT<br/>(append-only)
+
+    Note over T: INVENTORY = 'internal'
+    C->>T: SYSTEM$GET_TAG (at proposal)
+    T-->>C: internal → L3, needs a human
+    C->>A: route · awaiting approval
+
+    Note over T,D: Governance reclassifies the table.<br/>No deploy. No code change.
+    Note over T: INVENTORY = 'regulated'
+
+    Reviewer->>C: Approve and execute
+    C->>A: route · approved by TSATHYA98
+    C->>X: dispatch(action_id)
+
+    X->>T: SYSTEM$GET_TAG again, now
+    T-->>X: regulated → L4, forbidden
+    X -x D: write NOT performed
+    X->>A: refuse · classification at execution time governs
+    X-->>C: refused
+    C-->>Reviewer: "Your approval was recorded.<br/>The action was not taken."
+```
+
+Step 4 records the approval and step 11 records the refusal — **both** survive in the log, because
+an audit trail that only keeps the outcome cannot answer who tried. Note also that the reviewer is
+never asked again: their intent was genuine and is preserved. What changed is the authority, and
+the check that catches it is a tag read the model is not party to.
+
 <details>
 <summary>The same loop, step by step</summary>
 
