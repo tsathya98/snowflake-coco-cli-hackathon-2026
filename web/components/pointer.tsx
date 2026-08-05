@@ -1,81 +1,111 @@
 "use client";
 
 /**
- * Pointer-reactive lighting.
+ * Pointer-reactive lighting and scroll reveals.
  *
- * Two effects, both driven by CSS custom properties rather than by React state:
- * an ambient glow that follows the cursor across the page, and a spotlight local
- * to whichever card is under it.
+ * Three effects, none of which carries meaning:
+ *   - an ambient glow that follows the cursor across the viewport
+ *   - a spotlight local to whichever card is under it
+ *   - a one-shot fade-and-rise as each section first enters view
  *
- * Written as direct style writes inside a requestAnimationFrame, never as
- * `setState`. A pointermove handler that re-renders would re-render the whole
- * tree at pointer frequency; here React renders once and the browser composites
- * the rest. One listener is delegated at the document rather than one per card,
- * so adding a card costs nothing.
+ * All of it is driven by CSS custom properties and attributes written directly to
+ * the DOM inside a requestAnimationFrame, never by React state. A pointermove
+ * handler that called setState would re-render the tree at pointer frequency;
+ * here React renders once and the browser composites the rest. The listeners are
+ * delegated at the window, so adding a card costs nothing.
  *
- * Disabled entirely under `prefers-reduced-motion`. Nothing here carries meaning —
- * it is lighting — so removing it costs a reader nothing, and motion that tracks
- * the cursor is exactly the kind that provokes symptoms in people who set that
- * preference.
+ * The hidden state for the reveal is applied *by this script*, not by the
+ * stylesheet — so if the JS never runs, every section is simply visible. A CSS-only
+ * `opacity: 0` would leave a reader with a blank page when it fails.
+ *
+ * Everything is skipped under `prefers-reduced-motion`, and the pointer effects are
+ * additionally gated on a fine pointer: on a phone there is no cursor to follow and
+ * the work would only cost battery.
  */
 
 import { useEffect } from "react";
 
 export function PointerGlow() {
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    const cleanups: (() => void)[] = [];
 
-    const root = document.documentElement;
-    let frame = 0;
-    let x = 0;
-    let y = 0;
-    let hovered: HTMLElement | null = null;
+    if (!calm) {
+      const sections = Array.from(document.querySelectorAll<HTMLElement>("[data-reveal]"));
+      sections.forEach((el) => el.setAttribute("data-reveal", "pending"));
 
-    const paint = () => {
-      frame = 0;
-      root.style.setProperty("--mx", `${x}px`);
-      root.style.setProperty("--my", `${y}px`);
+      const observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (!entry.isIntersecting) continue;
+            const el = entry.target as HTMLElement;
+            // Stagger by position within its group so a row of tiles arrives as a
+            // sweep rather than all at once.
+            const delay = Number(el.dataset.revealDelay ?? 0);
+            window.setTimeout(() => el.setAttribute("data-reveal", "shown"), delay);
+            observer.unobserve(el);
+          }
+        },
+        { rootMargin: "0px 0px -8% 0px", threshold: 0.08 },
+      );
+      sections.forEach((el) => observer.observe(el));
+      cleanups.push(() => observer.disconnect());
+    }
 
-      if (hovered) {
-        const box = hovered.getBoundingClientRect();
-        hovered.style.setProperty("--gx", `${((x - box.left) / box.width) * 100}%`);
-        hovered.style.setProperty("--gy", `${((y - box.top) / box.height) * 100}%`);
-      }
-    };
+    if (!calm && fine) {
+      const root = document.documentElement;
+      let frame = 0;
+      let x = 0;
+      let y = 0;
+      let hovered: HTMLElement | null = null;
 
-    const onMove = (event: PointerEvent) => {
-      x = event.clientX;
-      y = event.clientY;
+      const paint = () => {
+        frame = 0;
+        root.style.setProperty("--mx", `${x}px`);
+        root.style.setProperty("--my", `${y}px`);
+        if (hovered) {
+          const box = hovered.getBoundingClientRect();
+          hovered.style.setProperty("--gx", `${((x - box.left) / box.width) * 100}%`);
+          hovered.style.setProperty("--gy", `${((y - box.top) / box.height) * 100}%`);
+        }
+      };
 
-      const over = (event.target as Element | null)?.closest?.("[data-glow]") as HTMLElement | null;
-      if (over !== hovered) {
-        // Clear the outgoing card's spotlight, or it freezes mid-fade where the
-        // pointer happened to leave.
+      const onMove = (event: PointerEvent) => {
+        x = event.clientX;
+        y = event.clientY;
+        const over = (event.target as Element | null)?.closest?.(
+          "[data-glow]",
+        ) as HTMLElement | null;
+        if (over !== hovered) {
+          // Clear the outgoing card, or its spotlight freezes wherever the pointer left.
+          hovered?.style.removeProperty("--gx");
+          hovered?.style.removeProperty("--gy");
+          hovered = over;
+        }
+        if (!frame) frame = requestAnimationFrame(paint);
+      };
+
+      // On the window rather than the document: leaving through browser chrome fires
+      // no final move, and the glow would stay lit in the corner.
+      const onLeave = () => {
+        root.style.removeProperty("--mx");
+        root.style.removeProperty("--my");
         hovered?.style.removeProperty("--gx");
         hovered?.style.removeProperty("--gy");
-        hovered = over;
-      }
+        hovered = null;
+      };
 
-      if (!frame) frame = requestAnimationFrame(paint);
-    };
+      window.addEventListener("pointermove", onMove, { passive: true });
+      window.addEventListener("pointerleave", onLeave);
+      cleanups.push(() => {
+        window.removeEventListener("pointermove", onMove);
+        window.removeEventListener("pointerleave", onLeave);
+        if (frame) cancelAnimationFrame(frame);
+      });
+    }
 
-    // `pointerleave` on the window, not the document: leaving through a browser
-    // chrome edge does not fire a final move, and the glow would stay lit.
-    const onLeave = () => {
-      root.style.removeProperty("--mx");
-      root.style.removeProperty("--my");
-      hovered?.style.removeProperty("--gx");
-      hovered?.style.removeProperty("--gy");
-      hovered = null;
-    };
-
-    window.addEventListener("pointermove", onMove, { passive: true });
-    window.addEventListener("pointerleave", onLeave);
-    return () => {
-      window.removeEventListener("pointermove", onMove);
-      window.removeEventListener("pointerleave", onLeave);
-      if (frame) cancelAnimationFrame(frame);
-    };
+    return () => cleanups.forEach((fn) => fn());
   }, []);
 
   return <div className="ambient" aria-hidden="true" />;

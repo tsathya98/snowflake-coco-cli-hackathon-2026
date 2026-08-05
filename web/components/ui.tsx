@@ -2,61 +2,143 @@
  * The shared visual vocabulary, matching streamlit/warrant_console.py.
  *
  * One chip renderer, one tile renderer, one accent mapping. Both surfaces of this
- * project use the same shapes and the same words so a reader moving between them
- * is not asked to learn a second language for the same ideas.
+ * project use the same shapes and the same words, so a reader moving between them is
+ * not asked to learn a second language for the same ideas.
  *
- * Colour never carries a meaning on its own here. Every chip prints its label,
- * every tile prints its caption, and every accent is paired with text that says
- * the same thing — a colour alone is invisible to a colourblind reader and to a
- * screen reader, and this page is partly an argument about auditability.
+ * Colour never carries a meaning on its own. Every chip prints its label, every tile
+ * its caption, and every accent is paired with text saying the same thing — a colour
+ * alone is invisible to a colourblind reader and to a screen reader, and this page is
+ * partly an argument about auditability.
+ *
+ * Responsive rules worth knowing: tables scroll horizontally inside `.scroller` rather
+ * than crushing six columns into 360px, tile rows collapse 5 → 2 → 1, and every
+ * interactive target keeps a 44px minimum height on touch.
  */
 
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
-/** A CSS accent token: one of good, warn, bad, info, model, muted. */
+/** A CSS accent token: good, warn, bad, info, model, muted. */
 type Tone = string;
 
-const accent = (tone: Tone) => ({ ["--accent" as string]: `var(--${tone})` }) as React.CSSProperties;
+const tone = (name: Tone) => ({ ["--tone" as string]: `var(--${name})` }) as CSSProperties;
+
+export function Reveal({
+  children,
+  delay = 0,
+  className = "",
+}: {
+  children: ReactNode;
+  delay?: number;
+  className?: string;
+}) {
+  return (
+    <div data-reveal data-reveal-delay={delay} className={className}>
+      {children}
+    </div>
+  );
+}
 
 export function Tiles({ figures }: { figures: [string, ReactNode, Tone][] }) {
   return (
-    <div className="tiles">
-      {figures.map(([label, value, tone]) => (
-        <div className="tile" data-glow key={label} style={accent(tone)}>
-          <div className="value">{value}</div>
-          <div className="label">{label}</div>
-        </div>
+    <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-5">
+      {figures.map(([label, value, name], i) => (
+        <Reveal key={label} delay={i * 60}>
+          <div
+            data-glow
+            style={tone(name)}
+            className="h-full rounded-xl border border-[var(--line)] border-t-[3px] bg-[var(--surface)] px-4 py-3 transition-colors duration-300"
+          >
+            <div
+              className="text-[1.7rem] font-extrabold leading-none tracking-[-0.03em]"
+              style={{ color: `var(--${name})` }}
+            >
+              {value}
+            </div>
+            <div className="mt-1.5 text-[0.62rem] font-bold uppercase tracking-[0.1em] text-[var(--text-muted)]">
+              {label}
+            </div>
+          </div>
+        </Reveal>
       ))}
     </div>
   );
 }
 
-export function Chip({ children, tone }: { children: ReactNode; tone: Tone }) {
+export function Chip({ children, tone: name }: { children: ReactNode; tone: Tone }) {
   return (
-    <span className="chip" style={accent(tone)}>
+    <span
+      className="mb-1 mr-1.5 inline-block rounded-full px-2.5 py-[3px] text-[0.68rem] font-bold tracking-wide"
+      style={{ background: `var(--${name})`, color: "var(--chip-ink)" }}
+    >
       {children}
     </span>
   );
 }
 
 export function Tag({ children }: { children: ReactNode }) {
-  return <span className="tag">{children}</span>;
+  return (
+    <span className="mb-1 mr-1.5 inline-block rounded-md border border-[var(--line)] bg-[var(--surface-hi)] px-1.5 py-0.5 font-mono text-[0.68rem] text-[var(--text-soft)]">
+      {children}
+    </span>
+  );
 }
 
-/** A callout whose border and tint take the accent, and whose text says why. */
-export function Note({ tone, children }: { tone: Tone; children: ReactNode }) {
+export function Note({ tone: name, children }: { tone: Tone; children: ReactNode }) {
   return (
-    <div className="note" data-glow style={accent(tone)}>
-      {children}
-    </div>
+    <Reveal>
+      <div
+        data-glow
+        style={{
+          ...tone(name),
+          borderColor: `color-mix(in srgb, var(--${name}) 45%, transparent)`,
+          // The tint derives from the same token as the border, so a new tone cannot
+          // half-apply — one name drives both.
+          background: `color-mix(in srgb, var(--${name}) 10%, transparent)`,
+        }}
+        className="rounded-xl border p-4 text-[0.9rem] leading-relaxed sm:px-5"
+      >
+        {children}
+      </div>
+    </Reveal>
   );
 }
 
 export function ModelText({ children }: { children: ReactNode }) {
   return (
-    <div className="model">
-      <div className="stamp">&#9670; model-generated</div>
-      <div>{children}</div>
+    <div
+      className="rounded-r-xl border-l-[3px] p-3.5 text-[0.92rem] leading-relaxed sm:p-4"
+      style={{
+        borderColor: "var(--model)",
+        background: "color-mix(in srgb, var(--model) 11%, transparent)",
+      }}
+    >
+      <div
+        className="mb-1.5 text-[0.63rem] font-extrabold uppercase tracking-[0.12em]"
+        style={{ color: "var(--model)" }}
+      >
+        &#9670; model-generated
+      </div>
+      <div className="text-[var(--text)]">{children}</div>
+    </div>
+  );
+}
+
+export function Card({
+  tone: name,
+  children,
+  className = "",
+}: {
+  tone: Tone;
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <div
+      data-glow
+      style={{ ...tone(name), borderLeftColor: `var(--${name})` }}
+      className={`rounded-r-xl border border-l-[4px] border-[var(--line)] bg-[var(--surface)] p-4 transition-colors duration-300 ${className}`}
+    >
+      {children}
     </div>
   );
 }
@@ -64,8 +146,12 @@ export function ModelText({ children }: { children: ReactNode }) {
 /**
  * A table from plain rows.
  *
- * @param columns `[key, heading, numeric?]`. `numeric` right-aligns and sets the
+ * @param columns `[key, heading, numeric?]`. `numeric` right-aligns and switches to the
  *   monospace face so figures line up down the column.
+ *
+ * Wrapped in `.scroller` so a phone scrolls sideways instead of wrapping every cell to
+ * three lines. `min-w-[640px]` guarantees there is something to scroll rather than a
+ * squeezed, unreadable grid.
  */
 export function Table({
   columns,
@@ -75,45 +161,68 @@ export function Table({
   rows: Record<string, unknown>[];
 }) {
   return (
-    <table>
-      <thead>
-        <tr>
-          {columns.map(([key, heading]) => (
-            <th key={key}>{heading}</th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {rows.map((row, index) => (
-          <tr key={index}>
-            {columns.map(([key, , numeric]) => (
-              <td key={key} className={numeric ? "num" : undefined}>
-                {String(row[key] ?? "-")}
-              </td>
+    <div className="scroller -mx-4 px-4 sm:mx-0 sm:px-0">
+      <table className="w-full min-w-[640px] border-separate border-spacing-0 overflow-hidden rounded-xl border border-[var(--line)] text-[0.84rem]">
+        <thead>
+          <tr>
+            {columns.map(([key, heading]) => (
+              <th
+                key={key}
+                className="border-b border-[var(--line)] bg-[var(--surface-hi)] px-3 py-2.5 text-left text-[0.62rem] font-bold uppercase tracking-[0.1em] text-[var(--text-muted)]"
+              >
+                {heading}
+              </th>
             ))}
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {rows.map((row, index) => (
+            <tr key={index} className="transition-colors hover:bg-[var(--surface)]">
+              {columns.map(([key, , numeric]) => (
+                <td
+                  key={key}
+                  className={`border-b border-[var(--line)] px-3 py-2.5 text-[var(--text-soft)] ${
+                    numeric ? "text-right font-mono tabular-nums" : ""
+                  }`}
+                >
+                  {String(row[key] ?? "-")}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
 
 export function Section({
   id,
+  eyebrow,
   title,
   lede,
   children,
 }: {
   id: string;
+  eyebrow: string;
   title: string;
   lede: ReactNode;
   children: ReactNode;
 }) {
   return (
-    <section id={id}>
-      <h2>{title}</h2>
-      <p>{lede}</p>
-      {children}
+    <section id={id} className="scroll-mt-20 py-9 sm:py-12">
+      <Reveal>
+        <div className="mb-1.5 text-[0.65rem] font-bold uppercase tracking-[0.16em] text-[var(--info)]">
+          {eyebrow}
+        </div>
+        <h2 className="text-[1.4rem] font-bold leading-tight tracking-[-0.02em] sm:text-[1.72rem]">
+          {title}
+        </h2>
+        <p className="mt-2.5 max-w-[80ch] text-[0.92rem] leading-relaxed text-[var(--text-soft)]">
+          {lede}
+        </p>
+      </Reveal>
+      <div className="mt-5">{children}</div>
     </section>
   );
 }

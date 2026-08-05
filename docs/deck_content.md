@@ -13,7 +13,7 @@ the data is 100% synthetic — say so on the slide rather than letting a judge w
 
 ## Slide 1 — Cover
 
-- **Team name:** _(fill in)_
+- **Team name:** Argmax
 - **Problem Statement:** PS1 — Intelligent Workflow Automation Agent
 - **Team leader:** Sathya T
 - **Team size:** 1
@@ -129,7 +129,7 @@ is a gate rather than an aspiration.
 | Statistical separation of the planted anomaly (robust *z*) | **−3.63 vs −0.46 next-worst** |
 | Reasoning eval — cases × scoring dimensions passed | **6 × 5, all** |
 | Hostile document in the grounding corpus: findings that cited it / routings it changed | **6 of 6 / 0** |
-| Tests / branch coverage / mypy-strict errors | **189 / 100% / 0** |
+| Tests / branch coverage / mypy-strict errors | **234 / 100% / 0** |
 
 ### The number that matters
 

@@ -1,382 +1,210 @@
+@import "tailwindcss";
+
 /*
  * One token set, two themes, swapped at :root.
  *
- * Warm neutrals rather than the blue-grey default: an operations console is read
- * for long stretches and a warm ground is easier to sit with. Every accent below
- * clears 4.5:1 against its own theme's surface, because colour on this page always
- * accompanies a word and must never be the only thing carrying a meaning.
+ * Warm neutrals rather than blue-grey: an operations console is read for long stretches
+ * and a warm ground is easier to sit with. Every accent clears 4.5:1 against its own
+ * theme's surface, because colour on this page always accompanies a word and must never
+ * be the only thing carrying a meaning.
  *
- * The vocabulary matches streamlit/warrant_console.py deliberately — same tier
- * names, same outcome names, same chip and tile shapes — so the public viewer and
- * the governed console read as one product rather than two builds of one idea.
+ * The vocabulary matches streamlit/warrant_console.py deliberately — same tier names,
+ * same outcome names, same chip and tile shapes — so the public viewer and the governed
+ * console read as one product rather than two builds of one idea.
  */
 
+@theme {
+  --color-ink: #131211;
+  --color-ink-deep: #0c0b0a;
+  --color-bone: #f4efe6;
+  --color-bone-soft: #cbc4b9;
+  --color-muted: #8e867b;
+
+  --color-good: #4ade80;
+  --color-warn: #fbbf24;
+  --color-bad: #f87171;
+  --color-info: #a5b4fc;
+  --color-model: #c4b5fd;
+
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, monospace;
+
+  --animate-rise: rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-sheen: sheen 2.6s ease-in-out infinite;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes sheen {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
 :root {
-  --ink: #171614;
-  --ink-deep: #100f0e;
   --surface: rgba(240, 235, 228, 0.045);
-  --surface-hi: rgba(240, 235, 228, 0.08);
+  --surface-hi: rgba(240, 235, 228, 0.085);
   --line: rgba(240, 235, 228, 0.12);
-  --line-hi: rgba(240, 235, 228, 0.24);
-
-  --bone: #f2ede4;
-  --bone-soft: #cfc8bd;
-  --muted: #968e83;
-
+  --line-hi: rgba(240, 235, 228, 0.26);
+  --page: #131211;
+  --text: #f4efe6;
+  --text-soft: #cbc4b9;
+  --text-muted: #8e867b;
   --good: #4ade80;
   --warn: #fbbf24;
   --bad: #f87171;
   --info: #a5b4fc;
   --model: #c4b5fd;
-
-  --r-sm: 6px;
-  --r: 10px;
-  --r-lg: 16px;
-
-  --mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, monospace;
+  --chip-ink: #0c0b0a;
 }
 
 @media (prefers-color-scheme: light) {
   :root {
-    --ink: #f7f4ee;
-    --ink-deep: #efeae1;
-    --surface: rgba(23, 22, 20, 0.035);
-    --surface-hi: rgba(23, 22, 20, 0.06);
-    --line: rgba(23, 22, 20, 0.13);
-    --line-hi: rgba(23, 22, 20, 0.26);
-
-    --bone: #17160f;
-    --bone-soft: #3d3830;
-    --muted: #6b6459;
-
+    --surface: rgba(19, 18, 17, 0.032);
+    --surface-hi: rgba(19, 18, 17, 0.06);
+    --line: rgba(19, 18, 17, 0.13);
+    --line-hi: rgba(19, 18, 17, 0.26);
+    --page: #f8f5f0;
+    --text: #14130f;
+    --text-soft: #3c372f;
+    --text-muted: #6a6359;
     --good: #15803d;
     --warn: #b45309;
     --bad: #b91c1c;
     --info: #4338ca;
     --model: #6d28d9;
+    --chip-ink: #ffffff;
   }
 }
 
-* {
-  box-sizing: border-box;
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
 }
 
-html,
 body {
   margin: 0;
-  padding: 0;
-  background: var(--ink);
-  color: var(--bone);
+  background: var(--page);
+  color: var(--text);
   font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  font-size: 15px;
-  line-height: 1.55;
   -webkit-font-smoothing: antialiased;
-}
-
-main {
-  max-width: 1180px;
-  margin: 0 auto;
-  padding: 28px 22px 96px;
-}
-
-h1,
-h2,
-h3 {
-  letter-spacing: -0.02em;
-  line-height: 1.2;
-}
-h2 {
-  font-size: 1.32rem;
-  margin: 0 0 6px;
-}
-h3 {
-  font-size: 1.02rem;
-  margin: 0;
-}
-p {
-  margin: 0 0 12px;
-  color: var(--bone-soft);
-  max-width: 78ch;
-}
-code {
-  font-family: var(--mono);
-  font-size: 0.86em;
-  background: var(--surface-hi);
-  border: 1px solid var(--line);
-  border-radius: var(--r-sm);
-  padding: 1px 5px;
-}
-a {
-  color: var(--info);
-}
-
-/* ---------------------------------------------------------------- masthead */
-.hero {
-  border: 1px solid var(--line);
-  border-radius: var(--r-lg);
-  padding: 26px 28px;
-  background:
-    radial-gradient(120% 140% at 8% 0%, rgba(165, 180, 252, 0.14), transparent 58%),
-    var(--surface);
-}
-.hero h1 {
-  font-size: 1.72rem;
-  margin: 0;
-  display: flex;
-  align-items: baseline;
-  gap: 13px;
-  flex-wrap: wrap;
-}
-.hero .kicker {
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.13em;
-  text-transform: uppercase;
-  color: var(--info);
-}
-.hero p {
-  margin: 12px 0 0;
-  max-width: 84ch;
-}
-
-/* ------------------------------------------------------------------- tiles */
-.tiles {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin: 18px 0 34px;
-}
-.tile {
-  flex: 1 1 132px;
-  border: 1px solid var(--line);
-  border-top: 3px solid var(--accent, var(--muted));
-  border-radius: var(--r);
-  padding: 13px 16px;
-  background: var(--surface);
-}
-.tile .value {
-  font-size: 1.85rem;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  line-height: 1.05;
-}
-.tile .label {
-  font-size: 0.66rem;
-  font-weight: 700;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-top: 4px;
-}
-
-/* ------------------------------------------------------------------- chips */
-.chip {
-  display: inline-block;
-  border-radius: 999px;
-  padding: 3px 11px;
-  font-size: 0.71rem;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  margin: 0 7px 5px 0;
-  color: var(--ink-deep);
-  background: var(--accent, var(--muted));
-}
-.tag {
-  display: inline-block;
-  font-family: var(--mono);
-  font-size: 0.7rem;
-  border: 1px solid var(--line);
-  background: var(--surface-hi);
-  border-radius: var(--r-sm);
-  padding: 2px 7px;
-  margin: 0 6px 5px 0;
-  color: var(--bone-soft);
-}
-
-/* ------------------------------------------------------------------- cards */
-section {
-  margin: 0 0 44px;
-  scroll-margin-top: 18px;
-}
-.card {
-  border: 1px solid var(--line);
-  border-left: 4px solid var(--accent, var(--muted));
-  border-radius: 0 var(--r) var(--r) 0;
-  background: var(--surface);
-  padding: 14px 17px;
-  margin-bottom: 10px;
-}
-.card .head {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 14px;
-}
-.card .name {
-  font-family: var(--mono);
-  font-weight: 700;
-  font-size: 0.95rem;
-}
-.card .outcome {
-  font-size: 0.7rem;
-  font-weight: 800;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  color: var(--accent, var(--muted));
-  white-space: nowrap;
-}
-.card .why {
-  color: var(--muted);
-  font-size: 0.82rem;
-  margin-top: 8px;
-}
-
-.model {
-  border-left: 3px solid var(--model);
-  background: color-mix(in srgb, var(--model) 12%, transparent);
-  border-radius: 0 var(--r) var(--r) 0;
-  padding: 12px 15px;
-}
-.model .stamp {
-  color: var(--model);
-  font-size: 0.66rem;
-  font-weight: 800;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  margin-bottom: 6px;
-}
-
-.note {
-  border: 1px solid var(--accent, var(--line-hi));
-  background: color-mix(in srgb, var(--accent, var(--muted)) 11%, transparent);
-  border-radius: var(--r);
-  padding: 13px 17px;
-  margin: 0 0 18px;
-  font-size: 0.9rem;
-}
-
-/* ------------------------------------------------------------------ tables */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.85rem;
-  border: 1px solid var(--line);
-  border-radius: var(--r);
-  overflow: hidden;
-}
-th {
-  text-align: left;
-  font-size: 0.66rem;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-  color: var(--muted);
-  font-weight: 700;
-  padding: 9px 12px;
-  background: var(--surface-hi);
-  border-bottom: 1px solid var(--line);
-}
-td {
-  padding: 9px 12px;
-  border-bottom: 1px solid var(--line);
-  color: var(--bone-soft);
-}
-tr:last-child td {
-  border-bottom: none;
-}
-td.num {
-  font-family: var(--mono);
-  text-align: right;
+  overflow-x: hidden;
 }
 
 /* ------------------------------------------------- pointer-reactive lighting
  *
- * Driven by --mx/--my (page) and --gx/--gy (per card), written by
- * components/pointer.tsx on a requestAnimationFrame. Everything here is purely
- * decorative: with the script absent, or motion reduced, the page loses only
- * light. No state, no meaning, and nothing to read is conveyed by it.
+ * Driven by --mx/--my (viewport) and --gx/--gy (per card), written by
+ * components/pointer.tsx inside a requestAnimationFrame. Purely decorative:
+ * without the script, or with motion reduced, the page loses only light.
+ *
+ * `@media (hover: hover)` keeps all of it off touch devices, where there is no
+ * cursor to follow and the effects would only cost battery.
  */
 .ambient {
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background: radial-gradient(
-    420px circle at var(--mx, -999px) var(--my, -999px),
-    color-mix(in srgb, var(--info) 13%, transparent),
-    transparent 70%
-  );
-  transition: opacity 0.4s ease;
-}
-main {
-  position: relative;
-  z-index: 1;
-}
-
-[data-glow] {
-  position: relative;
-  isolation: isolate;
-  transition:
-    border-color 0.22s ease,
-    transform 0.22s ease;
-}
-[data-glow]::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  border-radius: inherit;
   opacity: 0;
-  transition: opacity 0.25s ease;
+  transition: opacity 0.5s ease;
   background: radial-gradient(
-    260px circle at var(--gx, 50%) var(--gy, 50%),
-    color-mix(in srgb, var(--accent, var(--info)) 20%, transparent),
+    460px circle at var(--mx, 50%) var(--my, 0%),
+    color-mix(in srgb, var(--info) 12%, transparent),
     transparent 68%
   );
 }
-[data-glow]:hover {
-  border-color: var(--line-hi);
-  transform: translateY(-1px);
+
+@media (hover: hover) and (pointer: fine) {
+  .ambient {
+    opacity: 1;
+  }
+
+  [data-glow] {
+    position: relative;
+    isolation: isolate;
+  }
+  [data-glow]::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    background: radial-gradient(
+      240px circle at var(--gx, 50%) var(--gy, 50%),
+      color-mix(in srgb, var(--tone, var(--info)) 22%, transparent),
+      transparent 66%
+    );
+  }
+  [data-glow]:hover::after {
+    opacity: 1;
+  }
+  [data-glow]:hover {
+    border-color: var(--line-hi);
+  }
 }
-[data-glow]:hover::after {
+
+/* Scroll reveal. The attribute is set by components/pointer.tsx once an element
+ * has intersected, so content is visible even if the script never runs — the
+ * hidden state is applied by JS, never by the stylesheet alone. */
+[data-reveal="pending"] {
+  opacity: 0;
+  transform: translateY(16px);
+}
+[data-reveal="shown"] {
   opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
   .ambient {
     display: none;
   }
-  [data-glow],
   [data-glow]::after {
-    transition: none;
+    display: none;
   }
-  [data-glow]:hover {
+  [data-reveal="pending"],
+  [data-reveal="shown"] {
+    opacity: 1;
     transform: none;
+    transition: none;
   }
 }
 
-/* ------------------------------------------------------------------ layout */
-.split {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 22px;
+::selection {
+  background: color-mix(in srgb, var(--info) 40%, transparent);
 }
-@media (max-width: 820px) {
-  .split {
-    grid-template-columns: 1fr;
-  }
+
+/* The table wrapper scrolls horizontally on a phone rather than squeezing six
+ * columns into 360px, and fades its right edge so the overflow is discoverable. */
+.scroller {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
 }
-.label {
-  font-size: 0.66rem;
-  font-weight: 700;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 5px;
+.scroller::-webkit-scrollbar {
+  height: 6px;
 }
-.foot {
-  border-top: 1px solid var(--line);
-  margin-top: 44px;
-  padding-top: 18px;
-  color: var(--muted);
-  font-size: 0.82rem;
+.scroller::-webkit-scrollbar-thumb {
+  background: var(--line-hi);
+  border-radius: 999px;
 }

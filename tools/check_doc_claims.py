@@ -28,7 +28,12 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 
-DOCUMENTS = ("README.md", "docs/rubric_alignment.md", "docs/judges_walkthrough.md")
+DOCUMENTS = (
+    "README.md",
+    "docs/rubric_alignment.md",
+    "docs/judges_walkthrough.md",
+    "docs/deck_content.md",
+)
 
 
 def measure(argv: list[str], pattern: str) -> int:

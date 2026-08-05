@@ -1,14 +1,15 @@
 /**
  * The public, read-only viewer.
  *
- * One scrolling page rather than tabs. A reviewer arriving from a submission form
- * has a minute and no idea what this is; asking them to hunt through tabs for the
- * argument loses more than the tidiness gains. The order is the order of the
- * claim: what it did, what it is allowed to do, what it refused, what governs it.
+ * One scrolling page rather than tabs. A reviewer arriving from a submission form has a
+ * minute and no idea what this is; asking them to hunt through tabs for the argument
+ * loses more than the tidiness gains. The order is the order of the claim: what it did,
+ * the one thing it would not decide alone, what it is allowed to do, what today's policy
+ * says about yesterday's actions, what it refused, and what governs all of it.
  *
- * Server-rendered on every request. There is no cache anywhere in this app —
- * the whole point is that reclassifying a table changes the agent's authority
- * immediately, and a cached tag read would hide exactly that.
+ * Server-rendered on every request. There is no cache anywhere in this app — the whole
+ * point is that reclassifying a table changes the agent's authority immediately, and a
+ * cached tag read would hide exactly that.
  */
 
 import { callJson, query } from "@/lib/snowflake";
@@ -30,10 +31,12 @@ import {
   type ReplayPayload,
 } from "@/lib/queries";
 import { PointerGlow } from "@/components/pointer";
-import { Chip, ModelText, Note, Section, Table, Tag, Tiles } from "@/components/ui";
+import { Card, Chip, ModelText, Note, Reveal, Section, Table, Tag, Tiles } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
+
+const REPO = "https://github.com/tsathya98/snowflake-coco-cli-hackathon-2026";
 
 const TIER_MEANING: Record<string, string> = {
   open: "act unsupervised (L2)",
@@ -41,8 +44,17 @@ const TIER_MEANING: Record<string, string> = {
   regulated: "read and explain, never act (L4)",
 };
 
-const str = (value: unknown) => String(value ?? "");
-const num = (value: unknown) => Number(value ?? 0);
+const NAV = [
+  ["pass", "One pass"],
+  ["evidence", "Evidence"],
+  ["authority", "Authority"],
+  ["replay", "Replay"],
+  ["refusals", "Refusals"],
+  ["governance", "Governance"],
+] as const;
+
+const str = (v: unknown) => String(v ?? "");
+const num = (v: unknown) => Number(v ?? 0);
 
 export default async function Page() {
   const [headline] = await query(HEADLINE);
@@ -68,132 +80,205 @@ export default async function Page() {
   return (
     <>
       <PointerGlow />
-      <main>
-        <header className="hero" data-glow>
-          <h1>
-            <span>&#9878;&#65039; Warrant</span>
-            <span className="kicker">governed autonomous operations &middot; on Snowflake</span>
-          </h1>
-          <p>
-            An operations agent that closes the loop from detection to action, and whose permission
-            to take each action is read from the Snowflake object tags on the data that action
-            touches &mdash; live, and again at execution time, so a human&rsquo;s approval cannot
-            outlive the policy it was granted under.
-          </p>
-          <p style={{ marginTop: 10, fontSize: "0.86rem", color: "var(--muted)" }}>
-            Team Argmax &middot; CoCo CLI Hackathon 2026, Problem Statement 1 &middot;{" "}
-            <a href="https://github.com/tsathya98/snowflake-coco-cli-hackathon-2026">source</a>
-          </p>
+
+      <nav className="sticky top-0 z-30 border-b border-[var(--line)] bg-[color-mix(in_srgb,var(--page)_88%,transparent)] backdrop-blur-md">
+        <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-2.5 sm:px-6">
+          <span className="shrink-0 text-[0.95rem] font-extrabold tracking-[-0.02em]">
+            &#9878;&#65039; Warrant
+          </span>
+          <div className="scroller flex min-w-0 flex-1 gap-1">
+            {NAV.map(([id, label]) => (
+              <a
+                key={id}
+                href={`#${id}`}
+                className="whitespace-nowrap rounded-lg px-2.5 py-1.5 text-[0.78rem] text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-hi)] hover:text-[var(--text)]"
+              >
+                {label}
+              </a>
+            ))}
+          </div>
+          <a
+            href={REPO}
+            className="hidden shrink-0 rounded-lg border border-[var(--line)] px-3 py-1.5 text-[0.78rem] font-semibold transition-colors hover:border-[var(--line-hi)] sm:block"
+            style={{ color: "var(--info)" }}
+          >
+            Source
+          </a>
+        </div>
+      </nav>
+
+      <main className="relative z-10 mx-auto max-w-6xl px-4 pb-24 sm:px-6">
+        <header className="pt-10 sm:pt-16">
+          <Reveal>
+            <div
+              className="mb-3 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[0.66rem] font-bold uppercase tracking-[0.14em]"
+              style={{
+                borderColor: "color-mix(in srgb, var(--info) 40%, transparent)",
+                background: "color-mix(in srgb, var(--info) 10%, transparent)",
+                color: "var(--info)",
+              }}
+            >
+              <span className="animate-sheen">&#9679;</span> live from Snowflake, uncached
+            </div>
+            <h1 className="max-w-[19ch] text-[2rem] font-extrabold leading-[1.05] tracking-[-0.035em] sm:text-[3.1rem]">
+              No action without a{" "}
+              <span
+                style={{
+                  background: "linear-gradient(100deg, var(--info), var(--model))",
+                  WebkitBackgroundClip: "text",
+                  backgroundClip: "text",
+                  color: "transparent",
+                }}
+              >
+                warrant
+              </span>
+              .
+            </h1>
+            <p className="mt-4 max-w-[68ch] text-[1rem] leading-relaxed text-[var(--text-soft)] sm:text-[1.08rem]">
+              An operations agent that closes the loop from detection to action, and whose
+              permission to take each action is read from the Snowflake object tags on the data
+              that action touches — live, and again at execution time, so a human&rsquo;s approval
+              cannot outlive the policy it was granted under.
+            </p>
+            <p className="mt-4 text-[0.82rem] text-[var(--text-muted)]">
+              Team Argmax &middot; CoCo CLI Hackathon 2026, Problem Statement 1 &middot;{" "}
+              <a href={REPO} className="underline underline-offset-2" style={{ color: "var(--info)" }}>
+                source on GitHub
+              </a>
+            </p>
+          </Reveal>
         </header>
 
-        <Tiles
-          figures={[
-            ["Exceptions detected", num(headline?.DETECTED), "info"],
-            ["Handled by the agent", num(headline?.ACTED), "good"],
-            ["Awaiting a human", num(headline?.AWAITING), "warn"],
-            ["Refused", num(headline?.REFUSED), "bad"],
-            ["Decisions logged", num(headline?.LOGGED), "muted"],
-          ]}
-        />
+        <div className="mt-9">
+          <Tiles
+            figures={[
+              ["Exceptions detected", num(headline?.DETECTED), "info"],
+              ["Handled by the agent", num(headline?.ACTED), "good"],
+              ["Awaiting a human", num(headline?.AWAITING), "warn"],
+              ["Refused", num(headline?.REFUSED), "bad"],
+              ["Decisions logged", num(headline?.LOGGED), "muted"],
+            ]}
+          />
+          <p className="mt-2.5 text-[0.76rem] text-[var(--text-muted)]">
+            Last recorded decision: {str(headline?.LAST_AT)}. Read on every request.
+          </p>
+        </div>
 
-        <Note tone="info">
-          <strong>This page is read-only, and not by convention.</strong> It authenticates as{" "}
-          <code>WARRANT_PUBLIC</code>, a role holding <code>SELECT</code> on a handful of objects
-          and <code>USAGE</code> on the two procedures that only compute. It has no grant on{" "}
-          <code>EXECUTE_ACTION</code>. Approving is a governed act and belongs to the console
-          inside Snowflake, where the reviewer has an identity of their own &mdash; the same reason
-          the conversational agent is given no tool bound to the executor.
-        </Note>
+        <div className="mt-7">
+          <Note tone="info">
+            <strong>This page is read-only, and not by convention.</strong> It authenticates as{" "}
+            <code className="font-mono text-[0.85em]">WARRANT_PUBLIC</code>, a role holding{" "}
+            <code className="font-mono text-[0.85em]">SELECT</code> on a handful of objects and{" "}
+            <code className="font-mono text-[0.85em]">USAGE</code> on the two procedures that only
+            compute. It has no grant on{" "}
+            <code className="font-mono text-[0.85em]">EXECUTE_ACTION</code>. Approving is a
+            governed act and belongs to the console inside Snowflake, where the reviewer has an
+            identity of their own — the same reason the conversational agent is given no tool bound
+            to the executor.
+          </Note>
+        </div>
 
         <Section
           id="pass"
-          title="What one pass did"
+          eyebrow="What one pass did"
+          title="Three outcomes, one loop, no branching on table names"
           lede={
             <>
-              One <code>CALL WARRANT.CORE.RUN_LOOP(&apos;AUTO&apos;)</code> over 2,400 shipments, 40
-              quality holds and 6 SKUs. Three different outcomes, from one loop with no branching on
-              table names &mdash; the tag on the data decided each one.
+              One <code className="font-mono text-[0.88em]">CALL WARRANT.CORE.RUN_LOOP(&apos;AUTO&apos;)</code>{" "}
+              over 2,400 shipments, 40 quality holds and 6 SKUs. The tag on the data decided every
+              routing below.
             </>
           }
         >
-          <Table
-            columns={[
-              ["ENTITY", "Entity"],
-              ["ACTION_TYPE", "Action proposed"],
-              ["TIER_LABEL", "Authority"],
-              ["BINDING_OBJECT", "Bound by"],
-              ["OUTCOME", "Outcome"],
-            ]}
-            rows={decisions.map((d) => ({
-              ...d,
-              TIER_LABEL: TIER_NAMES[num(d.TIER)] ?? "-",
-              BINDING_OBJECT: str(d.BINDING_OBJECT).split(".").pop(),
-              OUTCOME:
-                str(d.DECISION) === "pending"
-                  ? "awaiting a human"
-                  : str(d.EXECUTION_RESULT),
-            }))}
-          />
+          <Reveal>
+            <Table
+              columns={[
+                ["ENTITY", "Entity"],
+                ["ACTION_TYPE", "Action proposed"],
+                ["TIER_LABEL", "Authority"],
+                ["BINDING_OBJECT", "Bound by"],
+                ["OUTCOME", "Outcome"],
+              ]}
+              rows={decisions.map((d) => ({
+                ...d,
+                TIER_LABEL: TIER_NAMES[num(d.TIER)] ?? "-",
+                BINDING_OBJECT: str(d.BINDING_OBJECT).split(".").pop(),
+                OUTCOME:
+                  str(d.DECISION) === "pending" ? "awaiting a human" : str(d.EXECUTION_RESULT),
+              }))}
+            />
+          </Reveal>
         </Section>
 
         {escalated ? (
           <Section
             id="evidence"
-            title="The one it would not decide alone"
-            lede="Evidence beside the reasoning, not behind a click. A reviewer asked to approve something whose evidence is one click away approves it without clicking."
+            eyebrow="The one it would not decide alone"
+            title="Evidence beside the reasoning, not behind a click"
+            lede="A reviewer asked to approve something whose evidence is one click away approves it without clicking."
           >
-            <div className="split">
-              <div>
-                <div className="label">What was observed</div>
-                <ul style={{ margin: "0 0 14px", paddingLeft: 18, color: "var(--bone-soft)" }}>
-                  <li>
-                    <strong>Observed</strong> &mdash; {str(escalated.OBSERVED)}
-                  </li>
-                  <li>
-                    <strong>Expected</strong> &mdash; {str(escalated.EXPECTED)}
-                  </li>
-                  <li>
-                    <strong>Deviation</strong> &mdash; {str(escalated.DEVIATION)}
-                  </li>
-                  <li>
-                    <strong>Detected by</strong> &mdash;{" "}
-                    <code>{str(escalated.DETECTION_METHOD)}</code>
-                  </li>
-                </ul>
-                <div className="label">Grounded in</div>
-                <div>
-                  {(JSON.parse(str(escalated.GROUNDED_IN) || "[]") as string[]).map((doc) => (
-                    <Tag key={doc}>{doc}</Tag>
-                  ))}
+            <div className="grid gap-5 lg:grid-cols-2">
+              <Reveal>
+                <div className="rounded-xl border border-[var(--line)] bg-[var(--surface)] p-4 sm:p-5" data-glow>
+                  <div className="mb-3 text-[0.62rem] font-bold uppercase tracking-[0.11em] text-[var(--text-muted)]">
+                    What was observed
+                  </div>
+                  <dl className="space-y-2 text-[0.88rem]">
+                    {[
+                      ["Observed", str(escalated.OBSERVED)],
+                      ["Expected", str(escalated.EXPECTED)],
+                      ["Deviation", str(escalated.DEVIATION)],
+                      ["Detected by", str(escalated.DETECTION_METHOD)],
+                    ].map(([k, v]) => (
+                      <div key={k} className="flex flex-col gap-0.5 sm:flex-row sm:gap-2">
+                        <dt className="shrink-0 font-semibold sm:w-28">{k}</dt>
+                        <dd className="m-0 text-[var(--text-soft)]">{v}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                  <div className="mt-4 text-[0.62rem] font-bold uppercase tracking-[0.11em] text-[var(--text-muted)]">
+                    Grounded in
+                  </div>
+                  <div className="mt-1.5">
+                    {(JSON.parse(str(escalated.GROUNDED_IN) || "[]") as string[]).map((doc) => (
+                      <Tag key={doc}>{doc}</Tag>
+                    ))}
+                  </div>
                 </div>
-              </div>
-              <div>
-                <div className="label">Why this action, and why it needs a human</div>
-                <ModelText>{str(escalated.ROOT_CAUSE)}</ModelText>
-                <div style={{ marginTop: 14 }}>
-                  <Chip tone={SEVERITY_TONE[str(escalated.SEVERITY).toLowerCase()] ?? "muted"}>
-                    {str(escalated.SEVERITY)}
-                  </Chip>
-                  <Chip tone={TIER_TONE[num(escalated.TIER)] ?? "muted"}>
-                    {TIER_NAMES[num(escalated.TIER)]}
-                  </Chip>
+              </Reveal>
+
+              <Reveal delay={90}>
+                <div className="rounded-xl border border-[var(--line)] bg-[var(--surface)] p-4 sm:p-5" data-glow>
+                  <div className="mb-3 text-[0.62rem] font-bold uppercase tracking-[0.11em] text-[var(--text-muted)]">
+                    Why this action, and why it needs a human
+                  </div>
+                  <ModelText>{str(escalated.ROOT_CAUSE)}</ModelText>
+                  <div className="mt-4">
+                    <Chip tone={SEVERITY_TONE[str(escalated.SEVERITY).toLowerCase()] ?? "muted"}>
+                      {str(escalated.SEVERITY)}
+                    </Chip>
+                    <Chip tone={TIER_TONE[num(escalated.TIER)] ?? "muted"}>
+                      {TIER_NAMES[num(escalated.TIER)]}
+                    </Chip>
+                  </div>
+                  <p className="mt-2 text-[0.83rem] leading-relaxed text-[var(--text-muted)]">
+                    {str(escalated.TIER_RATIONALE)}
+                  </p>
+                  <p className="mt-2 text-[0.78rem] text-[var(--text-muted)]">
+                    Produced by <code className="font-mono">{str(escalated.MODEL)}</code>. Bound as
+                    query parameters — the model never contributes SQL text.
+                  </p>
                 </div>
-                <p style={{ fontSize: "0.84rem", color: "var(--muted)", marginTop: 6 }}>
-                  {str(escalated.TIER_RATIONALE)}
-                </p>
-                <p style={{ fontSize: "0.8rem", color: "var(--muted)" }}>
-                  Produced by <code>{str(escalated.MODEL)}</code>. Bound as query parameters &mdash;
-                  the model never contributes SQL text.
-                </p>
-              </div>
+              </Reveal>
             </div>
           </Section>
         ) : null}
 
         <Section
           id="authority"
-          title="What is it allowed to do, right now?"
-          lede="Every action in the registry resolved against the classifications currently on the data it touches. Most restricted first — what the agent may not do is what a reviewer should read before what it may. Computed by the same resolver the executor uses."
+          eyebrow="What is it allowed to do, right now?"
+          title="Every action, resolved against the tags in force"
+          lede="Most restricted first — what the agent may not do is what a reviewer should read before what it may. Computed by the same resolver the executor uses."
         >
           <Tiles
             figures={[
@@ -202,37 +287,40 @@ export default async function Page() {
               ["Acts unsupervised", counts["acts unsupervised"] ?? 0, "good"],
             ]}
           />
-          {manifest.capabilities.map((capability) => (
-            <div
-              className="card"
-              data-glow
-              key={capability.action}
-              style={
-                {
-                  ["--accent" as string]: `var(--${OUTCOME_TONE[capability.outcome] ?? "muted"})`,
-                } as React.CSSProperties
-              }
-            >
-              <div className="head">
-                <span className="name">{capability.action}</span>
-                <span className="outcome">{capability.outcome}</span>
-              </div>
-              <div style={{ marginTop: 8 }}>
-                {capability.classifications.map((c) => (
-                  <Tag key={c.object}>
-                    {c.object.split(".").pop()} &middot; {c.sensitivity ?? "untagged"}
-                  </Tag>
-                ))}
-              </div>
-              <div className="why">{capability.rationale}</div>
-            </div>
-          ))}
+          <div className="mt-4 space-y-2.5">
+            {manifest.capabilities.map((capability, i) => (
+              <Reveal key={capability.action} delay={i * 55}>
+                <Card tone={OUTCOME_TONE[capability.outcome] ?? "muted"}>
+                  <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                    <span className="font-mono text-[0.92rem] font-bold">{capability.action}</span>
+                    <span
+                      className="text-[0.66rem] font-extrabold uppercase tracking-[0.11em]"
+                      style={{ color: `var(--${OUTCOME_TONE[capability.outcome] ?? "muted"})` }}
+                    >
+                      {capability.outcome}
+                    </span>
+                  </div>
+                  <div className="mt-2">
+                    {capability.classifications.map((c) => (
+                      <Tag key={c.object}>
+                        {c.object.split(".").pop()} &middot; {c.sensitivity ?? "untagged"}
+                      </Tag>
+                    ))}
+                  </div>
+                  <div className="mt-2 text-[0.8rem] leading-relaxed text-[var(--text-muted)]">
+                    {capability.rationale}
+                  </div>
+                </Card>
+              </Reveal>
+            ))}
+          </div>
         </Section>
 
         <Section
           id="replay"
+          eyebrow="Decision replay"
           title="Would today's policy still allow what already happened?"
-          lede="Every recorded action re-resolved against the classifications in force now — not a report over stored tiers, but the real resolver over the real registry with current tags. The question an auditor actually asks, and the one nobody can usually answer."
+          lede="Every recorded action re-resolved against the classifications in force now — not a report over stored tiers, but the real resolver over the real registry with current tags. The question an auditor actually asks."
         >
           <Tiles
             figures={[
@@ -246,164 +334,179 @@ export default async function Page() {
               ],
             ]}
           />
-          <Table
-            columns={[
-              ["action_type", "Action"],
-              ["execution_result", "Ran as"],
-              ["then", "Tier then"],
-              ["now", "Tier now"],
-              ["attention", "Needs attention"],
-            ]}
-            rows={replay.decisions.map((d) => ({
-              ...d,
-              then: TIER_NAMES[d.tier_then] ?? "-",
-              now: TIER_NAMES[d.tier_now] ?? "-",
-              attention: d.needs_attention ? "YES" : "no",
-            }))}
-          />
+          <div className="mt-4">
+            <Reveal>
+              <Table
+                columns={[
+                  ["action_type", "Action"],
+                  ["execution_result", "Ran as"],
+                  ["then", "Tier then"],
+                  ["now", "Tier now"],
+                  ["attention", "Needs attention"],
+                ]}
+                rows={replay.decisions.map((d) => ({
+                  ...d,
+                  then: TIER_NAMES[d.tier_then] ?? "-",
+                  now: TIER_NAMES[d.tier_now] ?? "-",
+                  attention: d.needs_attention ? "YES" : "no",
+                }))}
+              />
+            </Reveal>
+          </div>
         </Section>
 
         <Section
           id="refusals"
-          title="Every action it declined to take"
+          eyebrow="The refusal ledger"
+          title="Every action the agent declined to take"
           lede="A refusal is a result, not an error, so it is recorded with the same care as an action. This is the question most agents cannot answer about themselves."
         >
           {refusals.length === 0 ? (
             <Note tone="muted">No refusals recorded in the current run.</Note>
           ) : (
-            refusals.map((row, index) => (
-              <div
-                className="card"
-                data-glow
-                key={index}
-                style={{ ["--accent" as string]: "var(--bad)" } as React.CSSProperties}
-              >
-                <div>
-                  <Chip tone="bad">Refused</Chip>
-                  <Chip tone="bad">{TIER_NAMES[num(row.TIER)] ?? str(row.TIER)}</Chip>
-                  <span style={{ color: "var(--muted)", fontSize: "0.84rem" }}>
-                    {str(row.WHEN_REFUSED)} &middot; {str(row.SUBJECT)}
-                  </span>
-                </div>
-                <div style={{ marginTop: 6 }}>
-                  <strong>{str(row.ACTION_TYPE)}</strong> &mdash; {str(row.RATIONALE)}
-                </div>
-                {row.FOOTPRINT ? (
-                  <div className="why">Classifications at execution time: {str(row.FOOTPRINT)}</div>
-                ) : null}
-              </div>
-            ))
+            <div className="space-y-2.5">
+              {refusals.map((row, index) => (
+                <Reveal key={index} delay={index * 55}>
+                  <Card tone="bad">
+                    <div className="flex flex-wrap items-center gap-x-1 gap-y-1">
+                      <Chip tone="bad">Refused</Chip>
+                      <Chip tone="bad">{TIER_NAMES[num(row.TIER)] ?? str(row.TIER)}</Chip>
+                      <span className="text-[0.8rem] text-[var(--text-muted)]">
+                        {str(row.WHEN_REFUSED)} &middot; {str(row.SUBJECT)}
+                      </span>
+                    </div>
+                    <div className="mt-1.5 text-[0.88rem] leading-relaxed">
+                      <strong>{str(row.ACTION_TYPE)}</strong> &mdash; {str(row.RATIONALE)}
+                    </div>
+                    {row.FOOTPRINT ? (
+                      <div className="mt-1.5 break-all font-mono text-[0.72rem] text-[var(--text-muted)]">
+                        {str(row.FOOTPRINT)}
+                      </div>
+                    ) : null}
+                  </Card>
+                </Reveal>
+              ))}
+            </div>
           )}
         </Section>
 
         <Section
           id="governance"
+          eyebrow="Governance"
           title="The classifications in force, read live"
           lede={
             <>
-              Read with <code>SYSTEM$GET_TAG</code> on every request &mdash; never from{" "}
-              <code>ACCOUNT_USAGE</code>, which lags by up to two hours, and never cached. Change a
-              tag and the agent&rsquo;s next decision changes with it, with no code change and no
-              redeploy.
+              Read with <code className="font-mono text-[0.88em]">SYSTEM$GET_TAG</code> on every
+              request — never from <code className="font-mono text-[0.88em]">ACCOUNT_USAGE</code>,
+              which lags by up to two hours, and never cached. Change a tag and the agent&rsquo;s
+              next decision changes with it, with no code change and no redeploy.
             </>
           }
         >
-          <Table
-            columns={[
-              ["OBJECT", "Object"],
-              ["SENSITIVITY", "Sensitivity"],
-              ["MAY", "The agent may"],
-            ]}
-            rows={governance.map((row) => ({
-              ...row,
-              MAY: TIER_MEANING[str(row.SENSITIVITY)] ?? "act only with human approval (L3)",
-            }))}
-          />
-          <p style={{ fontSize: "0.82rem", color: "var(--muted)", marginTop: 8 }}>
+          <Reveal>
+            <Table
+              columns={[
+                ["OBJECT", "Object"],
+                ["SENSITIVITY", "Sensitivity"],
+                ["MAY", "The agent may"],
+              ]}
+              rows={governance.map((row) => ({
+                ...row,
+                MAY: TIER_MEANING[str(row.SENSITIVITY)] ?? "act only with human approval (L3)",
+              }))}
+            />
+          </Reveal>
+          <p className="mt-2.5 text-[0.8rem] text-[var(--text-muted)]">
             Untagged is deliberately not treated as open: an object nobody has classified is not the
             same as an object someone classified as safe.
           </p>
-        </Section>
 
-        <Section
-          id="masking"
-          title="What it may see, as opposed to what it may do"
-          lede={
-            <>
-              The sensitivity tag stops the agent <strong>acting</strong> on a regulated record. It
-              does not stop it <strong>reading</strong> one, deliberately, or it could never surface
-              an aging hold and explain it. Those are two controls, so there is a second: a masking
-              policy on <code>QUALITY_HOLDS.lot_ref</code>.
-            </>
-          }
-        >
-          <Table
-            columns={[
-              ["HOLD", "Hold"],
-              ["LOT_REFERENCE", "Lot reference"],
-              ["SITE", "Site"],
-              ["SKU", "SKU"],
-              ["DAYS_OPEN", "Days open", true],
-              ["REASON", "Reason"],
-            ]}
-            rows={holds}
-          />
-          <p style={{ fontSize: "0.82rem", color: "var(--muted)", marginTop: 8 }}>
-            The policy is attached to the column and follows the <em>role</em>, not the client
-            &mdash; so it holds even here, outside Snowflake. This page reads as{" "}
-            <code>WARRANT_PUBLIC</code>, which is not the quality owner, and sees exactly what the
-            agent sees. A qualified person reads the real values from the same query.
+          <h3 className="mt-9 text-[1.05rem] font-bold tracking-[-0.015em]">
+            What it may <em>see</em>, as opposed to what it may <em>do</em>
+          </h3>
+          <p className="mt-2 max-w-[80ch] text-[0.9rem] leading-relaxed text-[var(--text-soft)]">
+            The sensitivity tag stops the agent <strong>acting</strong> on a regulated record. It
+            does not stop it <strong>reading</strong> one, deliberately, or it could never surface
+            an aging hold and explain it. Those are two controls, so there is a second: a masking
+            policy on <code className="font-mono text-[0.88em]">QUALITY_HOLDS.lot_ref</code>.
           </p>
-        </Section>
+          <div className="mt-4">
+            <Reveal>
+              <Table
+                columns={[
+                  ["HOLD", "Hold"],
+                  ["LOT_REFERENCE", "Lot reference"],
+                  ["SITE", "Site"],
+                  ["SKU", "SKU"],
+                  ["DAYS_OPEN", "Days open", true],
+                  ["REASON", "Reason"],
+                ]}
+                rows={holds}
+              />
+            </Reveal>
+          </div>
+          <p className="mt-2.5 max-w-[80ch] text-[0.8rem] leading-relaxed text-[var(--text-muted)]">
+            The policy is attached to the column and follows the <em>role</em>, not the client — so
+            it holds even here, outside Snowflake. This page reads as{" "}
+            <code className="font-mono">WARRANT_PUBLIC</code>, which is not the quality owner, and
+            sees exactly what the agent sees.
+          </p>
 
-        <Section
-          id="metrics"
-          title="The governed metric layer"
-          lede={
-            <>
-              Read through <code>SEMANTIC_VIEW(...)</code> against{" "}
-              <code>CORE.OPS_ANALYSIS</code>, not the base tables. Classification governs what the
-              agent may <em>do</em>; the semantic view governs what the numbers <em>mean</em>, so
-              this page and the agent cannot quietly disagree about on-time rate.
-            </>
-          }
-        >
-          <Table
-            columns={[
-              ["SUPPLIER", "Supplier"],
-              ["TIER", "Tier"],
-              ["ON_TIME_PCT", "On-time %", true],
-              ["SHIPMENTS", "Shipments", true],
-              ["AVG_DAYS_LATE", "Avg days late", true],
-            ]}
-            rows={metrics}
-          />
+          <h3 className="mt-9 text-[1.05rem] font-bold tracking-[-0.015em]">
+            The governed metric layer
+          </h3>
+          <p className="mt-2 max-w-[80ch] text-[0.9rem] leading-relaxed text-[var(--text-soft)]">
+            Read through <code className="font-mono text-[0.88em]">SEMANTIC_VIEW(...)</code>, not
+            the base tables. Classification governs what the agent may <em>do</em>; the semantic
+            view governs what the numbers <em>mean</em>.
+          </p>
+          <div className="mt-4">
+            <Reveal>
+              <Table
+                columns={[
+                  ["SUPPLIER", "Supplier"],
+                  ["TIER", "Tier"],
+                  ["ON_TIME_PCT", "On-time %", true],
+                  ["SHIPMENTS", "Shipments", true],
+                  ["AVG_DAYS_LATE", "Avg days late", true],
+                ]}
+                rows={metrics}
+              />
+            </Reveal>
+          </div>
         </Section>
 
         <Section
           id="log"
-          title="The append-only decision log"
-          lede="Every phase of every run, including every refusal, written once and never updated. The most recent 40."
+          eyebrow="The append-only log"
+          title="Every phase of every run, written once"
+          lede="Including every refusal. Never updated, never deleted. The most recent 40."
         >
-          <Table
-            columns={[
-              ["AT", "At"],
-              ["PHASE", "Phase"],
-              ["OUTCOME", "Outcome"],
-              ["TIER", "Tier"],
-              ["ACTOR", "Actor"],
-              ["RATIONALE", "Rationale"],
-            ]}
-            rows={audit}
-          />
+          <Reveal>
+            <Table
+              columns={[
+                ["AT", "At"],
+                ["PHASE", "Phase"],
+                ["OUTCOME", "Outcome"],
+                ["TIER", "Tier"],
+                ["ACTOR", "Actor"],
+                ["RATIONALE", "Rationale"],
+              ]}
+              rows={audit}
+            />
+          </Reveal>
         </Section>
 
-        <div className="foot">
-          Read live from Snowflake on every request &mdash; nothing on this page is cached, because
-          the claim is that a governance change takes effect immediately. Data is synthetic and
-          generated in-warehouse. The governed console, where actions are actually approved, runs
-          as Streamlit in Snowflake on the reviewer&rsquo;s own identity.
-        </div>
+        <footer className="mt-6 border-t border-[var(--line)] pt-6 text-[0.8rem] leading-relaxed text-[var(--text-muted)]">
+          Read live from Snowflake on every request — nothing here is cached, because the claim is
+          that a governance change takes effect immediately. Data is synthetic and generated
+          in-warehouse. The governed console, where actions are actually approved, runs as Streamlit
+          in Snowflake on the reviewer&rsquo;s own identity.{" "}
+          <a href={REPO} className="underline underline-offset-2" style={{ color: "var(--info)" }}>
+            Source, tests and reproduction steps
+          </a>
+          .
+        </footer>
       </main>
     </>
   );
