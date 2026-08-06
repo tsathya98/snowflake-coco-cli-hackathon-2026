@@ -1,0 +1,108 @@
+WARRANT DEMO — PASTE BUFFER
+Everything you paste during the take, in the order you paste it.
+Keep this window on a second desktop or minimised. It must never appear on camera.
+
+
+================================================================
+BEFORE RECORDING — pre-flight (not on camera)
+================================================================
+
+snow sql -c warrant -f sql/90_reset.sql
+
+
+snow sql -c warrant -q "
+SELECT (SELECT COUNT(*) FROM WARRANT.CORE.PENDING_ACTIONS WHERE decision='pending') AS pending,
+       (SELECT COUNT(*) FROM WARRANT.CORE.FINDINGS)                                 AS findings,
+       (SELECT COUNT(*) FROM WARRANT.DATA.RUNBOOKS WHERE doc_id='RB-666')           AS attack_left,
+       SYSTEM\$GET_TAG('WARRANT.CORE.SENSITIVITY','WARRANT.DATA.INVENTORY','TABLE')  AS inventory_tag;"
+
+
+cortex mcp list
+
+
+snow sql -c warrant -q "SHOW TASKS IN SCHEMA WARRANT.CORE;"
+
+
+Required before you press Record:
+  pending = 0
+  findings = 0
+  attack_left = 0
+  inventory_tag = internal
+  warrant appears in cortex mcp list
+  both tasks show started
+
+
+================================================================
+1:25 — TERMINAL — start CoCo
+================================================================
+
+cortex mcp list
+
+
+cortex
+
+
+================================================================
+1:25 — PROMPT 1 of 3  (operate-warrant)
+================================================================
+
+Use the operate-warrant skill. Call governance_posture and authority_manifest, then tell me what Warrant may do right now and which Snowflake tags make that true.
+
+
+================================================================
+1:25 — PROMPT 2 of 3  (orchestrate-loop)  ** the end-to-end run **
+================================================================
+
+Using the orchestrate-loop skill, run one full AUTO pass against the live account. Summarise what detection, investigation, authority classification, routing, execution and audit did for each exception.
+
+
+================================================================
+2:50 — PROMPT 3 of 3  (classify-authority)
+================================================================
+
+Use the classify-authority skill to compare raise_replenishment with open_supplier_case. Show the touched object, live tag, and final tier for each.
+
+
+================================================================
+3:12 — SNOWSIGHT — the policy change
+================================================================
+
+ALTER TABLE WARRANT.DATA.INVENTORY SET TAG WARRANT.CORE.SENSITIVITY = 'regulated';
+
+
+================================================================
+3:12 — STREAMLIT CONSOLE — reviewer note, then Approve and execute
+================================================================
+
+Checked in-transit is zero and SKU-1003 is not on quality hold. Quantity restores to safety-stock minimum.
+
+
+   -> Click "Approve and execute", then STOP SPEAKING for two full seconds.
+
+
+================================================================
+3:57 — TERMINAL — the adversarial suite
+================================================================
+
+uv run pytest tests/test_adversarial.py -q
+
+
+================================================================
+4:23 — VERCEL VIEWER — no paste
+================================================================
+
+   -> Shortcut "The refusal that held", then "Approve and execute".
+   -> Hold on the green result and the visible URL for two seconds. Stop recording.
+
+
+================================================================
+AFTER RECORDING — restore (not on camera)
+================================================================
+
+snow sql -c warrant -q "ALTER TABLE WARRANT.DATA.INVENTORY SET TAG WARRANT.CORE.SENSITIVITY = 'internal';"
+
+
+snow sql -c warrant -f sql/90_reset.sql
+
+
+snow sql -c warrant -q "CALL WARRANT.CORE.RUN_LOOP('AUTO');"
