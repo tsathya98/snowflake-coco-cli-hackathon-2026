@@ -42,8 +42,25 @@ export function Decide({ actionType }: { actionType: string }) {
       </div>
       <p className="mt-1.5 text-[0.84rem] leading-relaxed text-[var(--text-soft)]">
         These are the controls a reviewer sees in the Snowflake console, wired to the same
-        statements. <strong>The buttons are live.</strong> Press one — nothing to fill in
-        first — and the refusal you get back is the database&apos;s, not this page&apos;s.
+        statements. <strong>The buttons are live</strong> — they really send them.
+      </p>
+      {/* Said before the click, not after.
+       *
+       * The result is a database error message, in red, containing the word "error" twice. A
+       * reader who has not been told what to expect can reasonably read that as the demo being
+       * broken — and a judge skimming may never reach the sentence that explains it. So the
+       * expectation is set first, and the result panel leads with the verdict rather than the
+       * stack trace. */}
+      <p
+        className="mt-2.5 rounded-lg border-l-2 px-3 py-2 text-[0.84rem] leading-relaxed"
+        style={{
+          borderColor: "var(--good)",
+          background: "color-mix(in srgb, var(--good) 8%, transparent)",
+        }}
+      >
+        <strong>Expect them to be refused. That is the demonstration</strong> — this page holds a
+        Snowflake role with no grant to approve anything, so the database turns it down. If a
+        button ever succeeded, <em>that</em> would be the bug.
       </p>
 
       {/* Editable, and pre-filled.
@@ -89,17 +106,30 @@ export function Decide({ actionType }: { actionType: string }) {
         ))}
       </div>
 
+      {/* The refused panel is tinted with --good, not --bad.
+       *
+       * Elsewhere on this page red means "refused", and a refusal is the desired outcome of the
+       * authority model. But here the reader has just pressed a button, and red plus the word
+       * "error" is the universal shape of something having gone wrong — the two meanings collide
+       * exactly where a first-time reader is least equipped to tell them apart. So the panel
+       * reports the *verdict* in the colour of a passing check, and keeps the database's own
+       * words in red inside it, where they read as evidence rather than as breakage. */}
       <div aria-live="polite" className="mt-4">
         {result?.outcome === "refused" ? (
           <div
             className="rounded-xl border p-3.5 sm:px-4"
             style={{
-              borderColor: "color-mix(in srgb, var(--bad) 45%, transparent)",
-              background: "color-mix(in srgb, var(--bad) 10%, transparent)",
+              borderColor: "color-mix(in srgb, var(--good) 45%, transparent)",
+              background: "color-mix(in srgb, var(--good) 8%, transparent)",
             }}
           >
-            <div className="text-[0.66rem] font-extrabold uppercase tracking-[0.11em] text-[var(--bad)]">
-              Refused by Snowflake
+            <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+              <span className="text-[0.66rem] font-extrabold uppercase tracking-[0.11em] text-[var(--good)]">
+                &#10003; The boundary held
+              </span>
+              <span className="text-[0.66rem] font-bold uppercase tracking-[0.11em] text-[var(--text-muted)]">
+                &middot; Snowflake refused it &middot; this is the expected result
+              </span>
             </div>
             <p className="mt-1.5 text-[0.86rem] leading-relaxed">
               The statement below was sent as{" "}
@@ -107,13 +137,19 @@ export function Decide({ actionType }: { actionType: string }) {
               it ran. Nothing about <code className="font-mono text-[0.85em]">{actionType}</code>{" "}
               changed.
             </p>
-            <pre className="mt-2.5 overflow-x-auto rounded-lg bg-[var(--page-deep)] p-3 font-mono text-[0.74rem] leading-relaxed text-[var(--text-soft)]">
+            <div className="mt-2.5 text-[0.6rem] font-bold uppercase tracking-[0.1em] text-[var(--text-muted)]">
+              What this page sent
+            </div>
+            <pre className="mt-1 overflow-x-auto rounded-lg bg-[var(--page-deep)] p-3 font-mono text-[0.74rem] leading-relaxed text-[var(--text-soft)]">
               {result.statement}
             </pre>
+            <div className="mt-2.5 text-[0.6rem] font-bold uppercase tracking-[0.1em] text-[var(--text-muted)]">
+              What Snowflake sent back, verbatim
+            </div>
             {/* Wraps rather than scrolls. Snowflake's privilege errors run to ~200 characters and
                 the important half is at the end — "must have UPDATE granted on TABLE …" — so a
                 horizontal scrollbar hides the payload behind an interaction nobody performs. */}
-            <pre className="mt-2 whitespace-pre-wrap break-words rounded-lg bg-[var(--page-deep)] p-3 font-mono text-[0.74rem] leading-relaxed text-[var(--bad)]">
+            <pre className="mt-1 whitespace-pre-wrap break-words rounded-lg bg-[var(--page-deep)] p-3 font-mono text-[0.74rem] leading-relaxed text-[var(--bad)]">
               {result.error}
             </pre>
             <p className="mt-2.5 text-[0.78rem] leading-relaxed text-[var(--text-muted)]">
