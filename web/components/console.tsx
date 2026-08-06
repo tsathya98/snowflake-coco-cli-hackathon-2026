@@ -59,27 +59,47 @@ const SHOTS: [string, string, string][] = [
 
 export function ConsoleGallery() {
   return (
-    <div className="grid gap-5 sm:grid-cols-2">
-      {SHOTS.map(([file, title, note]) => (
-        <figure
-          key={file}
-          className="m-0 overflow-hidden rounded-xl border border-[var(--line)] bg-[var(--surface)]"
-          data-glow
-        >
-          <Image
-            src={`/console/${file}.png`}
-            alt={title}
-            width={1400}
-            height={800}
-            className="h-auto w-full border-b border-[var(--line)]"
-            sizes="(max-width: 640px) 100vw, 50vw"
-          />
-          <figcaption className="p-3.5 sm:p-4">
-            <div className="text-[0.86rem] font-bold">{title}</div>
-            <p className="mt-1 text-[0.79rem] leading-relaxed text-[var(--text-muted)]">{note}</p>
-          </figcaption>
-        </figure>
-      ))}
-    </div>
+    <>
+      <p className="mb-4 text-[0.82rem] text-[var(--text-muted)]">
+        A console is dense, and a thumbnail of one is unreadable.{" "}
+        <strong className="text-[var(--text-soft)]">Click any shot to open it full size.</strong>
+      </p>
+      {/* Two-up only from lg. These are 1400px-wide screenshots of a data-dense app: at the sm
+          breakpoint a half-width column is ~300px, which is a picture of a console rather than
+          a console you can read. */}
+      <div className="grid gap-5 lg:grid-cols-2">
+        {SHOTS.map(([file, title, note]) => (
+          <figure
+            key={file}
+            className="m-0 overflow-hidden rounded-xl border border-[var(--line)] bg-[var(--surface)]"
+            data-glow
+          >
+            <a
+              href={`/console/${file}.png`}
+              target="_blank"
+              rel="noreferrer"
+              className="group relative block cursor-zoom-in"
+              aria-label={`${title} — open full size`}
+            >
+              <Image
+                src={`/console/${file}.png`}
+                alt={title}
+                width={1400}
+                height={800}
+                className="h-auto w-full border-b border-[var(--line)] transition-opacity group-hover:opacity-80"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+              />
+              <span className="pointer-events-none absolute bottom-2 right-2 rounded-md border border-[var(--line-hi)] bg-[var(--page-deep)] px-2 py-1 text-[0.66rem] font-bold uppercase tracking-[0.08em] text-[var(--text-soft)] opacity-0 transition-opacity group-hover:opacity-100">
+                Open full size &#8599;
+              </span>
+            </a>
+            <figcaption className="p-3.5 sm:p-4">
+              <div className="text-[0.86rem] font-bold">{title}</div>
+              <p className="mt-1 text-[0.79rem] leading-relaxed text-[var(--text-muted)]">{note}</p>
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+    </>
   );
 }
