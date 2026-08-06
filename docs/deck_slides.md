@@ -119,9 +119,23 @@ share the slide. Lead with the three lanes, then the diagram.
 
 Say out loud: *"Same code path, three endings. There is no `if table_name` anywhere in this."*
 
-**The diagram: use the sequence diagram, not the flowchart.** The flowchart shows what connects to
-what; the sequence diagram shows *when*, and the ordering is the argument. Export it from the
-README's `sequenceDiagram` block.
+**The diagram is already rendered for you.** Both are in `docs/images/deck/`, produced from the
+same mermaid source the README uses — so the deck and the repo cannot show different diagrams —
+at 3× on a **transparent** background, which means they sit on the template's navy without a white
+box around them.
+
+| File | Size | Use it for |
+|---|---|---|
+| `deck/sequence.png` | 4434 × 2880 | **The one to use.** The approval that doesn't survive: propose → reclassify → refuse, twelve numbered steps |
+| `deck/sequence-dark.png` | same | If the slide background is dark |
+| `deck/architecture.png` | 7467 × 1242 | Wide and short — fits as a full-width strip under the title |
+| `deck/architecture-dark.png` | same | Dark-background variant |
+
+**Prefer the sequence diagram if you can only fit one.** The flowchart shows what connects to
+what; the sequence diagram shows *when*, and the ordering is the entire argument — the tag is read
+at step 1, the reclassification lands at step 4, and the second read at step 7 is what refuses it.
+Regenerate after changing a README diagram with:
+`node tools/render_deck_diagrams.mjs . docs/images/deck` (needs `puppeteer-core` and Chrome).
 
 **The seven stages, as a strip under the diagram** — mark 4, 5 and 6 in amber:
 
