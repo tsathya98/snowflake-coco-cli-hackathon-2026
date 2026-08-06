@@ -113,8 +113,9 @@ flowchart TB
 
 ## CoCo Agent Skills, and where each one lands
 
-The five skills in [`.cortex/skills/`](../.cortex/skills/) map one-to-one onto the phases
-above, and each names the module that implements it.
+Five of the six skills in [`.cortex/skills/`](../.cortex/skills/) map one-to-one onto the phases
+above, and each names the module that implements it. The sixth, `operate-warrant`, is not a phase
+— it is how an operator drives all five from a terminal, over the MCP server in [`mcp/`](../mcp/).
 
 | Skill | Phase | Implemented by |
 |---|---|---|

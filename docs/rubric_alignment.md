@@ -51,8 +51,10 @@ the module that implements it so the skill and the code cannot drift apart silen
 | `operate-warrant` | driving it | `mcp/warrant_mcp/server.py` |
 
 *Drivable by it.* Cortex Code CLI is a full MCP client, and [`mcp/`](../mcp/) exposes Warrant as
-an MCP server: twelve tools, ten annotated `readOnlyHint`, one `destructiveHint`. Register it with
-`cortex mcp add warrant …` and the governed capabilities appear as `mcp__warrant__*`.
+an MCP server: **13 governed tools**, eleven annotated `readOnlyHint` and two that act, of which
+one declares `destructiveHint`. Five resources carry the same state for clients that support them,
+each with a tool twin for clients that do not. Register it with `cortex mcp add warrant …` and the
+governed capabilities appear as `mcp__warrant__*`.
 
 The load-bearing detail is what the tools *do not* accept. Not one takes a tier, a role or a force
 flag — authority is resolved from the object tags inside every call, and
@@ -101,6 +103,31 @@ A service list is only worth anything if it is honest, so:
   documented rather than hidden.
 - **A `generic` agent tool bound to the executor** — this one is a governance decision, not an
   omission. See Technical Execution below.
+
+---
+
+## Track 1's own strong-vs-weak list
+
+The organisers' walkthrough session named, for this track specifically, what a strong submission
+looks like and what a weak one looks like. Those are the sharpest criteria published anywhere for
+Problem Statement 1, so they are answered directly rather than left implied.
+
+**What they said is strong.**
+
+| | Where it is |
+|---|---|
+| **Multi-step reasoning** | Five phases, not one prompt: detect → investigate → classify authority → route → audit. Each is a module and a skill; `warrant/orchestrate/loop.py` runs them idempotently behind a circuit breaker. |
+| **Autonomous execution** | It writes. `open_supplier_case` executed with no human in the loop, on data tagged `open`, and the row is in the append-only log. The demonstration is not a draft-only agent. |
+| **Reusable modules** | An action is a registry entry, not a code path. Adding one forces it — by invariant test — to declare its footprint, bind parameters in placeholder order, and state an undo path. Governing a new table is `ALTER TABLE … SET TAG`, with no code change at all. |
+| **Context-aware triggers** | A Stream on `PENDING_ACTIONS` fires `EXECUTE_ON_APPROVAL` when a human approves; `SCAN_FOR_EXCEPTIONS` sweeps hourly. Both serverless, so an idle schedule costs 0.007 credits — measured, not asserted. |
+
+**What they said is weak, and why this is not that.**
+
+| Anti-pattern | Why this isn't it |
+|---|---|
+| *A chatbot layer over a database* | There is a conversational surface, and it is deliberately the **least** capable one: two read-only tools and no tool bound to the executor. Acting belongs to the governed console, which has an identity. A chat box wired to `EXECUTE_ACTION` would put the most persuadable surface in the system on the far side of the gate. |
+| *A single one-shot prompt* | One model call produces a *finding*, under a JSON schema, grounded by Cortex Search. It never produces SQL, never chooses its own authority, and never names the objects it touches — those come from the registry. Removing the model entirely would still leave a governed pipeline; removing the governance would leave an agent nobody would deploy. |
+| *A dashboard with alerts* | The output is not a notification. Five of six exceptions ended in an executed action or a queued one with an undo path. What a dashboard cannot do — and this does — is **refuse**, record why, and re-check the policy again at execution time. |
 
 ---
 
@@ -270,9 +297,10 @@ finding them hidden:
 - `SNOWFLAKE.ML.ANOMALY_DETECTION` is a documented seam, not an implementation.
 - The thresholds come from a corpus written for this project. A real deployment would need those
   documents to be the live controlled ones.
-- Streamlit in Snowflake is not publicly viewable — a viewer needs an account in ours. The console
-  therefore appears in the video rather than behind a public link, and everything else in this
-  document is checkable from the repository alone.
+- Streamlit in Snowflake is not publicly viewable — a viewer needs an account in ours. That is why
+  the [public read-only viewer](https://snowflake-coco-cli-hackathon-2026.vercel.app/) exists: it
+  reads the same account live, carries the console as screenshots, and lets anyone press *Approve*
+  and watch Snowflake refuse it. The console itself appears in the submission video.
 
 ---
 

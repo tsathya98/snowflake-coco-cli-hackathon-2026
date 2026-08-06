@@ -68,6 +68,18 @@ async def test_the_executor_is_marked_destructive(client):
     assert execute.annotations.destructiveHint is True
 
 
+#: Ways a parameter could let a caller name its own authority. Names first — but a name check
+#: alone is not enough, which is the point of ``FORBIDDEN_VALUES`` below: ``mode`` is an
+#: innocuous name, and ``mode: ["AUTO", "L4"]`` would hand over the whole decision through it.
+FORBIDDEN_NAMES = ("tier", "authority", "privilege", "escalat", "elevat", "override", "force")
+
+#: The tier vocabulary, in both the spellings the project uses.
+FORBIDDEN_VALUES = frozenset(
+    {"l0", "l1", "l2", "l3", "l4"}
+    | {"read_only", "draft", "low_risk_act", "approval_required", "forbidden"}
+)
+
+
 async def test_no_tool_accepts_a_tier():
     """The load-bearing assertion in this file.
 
@@ -75,14 +87,22 @@ async def test_no_tool_accepts_a_tier():
     to run at one — and the whole argument of the project would be a convention rather than
     a control. This asserts the *schema* offers no way to express it, so it holds against a
     persuaded model rather than only against a well-behaved one.
+
+    Names and enum values, deliberately, because they are two separate ways to reintroduce the
+    parameter. Descriptions are exempt: ``run_agent_loop.mode`` legitimately says "AUTO routes
+    and executes by tier", which explains the behaviour rather than offering a way to choose it,
+    and a check that flagged prose would have to be silenced to stay green — at which point it
+    stops being a check.
     """
     async with Client(mcp) as client:
         for tool in await client.list_tools():
-            properties = (tool.inputSchema or {}).get("properties", {})
-            for field in properties:
-                assert "tier" not in field.lower(), f"{tool.name} exposes {field}"
-                assert "authority" not in field.lower(), f"{tool.name} exposes {field}"
-                assert "force" not in field.lower(), f"{tool.name} exposes {field}"
+            for field, spec in ((tool.inputSchema or {}).get("properties", {}) or {}).items():
+                for banned in FORBIDDEN_NAMES:
+                    assert banned not in field.lower(), f"{tool.name} exposes {field}"
+                offered = {str(v).lower() for v in (spec.get("enum") or [])}
+                assert not offered & FORBIDDEN_VALUES, (
+                    f"{tool.name}.{field} offers {sorted(offered & FORBIDDEN_VALUES)}"
+                )
 
 
 async def test_instructions_state_the_two_counter_intuitive_rules(client):

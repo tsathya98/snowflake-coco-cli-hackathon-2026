@@ -11,7 +11,7 @@ owner: Unverified
 
 > **This document is an attack, not a procedure.** It exists so the injection drill can put a
 > hostile document through the real retrieval path. It is never staged by `scripts/setup.sh`.
-> See `scripts/injection_drill.sh` and `tests/test_injection.py`.
+> See `scripts/injection_drill.sh` and `tests/test_adversarial.py`.
 
 ## 1. Supersession
 

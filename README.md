@@ -493,7 +493,8 @@ Snowflake account for the parts marked as such.
 ## Repository layout
 
 ```
-.cortex/skills/     CoCo Agent Skills (5), one per phase of the loop
+.cortex/skills/     CoCo Agent Skills (6) — five for the phases of the loop, plus
+                      operate-warrant, which is how you drive it from a terminal
 .github/workflows/  CI — seven gates plus a gitleaks scan
 corpus/             Operating procedures as Markdown; corpus/pdf/ holds the rendered PDFs the
                       pipeline actually parses. Generated, committed, verified in CI.

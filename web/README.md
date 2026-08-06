@@ -7,7 +7,7 @@ decided and why, and cannot decide anything.
 
 That limit is not a UI convention. It is enforced in grants — see
 [`sql/50_public_viewer.sql`](../sql/50_public_viewer.sql). `WARRANT_PUBLIC` holds `SELECT` on the
-operational tables and `USAGE` on the two procedures that only compute. It has no grant on
+operational tables and `USAGE` on the three procedures that only compute. It has no grant on
 `EXECUTE_ACTION`, `EXECUTE_APPROVED`, `RUN_LOOP` or `GENERATE_AUDIT_PACK`. A missing button is a
 decision a bug can undo; a missing grant is Snowflake refusing the statement.
 
@@ -31,6 +31,28 @@ one ever *is* permitted, the page says so as an alarm rather than a success, and
 fails.
 
 [sharing]: https://docs.snowflake.com/en/developer-guide/streamlit/features/sharing-streamlit-apps
+
+## What is on the page
+
+One scrolling page rather than tabs — a reviewer arriving from a submission form has a minute and
+no idea what this is, and asking them to hunt through tabs for the argument loses more than the
+tidiness gains. The order is the order of the claim.
+
+| Section | What it shows | Source |
+|---|---|---|
+| Hero | Three tables resolved live to L4 / L3 / L2. Not an illustration — the same `SYSTEM$GET_TAG` read that drives the agent, so retagging a table changes it | `components/resolution.tsx` |
+| One pass | Weekly on-time delivery for six suppliers with the RB-001 threshold, then the routing table. Hover the chart to read every supplier at that week | `components/trend.tsx` |
+| Evidence | The escalated action, detector measurement beside model reasoning, and the **live** approve / reject / defer controls | `components/decide.tsx` |
+| Console | Eight screenshots of the Streamlit console, click-to-full-size, because that surface cannot be shared | `components/console.tsx` |
+| Authority | The capability manifest, plus a what-if that prices a policy change without making it | `components/whatif.tsx` |
+| Replay · Refusals · Governance | Every recorded action re-resolved against today's tags; the refusal ledger; the tags in force | `app/page.tsx` |
+| Tested | The planted hostile runbook, and the six scored reasoning cases | `components/tested.tsx` |
+| Unattended | One mark per task run over 24 hours, coloured by outcome | `components/charts.tsx` |
+| CoCo CLI | The MCP tool surface, the resources, the six skills, and the no-tier invariant | `components/coco.tsx` |
+
+The tool, skill and scorecard lists in the last two are transcriptions of things this app cannot
+import, so `tools/check_doc_claims.py` walks the MCP server, the skills tree and
+`eval/scorecard.json` and fails the gate if any of them drifts.
 
 ## Running it locally
 

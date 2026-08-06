@@ -5,9 +5,20 @@ Where a command produces output worth checking, the actual observed output is sh
 
 ## What you can verify without a Snowflake account
 
-Streamlit in Snowflake is not publicly viewable — a viewer needs an account in ours — so the
-console appears in the submission video rather than behind a public link. Everything else is
-checkable from the repository alone, in about two minutes:
+**Start here: [snowflake-coco-cli-hackathon-2026.vercel.app](https://snowflake-coco-cli-hackathon-2026.vercel.app/)**
+— the deployed viewer, reading this account live with no cache anywhere. It carries the tag
+resolution, the decision replay, the refusal ledger, the unattended task timeline, the MCP tool
+surface, and screenshots of the governed console.
+
+The one thing worth doing there before reading any of this: **press *Approve and execute*.** The
+button is live, it sends the statement the console sends, and Snowflake refuses it in front of you.
+That is the project's whole claim, checkable in one click and without an account.
+
+*Streamlit in Snowflake itself is not publicly viewable — a viewer needs an account in ours — which
+is why that viewer exists and why the console appears there as screenshots and in the submission
+video.*
+
+The rest is checkable from the repository alone, in about two minutes:
 
 ```bash
 uv sync --all-extras

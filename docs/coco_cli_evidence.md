@@ -14,7 +14,7 @@ the point of this document is that a reviewer can check it.
 |---|---|
 | Binary | `cortex`, **v1.1.53**, at `~/.local/bin/cortex` (WSL Ubuntu) |
 | Connection | `warrant` — CoCo reads the same `~/.snowflake/connections.toml` the `snow` CLI uses |
-| Project skills | All five in `.cortex/skills/` are discovered when `cortex` starts in the repo root |
+| Project skills | All six in `.cortex/skills/` are discovered when `cortex` starts in the repo root |
 | Project context | `AGENTS.md` is loaded automatically at session start |
 
 ### 🔴 Headless mode is unavailable on this account
@@ -248,78 +248,22 @@ bare `ALTER` would abort `setup.sh` for them.
 
 ---
 
-## Session 3 — Extend the semantic view
+## What these two sessions establish
 
-*Why: a real gap. `CORE.OPS_ANALYSIS` covers shipments, suppliers and SKUs only, so the Cortex
-Analyst tool on the agent cannot answer anything about inventory or quality. CoCo ships
-`semantic-view-patterns` and can generate semantic views from table metadata.*
+Both were run interactively against the live account, and both **found a real defect rather than
+confirming the design** — which is the only kind of tool use worth reporting. The record below is
+what changed in the repository as a result; the query history behind each is checkable by a third
+party, which a transcript is not.
 
-```
-#WARRANT.DATA.INVENTORY #WARRANT.DATA.QUALITY_HOLDS #WARRANT.CORE.OPS_ANALYSIS
-
-Extend the semantic view CORE.OPS_ANALYSIS to cover inventory cover and quality-hold ageing,
-following the naming already used for shipments. Keep the logical/physical name distinction —
-the view declares `suppliers.supplier AS supplier_name`, and queries use the logical name.
-Do not expose QUALITY_HOLDS.lot_ref: it carries a masking policy and the agent must not
-surface it.
-```
-
-**What happened:** _(fill in: the DDL, whether `sql/30_ai.sql` changed, and the verifying query)_
-
----
-
-## Session 4 — Exercise the project's own skills
-
-*Why: the deck template explicitly asks **which Cortex Code CLI skills are used and how they
-connect**. Skills that exist but were never invoked answer that question weakly.*
-
-```
-$classify-authority
-
-Resolve the authority tier for release_quality_hold against the live tags, then check your
-answer against CALL WARRANT.CORE.AUTHORITY_MANIFEST(NULL). Do they agree? If not, which is
-wrong and why?
-```
-
-```
-$detect-anomaly
-
-Review src/warrant/detect/exceptions.py against the thresholds in the corpus:
-#WARRANT.DATA.RUNBOOKS. Is every number in the detectors actually quoted from a clause, and
-is any clause implemented incorrectly?
-```
-
-**What happened:** _(fill in: whether the skill's answer matched the implementation)_
-
----
-
-## Session 5 — Adversarial review of the submission
-
-*Why: an outside reading of the repo against the problem statement, from a tool that has the
-project context loaded and no investment in the existing design.*
-
-```
-Read AGENTS.md, README.md and docs/rubric_alignment.md. You are a hackathon judge scoring
-against: Technical Execution 40%, Real-World Relevance 30%, Solution Completeness 30%, plus
-T&C §9 (Cortex Code CLI, Python, Snowflake platform, and special consideration for Snowpark /
-Worksheets / Streamlit / Marketplace).
-
-Where is this submission weakest? Name the three claims you would most want to disprove, and
-tell me exactly how you would try.
-```
-
-**What happened:** _(fill in: the three claims, and what was done about each)_
-
----
-
-## Summary for the deck and the portal
-
-_(fill in once the sessions are done)_
-
-| Session | Skill(s) used | Outcome | Commit |
+| Session | Skills used | Outcome | Landed in |
 |---|---|---|---|
-| 1 RBAC audit | `rbac`, docs search | **Found a real over-grant.** `IMPORTED PRIVILEGES ON DATABASE SNOWFLAKE` was unnecessary and its justifying comment contradicted Gotcha #3. Revoked live, removed from `sql/00_setup.sql`, verified by re-running the loop and checking `grounded_in`. | `sql/00_setup.sql` +3 −2 |
-| 2 Credit burn | cost intelligence | **8.39 of 400 credits used**; survives to Sept 4 on any projection. Surfaced that `COMPUTE_WH` is 39% of spend and sits outside `WARRANT_MONITOR` — a hole in the cost guard. AI functions only 6.5%; serverless tasks 0.007. Gap closed with a separate `WARRANT_DEV_MONITOR`; verification found `SNOWFLAKE_LEARNING_WH` unguarded too. | `sql/00_setup.sql` |
-| 3 Semantic view | `semantic-view-patterns` | | |
-| 4 Own skills | `$classify-authority`, `$detect-anomaly` | | |
-| 5 Adversarial review | project context | | |
+| 1 · RBAC least-privilege audit | bundled `rbac`, docs search | **A real over-grant.** `IMPORTED PRIVILEGES ON DATABASE SNOWFLAKE` was unnecessary and its justifying comment contradicted the project's own rule against reading tags from `ACCOUNT_USAGE`. Revoked live, then verified by re-running the loop and checking `grounded_in` — the one signal that would reveal a broken `SEARCH_PREVIEW`. | `sql/00_setup.sql` +3 −2 |
+| 2 · Trial credit burn | cost intelligence | **8.39 of 400 credits** built the whole project. Surfaced that `COMPUTE_WH` was 39% of spend and sat outside `WARRANT_MONITOR` — a hole in the cost guard. Closed with a separate `WARRANT_DEV_MONITOR` rather than a shared quota, so a browsing binge cannot suspend the demo; verifying that found `SNOWFLAKE_LEARNING_WH` unguarded too. | `sql/00_setup.sql` |
+
+Two figures from session 2 are worth quoting because they were *measured* rather than asserted:
+**AI functions are 6.5% of spend** — the reasoning is the cheap part, warehouse compute dominates —
+and **serverless tasks cost 0.007 credits**, which is what "an idle schedule costs nothing" means
+in numbers.
+
+Further sessions are planned and not yet run; their prompts are kept out of this file rather than
+sitting here as blanks.

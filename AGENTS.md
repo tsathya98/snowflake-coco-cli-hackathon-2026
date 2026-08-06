@@ -53,7 +53,7 @@ artifact.
 - **Two governance controls, doing different jobs.** The `SENSITIVITY` tag decides what the agent
   may *do*; the `LOT_REF_MASK` masking policy decides what it may *see*. Reads are deliberately
   tag-exempt, so the mask is what stops an agent that may not act on a regulated record from
-  reading every field of it. Both are re-applied in `sql/10` because `CREATE OR REPLACE TABLE`
+  reading every field of it. Both are re-applied in `sql/10_synthetic_data.sql` because `CREATE OR REPLACE TABLE`
   silently drops tags and policies alike.
 - **Every function takes its Snowpark `Session` as its first positional argument.** Nothing in
   `src/warrant/` calls `get_active_session()`; only the stored-procedure entry points in

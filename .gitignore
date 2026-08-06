@@ -78,3 +78,4 @@ web/next-env.d.ts
 
 # WSL virtualenv for the MCP server (CoCo and connections.toml live in the distro)
 .venv-wsl/
+docs/coco_sessions_planned.md

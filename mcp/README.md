@@ -77,6 +77,7 @@ auto-approve them and prompt on the rest.
 | `detect_exceptions` | ✓ | Run the detectors |
 | `search_runbooks` | ✓ | Cortex Search over the parsed procedures |
 | `read_runbook` | ✓ | One procedure in full |
+| `task_activity` | ✓ | What ran unattended in the last N hours, and how each run ended |
 | `run_agent_loop` | | One governed pass: detect → reason → classify → route → audit |
 | `execute_approved_action` | | Dispatch something a human approved — **re-resolves authority first** |
 

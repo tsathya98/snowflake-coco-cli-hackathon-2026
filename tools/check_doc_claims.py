@@ -218,6 +218,34 @@ COCO = "web/components/coco.tsx"
 TESTED = "web/components/tested.tsx"
 
 
+def mcp_readme_failures() -> list[str]:
+    """Check that ``mcp/README.md`` documents exactly the tools and resources the server has.
+
+    A count alone would not have caught this: the README's table listed twelve of the thirteen
+    tools, and the missing one was found by reading. Comparing the *sets* means a tool added
+    without a table row fails the gate instead of quietly going undocumented.
+
+    Returns:
+        One message per tool or resource that the table and the server disagree about.
+    """
+    server = (ROOT / "mcp" / "warrant_mcp" / "server.py").read_text(encoding="utf-8")
+    readme = (ROOT / "mcp" / "README.md").read_text(encoding="utf-8")
+
+    real = set(re.findall(r"@mcp\.tool\(.*?\)\s*\ndef (\w+)", server, re.S))
+    documented = set(re.findall(r"^\| `(\w+)`", readme, re.M))
+    failures = [f"mcp/README.md: no table row for the tool {t}" for t in sorted(real - documented)]
+    failures += [
+        f"mcp/README.md: documents {t}, which the server no longer defines"
+        for t in sorted(documented - real)
+    ]
+    failures += [
+        f"mcp/README.md: does not mention the resource {uri}"
+        for uri in sorted(re.findall(r'@mcp\.resource\(\s*\n?\s*"([^"]+)"', server))
+        if uri not in readme
+    ]
+    return failures
+
+
 def mcp_surface_failures() -> list[str]:
     """Check the page's tool, resource and skill lists against the server and the skills tree.
 
@@ -305,6 +333,7 @@ def main() -> int:
         print(f"  {actual:>4}  {label:<34} {status}")
 
     for label, derive_failures in (
+        ("mcp/README vs the MCP server", mcp_readme_failures),
         ("deployed page vs the MCP server", mcp_surface_failures),
         ("deployed page vs eval and images", recorded_claims_failures),
     ):

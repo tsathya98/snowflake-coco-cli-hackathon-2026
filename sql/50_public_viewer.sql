@@ -109,6 +109,15 @@ GRANT SELECT ON SEMANTIC VIEW WARRANT.CORE.OPS_ANALYSIS TO ROLE WARRANT_PUBLIC;
 GRANT USAGE ON PROCEDURE WARRANT.CORE.AUTHORITY_MANIFEST(OBJECT) TO ROLE WARRANT_PUBLIC;
 GRANT USAGE ON PROCEDURE WARRANT.CORE.REPLAY_DECISIONS(OBJECT)   TO ROLE WARRANT_PUBLIC;
 
+-- TASK_ACTIVITY is also granted at the end of 46_schedule.sql, because CREATE OR REPLACE
+-- PROCEDURE there drops this grant and it has to be restored in the same breath. It is
+-- repeated here on purpose: this file is documented as the definition of what WARRANT_PUBLIC
+-- may do, and re-running it is the recovery when grants are lost. A grant that exists only in
+-- 46 would make both of those statements false — the boundary would read as two procedures
+-- while the role held three, and the recovery would silently leave the page's task timeline
+-- broken. GRANT is idempotent, so saying it twice costs nothing.
+GRANT USAGE ON PROCEDURE WARRANT.CORE.TASK_ACTIVITY(NUMBER)      TO ROLE WARRANT_PUBLIC;
+
 -- ---------------------------------------------------------------------------
 -- The service user.
 --
