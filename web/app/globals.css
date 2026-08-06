@@ -1,12 +1,18 @@
 @import "tailwindcss";
 
 /*
- * One token set, two themes, swapped at :root.
+ * Two explicit themes, never an implicit one.
  *
- * Warm neutrals rather than blue-grey: an operations console is read for long stretches
- * and a warm ground is easier to sit with. Every accent clears 4.5:1 against its own
- * theme's surface, because colour on this page always accompanies a word and must never
- * be the only thing carrying a meaning.
+ * `<html data-theme>` is always set — by an inline script before first paint, and by the
+ * toggle thereafter. So the stylesheet needs exactly two states rather than three, and
+ * there is no `prefers-color-scheme` block here that an explicit choice would then have
+ * to fight with.
+ *
+ * Dark is warm near-black; light is the warm bone-and-cream family rather than white,
+ * because an operations console is read for long stretches and a warm ground is easier
+ * to sit with than a bluish one. Every accent clears 4.5:1 against its own theme's
+ * surface — colour on this page always accompanies a word and must never be the only
+ * thing carrying a meaning.
  *
  * The vocabulary matches streamlit/warrant_console.py deliberately — same tier names,
  * same outcome names, same chip and tile shapes — so the public viewer and the governed
@@ -14,84 +20,71 @@
  */
 
 @theme {
-  --color-ink: #131211;
-  --color-ink-deep: #0c0b0a;
-  --color-bone: #f4efe6;
-  --color-bone-soft: #cbc4b9;
-  --color-muted: #8e867b;
-
-  --color-good: #4ade80;
-  --color-warn: #fbbf24;
-  --color-bad: #f87171;
-  --color-info: #a5b4fc;
-  --color-model: #c4b5fd;
-
   --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, monospace;
-
-  --animate-rise: rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
   --animate-sheen: sheen 2.6s ease-in-out infinite;
-}
-
-@keyframes rise {
-  from {
-    opacity: 0;
-    transform: translateY(14px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
 }
 
 @keyframes sheen {
   0%,
   100% {
-    opacity: 0.45;
+    opacity: 0.4;
   }
   50% {
     opacity: 1;
   }
 }
 
-:root {
+:root,
+:root[data-theme="dark"] {
+  --page: #131211;
+  --page-deep: #0c0b0a;
   --surface: rgba(240, 235, 228, 0.045);
   --surface-hi: rgba(240, 235, 228, 0.085);
   --line: rgba(240, 235, 228, 0.12);
   --line-hi: rgba(240, 235, 228, 0.26);
-  --page: #131211;
+
   --text: #f4efe6;
   --text-soft: #cbc4b9;
   --text-muted: #8e867b;
+
   --good: #4ade80;
   --warn: #fbbf24;
   --bad: #f87171;
   --info: #a5b4fc;
   --model: #c4b5fd;
+  --muted: #8e867b;
   --chip-ink: #0c0b0a;
+
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4);
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    --surface: rgba(19, 18, 17, 0.032);
-    --surface-hi: rgba(19, 18, 17, 0.06);
-    --line: rgba(19, 18, 17, 0.13);
-    --line-hi: rgba(19, 18, 17, 0.26);
-    --page: #f8f5f0;
-    --text: #14130f;
-    --text-soft: #3c372f;
-    --text-muted: #6a6359;
-    --good: #15803d;
-    --warn: #b45309;
-    --bad: #b91c1c;
-    --info: #4338ca;
-    --model: #6d28d9;
-    --chip-ink: #ffffff;
-  }
+:root[data-theme="light"] {
+  --page: #f1ece1;
+  --page-deep: #e6dfce;
+  --surface: #ffffff;
+  --surface-hi: #f6f1e4;
+  --line: rgba(28, 22, 12, 0.12);
+  --line-hi: rgba(28, 22, 12, 0.28);
+
+  --text: #161310;
+  --text-soft: #3a342b;
+  --text-muted: #6f6557;
+
+  --good: #0d7a60;
+  --warn: #9b6309;
+  --bad: #b9341f;
+  --info: #553590;
+  --model: #553590;
+  --muted: #6f6557;
+  --chip-ink: #ffffff;
+
+  --shadow-card: 0 1px 2px rgba(28, 22, 12, 0.06), 0 1px 1px rgba(28, 22, 12, 0.04);
 }
 
 html {
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
+  background: var(--page);
 }
 
 body {
@@ -101,17 +94,35 @@ body {
   font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
+}
+
+:focus-visible {
+  outline: 2px solid var(--info);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--info) 35%, transparent);
+}
+
+/* -------------------------------------------------------------------- nav state
+ * data-active is written by ScrollSpy. A tab bar's orientation, without a tab bar's
+ * habit of hiding five sixths of the page behind a click. */
+a[data-active="true"] {
+  background: var(--surface-hi);
+  color: var(--text);
 }
 
 /* ------------------------------------------------- pointer-reactive lighting
- *
  * Driven by --mx/--my (viewport) and --gx/--gy (per card), written by
  * components/pointer.tsx inside a requestAnimationFrame. Purely decorative:
  * without the script, or with motion reduced, the page loses only light.
- *
- * `@media (hover: hover)` keeps all of it off touch devices, where there is no
- * cursor to follow and the effects would only cost battery.
- */
+ * `(hover: hover)` keeps all of it off touch devices, where there is no cursor
+ * to follow and the work would only cost battery. */
 .ambient {
   position: fixed;
   inset: 0;
@@ -121,7 +132,7 @@ body {
   transition: opacity 0.5s ease;
   background: radial-gradient(
     460px circle at var(--mx, 50%) var(--my, 0%),
-    color-mix(in srgb, var(--info) 12%, transparent),
+    color-mix(in srgb, var(--info) 10%, transparent),
     transparent 68%
   );
 }
@@ -145,7 +156,7 @@ body {
     transition: opacity 0.3s ease;
     background: radial-gradient(
       240px circle at var(--gx, 50%) var(--gy, 50%),
-      color-mix(in srgb, var(--tone, var(--info)) 22%, transparent),
+      color-mix(in srgb, var(--tone, var(--info)) 18%, transparent),
       transparent 66%
     );
   }
@@ -157,9 +168,9 @@ body {
   }
 }
 
-/* Scroll reveal. The attribute is set by components/pointer.tsx once an element
- * has intersected, so content is visible even if the script never runs — the
- * hidden state is applied by JS, never by the stylesheet alone. */
+/* Scroll reveal. The attribute is set by components/pointer.tsx, so content is visible
+ * even if the script never runs — the hidden state is applied by JS, never by the
+ * stylesheet alone. A CSS-only opacity:0 would leave a reader with a blank page. */
 [data-reveal="pending"] {
   opacity: 0;
   transform: translateY(16px);
@@ -176,9 +187,7 @@ body {
   html {
     scroll-behavior: auto;
   }
-  .ambient {
-    display: none;
-  }
+  .ambient,
   [data-glow]::after {
     display: none;
   }
@@ -188,23 +197,67 @@ body {
     transform: none;
     transition: none;
   }
+  body {
+    transition: none;
+  }
 }
 
-::selection {
-  background: color-mix(in srgb, var(--info) 40%, transparent);
-}
-
-/* The table wrapper scrolls horizontally on a phone rather than squeezing six
- * columns into 360px, and fades its right edge so the overflow is discoverable. */
+/* ----------------------------------------------------------------- table scroll
+ *
+ * Six columns do not fit a phone, and wrapping every cell to three lines is worse than
+ * scrolling. So the wrapper scrolls — but a scroll region nobody can see is a scroll
+ * region nobody uses, which is why there are three affordances rather than none:
+ *
+ *   1. a permanently visible slim scrollbar, not the overlay kind that fades away
+ *   2. a fade on whichever edge has content beyond it, toggled by data-overflow
+ *   3. a one-line hint above the table, shown only when it actually overflows
+ */
 .scroller {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
+  scrollbar-color: var(--line-hi) transparent;
+  scrollbar-gutter: stable;
 }
 .scroller::-webkit-scrollbar {
-  height: 6px;
+  height: 8px;
+}
+.scroller::-webkit-scrollbar-track {
+  background: var(--surface);
+  border-radius: 999px;
 }
 .scroller::-webkit-scrollbar-thumb {
   background: var(--line-hi);
   border-radius: 999px;
+}
+.scroller::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+.table-wrap {
+  position: relative;
+}
+.table-wrap::before,
+.table-wrap::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 10px;
+  width: 34px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 2;
+}
+.table-wrap::before {
+  left: 0;
+  background: linear-gradient(to right, var(--page), transparent);
+}
+.table-wrap::after {
+  right: 0;
+  background: linear-gradient(to left, var(--page), transparent);
+}
+.table-wrap[data-overflow~="left"]::before,
+.table-wrap[data-overflow~="right"]::after {
+  opacity: 1;
 }

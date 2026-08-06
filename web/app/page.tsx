@@ -31,7 +31,10 @@ import {
   type ReplayPayload,
 } from "@/lib/queries";
 import { PointerGlow } from "@/components/pointer";
-import { Card, Chip, ModelText, Note, Reveal, Section, Table, Tag, Tiles } from "@/components/ui";
+import { Card, Chip, ModelText, Note, Reveal, Section, Tag, Tiles } from "@/components/ui";
+import { DataTable } from "@/components/table";
+import { ScrollSpy, ThemeToggle } from "@/components/theme";
+import { WhatIf } from "@/components/whatif";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -80,6 +83,7 @@ export default async function Page() {
   return (
     <>
       <PointerGlow />
+      <ScrollSpy ids={NAV.map(([id]) => id)} />
 
       <nav className="sticky top-0 z-30 border-b border-[var(--line)] bg-[color-mix(in_srgb,var(--page)_88%,transparent)] backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-2.5 sm:px-6">
@@ -97,6 +101,7 @@ export default async function Page() {
               </a>
             ))}
           </div>
+          <ThemeToggle />
           <a
             href={REPO}
             className="hidden shrink-0 rounded-lg border border-[var(--line)] px-3 py-1.5 text-[0.78rem] font-semibold transition-colors hover:border-[var(--line-hi)] sm:block"
@@ -191,7 +196,7 @@ export default async function Page() {
           }
         >
           <Reveal>
-            <Table
+            <DataTable
               columns={[
                 ["ENTITY", "Entity"],
                 ["ACTION_TYPE", "Action proposed"],
@@ -277,7 +282,7 @@ export default async function Page() {
         <Section
           id="authority"
           eyebrow="What is it allowed to do, right now?"
-          title="Every action, resolved against the tags in force"
+          title="Every action, resolved against the tags in force — and what a policy change would cost"
           lede="Most restricted first — what the agent may not do is what a reviewer should read before what it may. Computed by the same resolver the executor uses."
         >
           <Tiles
@@ -287,32 +292,8 @@ export default async function Page() {
               ["Acts unsupervised", counts["acts unsupervised"] ?? 0, "good"],
             ]}
           />
-          <div className="mt-4 space-y-2.5">
-            {manifest.capabilities.map((capability, i) => (
-              <Reveal key={capability.action} delay={i * 55}>
-                <Card tone={OUTCOME_TONE[capability.outcome] ?? "muted"}>
-                  <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                    <span className="font-mono text-[0.92rem] font-bold">{capability.action}</span>
-                    <span
-                      className="text-[0.66rem] font-extrabold uppercase tracking-[0.11em]"
-                      style={{ color: `var(--${OUTCOME_TONE[capability.outcome] ?? "muted"})` }}
-                    >
-                      {capability.outcome}
-                    </span>
-                  </div>
-                  <div className="mt-2">
-                    {capability.classifications.map((c) => (
-                      <Tag key={c.object}>
-                        {c.object.split(".").pop()} &middot; {c.sensitivity ?? "untagged"}
-                      </Tag>
-                    ))}
-                  </div>
-                  <div className="mt-2 text-[0.8rem] leading-relaxed text-[var(--text-muted)]">
-                    {capability.rationale}
-                  </div>
-                </Card>
-              </Reveal>
-            ))}
+          <div className="mt-6">
+            <WhatIf initial={manifest} />
           </div>
         </Section>
 
@@ -336,7 +317,7 @@ export default async function Page() {
           />
           <div className="mt-4">
             <Reveal>
-              <Table
+              <DataTable
                 columns={[
                   ["action_type", "Action"],
                   ["execution_result", "Ran as"],
@@ -404,7 +385,7 @@ export default async function Page() {
           }
         >
           <Reveal>
-            <Table
+            <DataTable
               columns={[
                 ["OBJECT", "Object"],
                 ["SENSITIVITY", "Sensitivity"],
@@ -432,7 +413,7 @@ export default async function Page() {
           </p>
           <div className="mt-4">
             <Reveal>
-              <Table
+              <DataTable
                 columns={[
                   ["HOLD", "Hold"],
                   ["LOT_REFERENCE", "Lot reference"],
@@ -462,7 +443,7 @@ export default async function Page() {
           </p>
           <div className="mt-4">
             <Reveal>
-              <Table
+              <DataTable
                 columns={[
                   ["SUPPLIER", "Supplier"],
                   ["TIER", "Tier"],
@@ -483,7 +464,7 @@ export default async function Page() {
           lede="Including every refusal. Never updated, never deleted. The most recent 40."
         >
           <Reveal>
-            <Table
+            <DataTable
               columns={[
                 ["AT", "At"],
                 ["PHASE", "Phase"],

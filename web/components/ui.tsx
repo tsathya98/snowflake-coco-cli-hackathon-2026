@@ -143,59 +143,6 @@ export function Card({
   );
 }
 
-/**
- * A table from plain rows.
- *
- * @param columns `[key, heading, numeric?]`. `numeric` right-aligns and switches to the
- *   monospace face so figures line up down the column.
- *
- * Wrapped in `.scroller` so a phone scrolls sideways instead of wrapping every cell to
- * three lines. `min-w-[640px]` guarantees there is something to scroll rather than a
- * squeezed, unreadable grid.
- */
-export function Table({
-  columns,
-  rows,
-}: {
-  columns: [string, string, boolean?][];
-  rows: Record<string, unknown>[];
-}) {
-  return (
-    <div className="scroller -mx-4 px-4 sm:mx-0 sm:px-0">
-      <table className="w-full min-w-[640px] border-separate border-spacing-0 overflow-hidden rounded-xl border border-[var(--line)] text-[0.84rem]">
-        <thead>
-          <tr>
-            {columns.map(([key, heading]) => (
-              <th
-                key={key}
-                className="border-b border-[var(--line)] bg-[var(--surface-hi)] px-3 py-2.5 text-left text-[0.62rem] font-bold uppercase tracking-[0.1em] text-[var(--text-muted)]"
-              >
-                {heading}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row, index) => (
-            <tr key={index} className="transition-colors hover:bg-[var(--surface)]">
-              {columns.map(([key, , numeric]) => (
-                <td
-                  key={key}
-                  className={`border-b border-[var(--line)] px-3 py-2.5 text-[var(--text-soft)] ${
-                    numeric ? "text-right font-mono tabular-nums" : ""
-                  }`}
-                >
-                  {String(row[key] ?? "-")}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
 export function Section({
   id,
   eyebrow,
@@ -210,7 +157,7 @@ export function Section({
   children: ReactNode;
 }) {
   return (
-    <section id={id} className="scroll-mt-20 py-9 sm:py-12">
+    <section id={id} className="scroll-mt-24 border-t border-[var(--line)] py-10 sm:py-14">
       <Reveal>
         <div className="mb-1.5 text-[0.65rem] font-bold uppercase tracking-[0.16em] text-[var(--info)]">
           {eyebrow}
