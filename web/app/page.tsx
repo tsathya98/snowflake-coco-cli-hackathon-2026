@@ -248,7 +248,7 @@ export default async function Page() {
             title="Evidence beside the reasoning, not behind a click"
             lede="A reviewer asked to approve something whose evidence is one click away approves it without clicking."
           >
-            <div className="grid gap-5 lg:grid-cols-2">
+            <div className="grid items-start gap-5 lg:grid-cols-2">
               <Reveal>
                 <div className="rounded-xl border border-[var(--line)] bg-[var(--surface)] p-4 sm:p-5" data-glow>
                   <div className="mb-3 text-[0.62rem] font-bold uppercase tracking-[0.11em] text-[var(--text-muted)]">

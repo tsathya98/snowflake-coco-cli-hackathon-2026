@@ -67,7 +67,7 @@ export function Coco() {
 
   return (
     <div className="space-y-5">
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
+      <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
         <Panel title={`The tool surface — ${TOOLS.length} tools, ${reads} read, ${acts} act`}>
           <ul className="m-0 list-none space-y-1.5 p-0">
             {TOOLS.map(([name, what, kind]) => (
