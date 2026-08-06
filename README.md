@@ -429,7 +429,7 @@ src/warrant/        Python package — detect / reason / authority / act / orche
 sql/                Idempotent DDL, run in filename order (00 → 45); 90 resets for a re-run
 streamlit/          Approval console (Streamlit in Snowflake)
 mcp/                MCP server — Warrant's governed tools, drivable by CoCo CLI or any
-                      MCP client. Ten read-only tools, two that act, none that take a tier.
+                      MCP client. Eleven read-only tools, two that act, none that take a tier.
 web/                Public read-only viewer (Next.js on Vercel), reading live from Snowflake.
                       Its approve/reject/defer buttons are live and send the real statements —
                       what you get back is Snowflake's refusal, not a disabled control.

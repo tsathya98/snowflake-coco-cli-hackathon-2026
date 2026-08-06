@@ -38,6 +38,11 @@ import { DataTable } from "@/components/table";
 import { ScrollSpy, ThemeToggle } from "@/components/theme";
 import { WhatIf } from "@/components/whatif";
 import { Decide } from "@/components/decide";
+import { Wordmark } from "@/components/mark";
+import { Resolution } from "@/components/resolution";
+import { Coco } from "@/components/coco";
+import { Tested } from "@/components/tested";
+import { ConsoleGallery } from "@/components/console";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -53,11 +58,14 @@ const TIER_MEANING: Record<string, string> = {
 const NAV = [
   ["pass", "One pass"],
   ["evidence", "Evidence"],
+  ["console", "Console"],
   ["authority", "Authority"],
   ["replay", "Replay"],
   ["refusals", "Refusals"],
+  ["tested", "Tested"],
   ["governance", "Governance"],
   ["unattended", "Unattended"],
+  ["cli", "CoCo CLI"],
 ] as const;
 
 const str = (v: unknown) => String(v ?? "");
@@ -92,9 +100,7 @@ export default async function Page() {
 
       <nav className="sticky top-0 z-30 border-b border-[var(--line)] bg-[color-mix(in_srgb,var(--page)_88%,transparent)] backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-2.5 sm:px-6">
-          <span className="shrink-0 text-[0.95rem] font-extrabold tracking-[-0.02em]">
-            &#9878;&#65039; Warrant
-          </span>
+          <Wordmark size={19} className="shrink-0 text-[0.95rem]" />
           <div className="scroller flex min-w-0 flex-1 gap-1">
             {NAV.map(([id, label]) => (
               <a
@@ -118,7 +124,10 @@ export default async function Page() {
       </nav>
 
       <main className="relative z-10 mx-auto max-w-6xl px-4 pb-24 sm:px-6">
-        <header className="pt-10 sm:pt-16">
+        {/* Two columns from lg up: the claim on the left, the live proof of it on the right.
+            Below that they stack, claim first — on a phone the diagram is the thing that can
+            wait, since the sentence above it says the same thing in words. */}
+        <header className="grid items-center gap-8 pt-10 sm:pt-16 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-10">
           <Reveal>
             <div
               className="mb-3 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[0.66rem] font-bold uppercase tracking-[0.14em]"
@@ -144,11 +153,15 @@ export default async function Page() {
               </span>
               .
             </h1>
-            <p className="mt-4 max-w-[68ch] text-[1rem] leading-relaxed text-[var(--text-soft)] sm:text-[1.08rem]">
-              An operations agent that closes the loop from detection to action, and whose
-              permission to take each action is read from the Snowflake object tags on the data
-              that action touches — live, and again at execution time, so a human&rsquo;s approval
-              cannot outlive the policy it was granted under.
+            <p className="mt-4 max-w-[62ch] text-[1.02rem] leading-relaxed sm:text-[1.14rem]">
+              Agents that <em>can</em> act don&rsquo;t get deployed, because nobody can say in
+              advance what they&rsquo;re allowed to do.
+            </p>
+            <p className="mt-3 max-w-[68ch] text-[0.96rem] leading-relaxed text-[var(--text-soft)] sm:text-[1.02rem]">
+              Warrant takes that answer from the data itself. Every action&rsquo;s authority is
+              read from the Snowflake object tags on the tables it touches — live, and again at
+              execution time, so a human&rsquo;s approval cannot outlive the policy it was granted
+              under. Change a tag, and what the agent may do changes with it. No code, no deploy.
             </p>
             <p className="mt-4 text-[0.82rem] text-[var(--text-muted)]">
               Team Argmax &middot; CoCo CLI Hackathon 2026, Problem Statement 1 &middot;{" "}
@@ -156,6 +169,10 @@ export default async function Page() {
                 source on GitHub
               </a>
             </p>
+          </Reveal>
+
+          <Reveal delay={120}>
+            <Resolution governance={governance} />
           </Reveal>
         </header>
 
@@ -293,6 +310,22 @@ export default async function Page() {
         ) : null}
 
         <Section
+          id="console"
+          eyebrow="Where a human actually decides"
+          title="The governed console, which you cannot open — so here it is"
+          lede={
+            <>
+              Approving is a governed act, so it lives in Streamlit in Snowflake, behind an
+              account. That surface cannot be shared with anyone who does not have one, and it is
+              the surface where the governance bites. Screenshots are a poor substitute for a live
+              app and a much better one than leaving it invisible.
+            </>
+          }
+        >
+          <ConsoleGallery />
+        </Section>
+
+        <Section
           id="authority"
           eyebrow="What is it allowed to do, right now?"
           title="Every action, resolved against the tags in force — and what a policy change would cost"
@@ -382,6 +415,22 @@ export default async function Page() {
               ))}
             </div>
           )}
+        </Section>
+
+        <Section
+          id="tested"
+          eyebrow="Where we tried to break it"
+          title="An attack in the corpus, and a score on the reasoning"
+          lede={
+            <>
+              A system that behaves well is not evidence until someone has tried to make it behave
+              badly. Two things below: a hostile document put through the real retrieval path, and
+              the agent&rsquo;s judgment graded case by case. Neither is live — the first is a
+              drill an operator runs, the second a recorded measurement — and both say so.
+            </>
+          }
+        >
+          <Tested />
         </Section>
 
         <Section
@@ -517,6 +566,21 @@ export default async function Page() {
             grant that serverless tasks require, and the task auto-suspended itself after three of
             them rather than failing quietly.
           </p>
+        </Section>
+
+        <Section
+          id="cli"
+          eyebrow="Driven from the CLI"
+          title="The agent is an MCP server, and CoCo CLI is how you operate it"
+          lede={
+            <>
+              Everything above is what the agent decided. This is the surface you decide{" "}
+              <em>with</em> — the same governed tools, in a terminal, with the authority model
+              intact all the way to the tool schema.
+            </>
+          }
+        >
+          <Coco />
         </Section>
 
         <Section

@@ -20,6 +20,7 @@ silence stops meaning anything.
 
 from __future__ import annotations
 
+import json
 import re
 import subprocess
 import sys
@@ -158,6 +159,87 @@ RULES: tuple[tuple[str, Callable[[], int], str], ...] = (
 )
 
 
+"""
+The deployed page transcribes three things it cannot import, and a transcription rots.
+
+The public viewer is a separate TypeScript app with no access to ``mcp/`` or ``eval/``, so its
+tool surface, skill list and scorecard are copies. That is worse than a stale README: it is the
+first thing a reviewer reads, it is on a public URL, and it is the section arguing that the
+surface is governed. The screenshots are copies for the same reason — Next serves only from
+``web/public/`` — and nothing else would stop one becoming a different picture from the README's.
+
+These are structural-equality checks rather than numbers quoted in prose, which is why they sit
+beside :data:`RULES` rather than inside it.
+"""
+
+COCO = "web/components/coco.tsx"
+TESTED = "web/components/tested.tsx"
+
+
+def mcp_surface_failures() -> list[str]:
+    """Check the page's tool, resource and skill lists against the server and the skills tree.
+
+    Returns:
+        One message per disagreement, empty if the page matches.
+    """
+    server = (ROOT / "mcp" / "warrant_mcp" / "server.py").read_text(encoding="utf-8")
+    coco = (ROOT / COCO).read_text(encoding="utf-8")
+
+    tools = re.findall(r"@mcp\.tool\((.*?)\)\s*\ndef (\w+)", server, re.S)
+    kinds = {name: "read" if '"readOnlyHint": True' in body else "act" for body, name in tools}
+    failures = []
+    for name, kind in kinds.items():
+        if f'["{name}", ' not in coco:
+            failures.append(f"{COCO}: does not list the tool {name}")
+        elif f'"{kind}"],' not in coco.split(f'["{name}", ')[1].split("\n")[0]:
+            failures.append(f"{COCO}: lists {name} as the wrong kind, not {kind}")
+
+    listed = len(re.findall(r'^\s+\["\w+", ".*?", "(?:read|act)"\],$', coco, re.M))
+    if listed != len(tools):
+        failures.append(f"{COCO}: lists {listed} tools; the server defines {len(tools)}")
+
+    failures += [
+        f"{COCO}: does not list the resource {uri}"
+        for uri in re.findall(r'@mcp\.resource\(\s*\n?\s*"([^"]+)"', server)
+        if uri not in coco
+    ]
+
+    skills = sorted(p.name for p in (ROOT / ".cortex" / "skills").iterdir() if p.is_dir())
+    if f"{len(skills)} CoCo skills" not in coco:
+        failures.append(f"{COCO}: does not say '{len(skills)} CoCo skills'")
+    failures += [f"{COCO}: does not list the skill {s}" for s in skills if f'["{s}", ' not in coco]
+    return failures
+
+
+def recorded_claims_failures() -> list[str]:
+    """Check the page's scorecard figures and its copies of the console screenshots.
+
+    Returns:
+        One message per disagreement, empty if the page matches.
+    """
+    tested = (ROOT / TESTED).read_text(encoding="utf-8")
+    scorecard = json.loads((ROOT / "eval" / "scorecard.json").read_text(encoding="utf-8"))
+    cases = scorecard["cases_evaluated"]
+    perfect = f"{len(cases)}/{len(cases)}"
+
+    failures = [f"{TESTED}: does not list the case {c}" for c in cases if f'"{c}"' not in tested]
+    for rate, value in scorecard["rates"].items():
+        if f'["{rate}", ' not in tested:
+            failures.append(f"{TESTED}: does not list the rate {rate}")
+        # The page prints one ratio per rate, so a rate below 1.0 must stop reading n/n.
+        if value < 1.0 and perfect in tested:
+            failures.append(f"{TESTED}: shows {perfect}, but {rate} is {value}")
+
+    for source in sorted((ROOT / "docs" / "images").glob("*.png")):
+        served = ROOT / "web" / "public" / "console" / source.name
+        where = f"web/public/console/{source.name}"
+        if not served.exists():
+            failures.append(f"{where}: missing; copy it from docs/images/")
+        elif served.read_bytes() != source.read_bytes():
+            failures.append(f"{where}: differs from docs/images/")
+    return failures
+
+
 def main() -> int:
     """Check every counted claim against the repository.
 
@@ -179,6 +261,14 @@ def main() -> int:
                     failures.append(f"{name}:{line}: claims {claimed} {label}; there are {actual}")
         status = "ok" if found else "not stated in any document"
         print(f"  {actual:>4}  {label:<34} {status}")
+
+    for label, derive_failures in (
+        ("deployed page vs the MCP server", mcp_surface_failures),
+        ("deployed page vs eval and images", recorded_claims_failures),
+    ):
+        found = derive_failures()
+        print(f"  {'':>4}  {label:<34} {'drifted' if found else 'ok'}")
+        failures.extend(found)
 
     if failures:
         print(

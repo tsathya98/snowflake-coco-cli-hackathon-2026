@@ -1,6 +1,6 @@
 # Warrant as an MCP server
 
-The five Agent Skills in [`.cortex/skills/`](../.cortex/skills/) tell CoCo CLI **how the loop is
+The six Agent Skills in [`.cortex/skills/`](../.cortex/skills/) tell CoCo CLI **how the loop is
 built**. This tells any MCP client **how to operate it**.
 
 Cortex Code CLI is a full MCP client, so registering this server puts Warrant's governed
@@ -62,8 +62,8 @@ Set `WARRANT_CONNECTION` if your connection is not named `warrant`.
 
 ## The tools
 
-Ten of the twelve are annotated `readOnlyHint: true`, which is what lets an MCP host auto-approve
-them and prompt on the rest.
+Eleven of the thirteen are annotated `readOnlyHint: true`, which is what lets an MCP host
+auto-approve them and prompt on the rest.
 
 | Tool | Reads | What it answers |
 |---|---|---|
