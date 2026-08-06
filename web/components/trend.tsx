@@ -297,7 +297,9 @@ export function OnTimeTrend({ rows }: { rows: Row[] }) {
         ))}
       </div>
 
-      <p className="mt-2 text-[0.75rem] leading-relaxed text-[var(--text-muted)]">
+      {/* Capped, not full-bleed. At the chart's width this ran to 174 characters a line, which is
+       *  more than twice a comfortable measure — the eye loses the start of the next line. */}
+      <p className="mt-2 max-w-[92ch] text-[0.75rem] leading-relaxed text-[var(--text-muted)]">
         Percent on time, bucketed by promised week. Hover the chart to read every supplier at that
         week; hover or tap a name to pick its line out of the pack. The dashed line is RB-001 §1 —
         20 points below {OTD_SUBJECT}&rsquo;s 90-day baseline of 90.8%. The first and last buckets

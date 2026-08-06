@@ -284,13 +284,15 @@ something it cannot name.
 
 ## Screenshots — which file goes on which slide
 
-All re-captured from the deployed site after the final round of changes, at 1440 CSS px,
-`deviceScaleFactor: 2`, so every file is 2880px wide and survives a projector. Section shots are
-clipped to the section's measured bounding box, so nothing is cut mid-heading.
+All captured at 1440 CSS px, `deviceScaleFactor: 2`, so every file is 2880px wide and survives a
+projector. Section shots are clipped to the section's measured bounding box, so nothing is cut
+mid-heading. The ones the section restructure invalidated were re-shot against the build that
+produced this commit, so they show the nine-section page, the three shortcut cards under the
+tiles, and the folded reference tables.
 
 | File | Slide | Why this one |
 |---|---|---|
-| `web/hero.png` | 1 or 2 | The claim and the live tag resolution in one frame. Strongest single image in the set. |
+| `web/hero.png` | 1 or 2 | The claim and the live tag resolution in one frame, with the five headline tiles under them. Strongest single image in the set. |
 | `web/hero-light.png` | — | Light-theme alternative if the template's background fights the dark one. |
 | `web/story-workflow.png` | **3** | The seven stages and the three lanes in one picture — the closest thing to the mandated "architecture diagram" that is also the mechanism. |
 | `web/one-pass.png` | 4 | The detection chart. SUP-002's line going through the RB-001 threshold is the most legible "something happened here" in the deck. |

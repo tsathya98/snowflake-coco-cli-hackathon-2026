@@ -138,14 +138,16 @@ export function Coco() {
             <div className="text-[0.95rem] font-bold">
               No tool on this server accepts an authority tier.
             </div>
-            <p className="mt-1.5 text-[0.86rem] leading-relaxed text-[var(--text-soft)]">
+            {/* Measure capped across this panel. Full-bleed at 1152px these ran to about 130
+             *  characters a line — legible in isolation, tiring for three paragraphs running. */}
+            <p className="mt-1.5 max-w-[78ch] text-[0.86rem] leading-relaxed text-[var(--text-soft)]">
               A tool that took <code className="font-mono">tier</code> as a parameter would hand
               the model the one decision the whole design exists to keep away from it. Every tool
               resolves the tier itself, from the live tag. There is nothing to pass and no
               elevated value to ask for — so prompt-engineering the model into a higher authority
               has no parameter to aim at.
             </p>
-            <p className="mt-2.5 text-[0.86rem] leading-relaxed text-[var(--text-soft)]">
+            <p className="mt-2.5 max-w-[78ch] text-[0.86rem] leading-relaxed text-[var(--text-soft)]">
               That is an easy claim to make and an easy one to break by accident, so it is a test
               rather than a comment. It walks the live schema of every registered tool:
             </p>
@@ -164,7 +166,7 @@ export function Coco() {
       </div>
 
       <Panel title="Drive it yourself">
-        <p className="text-[0.86rem] leading-relaxed text-[var(--text-soft)]">
+        <p className="max-w-[78ch] text-[0.86rem] leading-relaxed text-[var(--text-soft)]">
           The agent has no privileged path of its own. What CoCo can do is exactly what the tool
           surface above allows, and the server tells the model so in its{" "}
           <code className="font-mono">instructions</code> before it calls anything:

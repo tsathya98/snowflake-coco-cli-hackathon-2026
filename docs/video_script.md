@@ -253,8 +253,10 @@ uv run pytest tests/test_adversarial.py -q
 
 ## 3:30–4:00 · Close
 
-**DO:** Switch to the public viewer tab. Scroll past the hero so the three live tag rows are seen,
-stop at Evidence.
+**DO:** Switch to the public viewer tab, at the top. Pause one beat so the three live tag rows on
+the right are readable, then **click the second shortcut card, "The refusal that held"** — it jumps
+straight to Evidence. Clicking beats scrolling here: it is one motion instead of ten, and it shows
+the page was built for someone in a hurry.
 
 **SAY:**
 

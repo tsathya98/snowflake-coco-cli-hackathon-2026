@@ -164,9 +164,9 @@ export function Tested() {
         <p className="mt-3.5 text-[0.82rem] leading-relaxed text-[var(--text-muted)]">
           <strong>Six of six is a small sample, and a perfect score should make you suspicious
           rather than impressed.</strong>{" "}
-          What it buys is a tripwire: the cases are chosen so that the plausible failures — acting
-          on a hold because it is old enough to feel urgent, replenishing stock that is already in
-          transit — each have a case that would catch them. Recorded in{" "}
+          What it buys is a tripwire. Each plausible failure has a case that would catch it: acting
+          on a hold because it is old enough to feel urgent, replenishing stock already in transit.
+          Recorded in{" "}
           <code className="font-mono">eval/scorecard.json</code> by a live run; CI verifies the
           recorded file rather than re-measuring, because CI has no Snowflake account.
         </p>
