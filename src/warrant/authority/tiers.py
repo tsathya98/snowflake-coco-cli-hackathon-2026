@@ -27,6 +27,7 @@ tested without a warehouse. Tag lookup lives in :mod:`warrant.authority.tags`.
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass
 from enum import IntEnum
 
@@ -70,35 +71,133 @@ Deliberately not ``LOW_RISK_ACT``: an object nobody has classified is not the sa
 object someone classified as open, and the agent should not be the one to assume.
 """
 
+RETENTION_SCRUTINY: dict[str, Tier] = {
+    "normal": Tier.READ_ONLY,
+    "legal_hold": Tier.FORBIDDEN,
+}
+"""Scrutiny each retention classification demands.
+
+A second axis, deliberately orthogonal to sensitivity. A record under legal hold may not be
+altered by anything, and that is true whether the table is ``open`` or ``regulated`` — which is
+the point: an object tagged ``open`` can still be forbidden, by a different tag.
+"""
+
 UNSUPERVISED_CEILING = Tier.DRAFT
 """Requests at or below this tier never touch a real system, so tags do not bind them."""
 
 
 @dataclass(frozen=True)
+class TagPolicy:
+    """One governance tag and what each of its values demands of an action.
+
+    The resolver iterates these rather than naming a tag, which is what makes the authority
+    model a property of *governance configuration* rather than of this file. Adding a third
+    axis — residency, contractual restriction, anything else the organisation already tags — is
+    a row here plus a field on :class:`TouchedObject`, not a change to any control flow.
+    """
+
+    tag: str
+    """Fully-qualified tag name, as SYSTEM$GET_TAG requires."""
+
+    attribute: str
+    """Field on :class:`TouchedObject` holding the read value."""
+
+    label: str
+    """How this tag reads in an audit rationale."""
+
+    scrutiny: Mapping[str, Tier]
+    """Value to the minimum tier an action touching such an object must run at."""
+
+    absent: Tier
+    """What an absent or unrecognised value demands."""
+
+    def demand(self, value: str | None) -> Tier:
+        """The tier this policy demands for one observed value.
+
+        Args:
+            value: The tag value read from the object, or ``None`` if it carries none.
+
+        Returns:
+            The demanded :class:`Tier`.
+        """
+        if value is None:
+            return self.absent
+        return self.scrutiny.get(value.strip().lower(), self.absent)
+
+    def describe(self, value: str | None) -> str:
+        """How this policy's finding should read in an audit rationale."""
+        if value is None:
+            return f"no {self.label} tag" + (
+                ", treated as unclassified" if self.absent > Tier.READ_ONLY else ""
+            )
+        cleaned = value.strip().lower()
+        if cleaned in self.scrutiny:
+            return f"{self.label}='{cleaned}'"
+        return f"an unrecognised {self.label} tag '{value}', treated as unclassified"
+
+
+POLICIES: tuple[TagPolicy, ...] = (
+    TagPolicy(
+        tag="WARRANT.CORE.SENSITIVITY",
+        attribute="sensitivity",
+        label="sensitivity",
+        scrutiny=SENSITIVITY_SCRUTINY,
+        # Absent means *unclassified*, which demands approval. Everything has some
+        # sensitivity, so not knowing it is itself the risk.
+        absent=UNTAGGED_SCRUTINY,
+    ),
+    TagPolicy(
+        tag="WARRANT.CORE.RETENTION",
+        attribute="retention",
+        label="retention",
+        scrutiny=RETENTION_SCRUTINY,
+        # Absent means *not under hold*, which demands nothing — and the asymmetry with
+        # sensitivity above is deliberate. A legal hold is an affirmative exceptional state
+        # somebody puts on a record; its absence is the ordinary case, not missing
+        # information. Treating an untagged object as held would freeze the whole estate.
+        absent=Tier.READ_ONLY,
+    ),
+)
+"""Every governance tag that can bind an action. Order is presentation only — all are read."""
+
+
+@dataclass(frozen=True)
 class TouchedObject:
-    """A fully-qualified object an action reads or writes, and its sensitivity tag."""
+    """A fully-qualified object an action reads or writes, and its governance tags."""
 
     fqn: str
     sensitivity: str | None = None
+    retention: str | None = None
+
+    def binding_policy(self) -> tuple[TagPolicy, Tier]:
+        """Which tag demands the most of an action touching this object.
+
+        Returns:
+            The most demanding :class:`TagPolicy` and the tier it demands. Ties resolve to
+            the first policy in :data:`POLICIES`, which is why sensitivity leads it — when
+            two axes agree, the primary classification is the one worth naming.
+        """
+        demands = [(policy, policy.demand(getattr(self, policy.attribute))) for policy in POLICIES]
+        return max(demands, key=lambda pair: pair[1])
 
     def required_scrutiny(self) -> Tier:
         """The minimum tier an action touching this object must run at.
 
         Returns:
-            The demanded :class:`Tier`. ``FORBIDDEN`` means no action is permissible at
-            all; an unrecognised or absent tag yields :data:`UNTAGGED_SCRUTINY`.
+            The most demanding tier across *every* governance tag. ``FORBIDDEN`` means no
+            action is permissible at all.
         """
-        if self.sensitivity is None:
-            return UNTAGGED_SCRUTINY
-        return SENSITIVITY_SCRUTINY.get(self.sensitivity.strip().lower(), UNTAGGED_SCRUTINY)
+        return self.binding_policy()[1]
 
     def describe_tag(self) -> str:
-        """How this object's classification should read in an audit rationale."""
-        if self.sensitivity is None:
-            return "no sensitivity tag, treated as unclassified"
-        if self.sensitivity.strip().lower() in SENSITIVITY_SCRUTINY:
-            return f"sensitivity='{self.sensitivity.strip().lower()}'"
-        return f"an unrecognised sensitivity tag '{self.sensitivity}', treated as unclassified"
+        """How this object's classification should read in an audit rationale.
+
+        Returns:
+            A description of whichever tag actually bound, so a rationale never names
+            sensitivity for a decision that retention made.
+        """
+        policy, _ = self.binding_policy()
+        return policy.describe(getattr(self, policy.attribute))
 
 
 @dataclass(frozen=True)
@@ -168,8 +267,8 @@ def resolve(requested: Tier, touched: list[TouchedObject]) -> Decision:
             tier=Tier.FORBIDDEN,
             binding_object=binding.fqn,
             rationale=(
-                f"{binding.fqn} is tagged sensitivity='regulated'. Acting on regulated "
-                f"records is never the agent's to do, at any confidence."
+                f"{binding.fqn} is tagged {binding.describe_tag()}. Acting on such records "
+                f"is never the agent's to do, at any confidence."
             ),
         )
 

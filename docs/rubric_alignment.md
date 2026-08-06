@@ -25,7 +25,7 @@ uv run pytest --cov --cov-report=term-missing
 
 Expected: clean, clean, `no issues found in 19 source files`, `SQL boundary holds across 27
 module(s)`, `6 document(s) verified`, `6 case(s) evaluated`, `Every counted claim matches the
-repository`, `238 passed … 100.00%` with the coverage gate satisfied.
+repository`, `247 passed … 100.00%` with the coverage gate satisfied.
 
 Every figure in that sentence is checked by the run above it. `tools/check_doc_claims.py` executes
 the project's own tools and compares what they print against what this document, the README and
@@ -133,6 +133,12 @@ The authority tier is resolved from Snowflake object tags on the data an action 
 | `QUALITY_HOLDS` | `regulated` | draft permitted (RB-003), action refused |
 | `RUNBOOKS` | *untagged* | treated as unclassified, not as cleared |
 
+And authority is not one hardcoded tag. `RETENTION` is a second, independent axis resolved
+through the same `POLICIES` mechanism: an object tagged `open` — which sensitivity alone would
+wave through — is refused outright when it carries `retention='legal_hold'`, with the rationale
+naming retention rather than sensitivity. Verified on the live account and held by
+`tests/test_retention.py`.
+
 The strongest single claim in the submission: **a human's own approval does not survive a
 reclassification.** Approve an action, retag the table, run the executor — it refuses and says
 why. `docs/judges_walkthrough.md` §"Verifying the central claim" has the exact commands, and
@@ -199,7 +205,7 @@ you, "the model's compliance changed nothing" is a property of the architecture.
 uv run pytest --cov --cov-report=term-missing
 ```
 
-**242 tests, 100% branch coverage of `src/warrant`, gated** (545 statements, 96 branches, zero
+**251 tests, 100% branch coverage of `src/warrant`, gated** (545 statements, 96 branches, zero
 missed; 230 pass, 3 are skipped for a missing optional dependency and 1 is the opt-in integration
 test). `mypy --strict` clean across 19 modules. Ruff clean against 21 rule families, including
 complexity, `BLE`, and `RUF100` — which fails on a `noqa` that no longer suppresses anything, so
@@ -248,7 +254,7 @@ Measured on the live account, not projected:
 | Human approvals that did **not** survive a reclassification | **1, refused** |
 | Reasoning eval — cases × dimensions passed | **6 × 5** |
 | Hostile-document findings where routing changed | **0 of 6** |
-| Tests / branch coverage / mypy-strict errors | **242 / 100% / 0** |
+| Tests / branch coverage / mypy-strict errors | **251 / 100% / 0** |
 
 **The number that matters** is not agent-versus-human on speed. It is *deployable versus not*. The
 same loop safely spans open, internal and regulated data in one pass, and the boundary is

@@ -26,6 +26,7 @@ from dataclasses import dataclass
 from snowflake.snowpark import Session
 
 from warrant.act.registry import ACTION_TYPES
+from warrant.authority.manifest import _with_override
 from warrant.authority.tags import read_sensitivity
 from warrant.authority.tiers import Tier, TouchedObject, resolve
 
@@ -108,11 +109,14 @@ def replay(session: Session, overrides: Mapping[str, str | None] | None = None) 
         auditor should be shown, and silently omitting it would make the report look cleaner than
         the system is.
     """
-    live: dict[str, str | None] = {}
+    # The whole TouchedObject is kept, not just its sensitivity.
+    #
+    # Flattening to {fqn: sensitivity} and rebuilding silently dropped every other governance
+    # axis: an object under legal hold replayed as though it were not, because the retention
+    # value never survived the round trip. The live read is authoritative and an override
+    # replaces one field of it — see manifest._with_override.
     needed = sorted({fqn for a in ACTION_TYPES.values() for fqn in a.touched_objects})
-    live.update({obj.fqn: obj.sensitivity for obj in read_sensitivity(session, needed)})
-    if overrides:
-        live.update(overrides)
+    live: dict[str, TouchedObject] = {obj.fqn: obj for obj in read_sensitivity(session, needed)}
 
     replayed: list[Replayed] = []
     for row in session.sql(DECIDED_ACTIONS).collect():
@@ -129,7 +133,7 @@ def replay(session: Session, overrides: Mapping[str, str | None] | None = None) 
             )
         else:
             touched = [
-                TouchedObject(fqn=fqn, sensitivity=live.get(fqn)) for fqn in action.touched_objects
+                _with_override(live.get(fqn), fqn, overrides) for fqn in action.touched_objects
             ]
             decision = resolve(action.requested_tier, touched)
             tier_now, rationale, binding = (

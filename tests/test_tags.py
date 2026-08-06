@@ -8,7 +8,7 @@ changes the agent's behaviour on the very next iteration.
 import pytest
 from snowflake.snowpark import Row, Session
 
-from warrant.authority.tags import SENSITIVITY_TAG, read_sensitivity
+from warrant.authority.tags import RETENTION_TAG, SENSITIVITY_TAG, read_sensitivity
 from warrant.authority.tiers import Tier
 
 from .conftest import DEMO_TAGS, FakeSession
@@ -30,17 +30,30 @@ def test_an_untagged_object_is_unclassified_not_cleared(tagged_session):
 
 
 def test_object_names_are_bound_never_interpolated(tagged_session):
-    """The lint in tools/ bans interpolated SQL; this proves the intent, not just the form."""
+    """The lint in tools/ bans interpolated SQL; this proves the intent, not just the form.
+
+    Both governance tags are read in one statement, so the bound parameters interleave as
+    ``(tag, object, tag, object)``. Asserted in full rather than by membership: a bug that
+    read the sensitivity tag twice and never read retention would still contain every
+    expected value.
+    """
     read_sensitivity(tagged_session, ["WARRANT.DATA.SHIPMENTS"])
     (call,) = tagged_session.calls
-    assert call.params == (SENSITIVITY_TAG, "WARRANT.DATA.SHIPMENTS")
+    assert call.params == (
+        SENSITIVITY_TAG,
+        "WARRANT.DATA.SHIPMENTS",
+        RETENTION_TAG,
+        "WARRANT.DATA.SHIPMENTS",
+    )
     assert "WARRANT.DATA.SHIPMENTS" not in call.sql
     assert SENSITIVITY_TAG not in call.sql
+    assert RETENTION_TAG not in call.sql
 
 
-def test_the_tag_is_fully_qualified():
-    """A bare tag name raises 'Tag SENSITIVITY does not exist' — the tag lives in CORE."""
+def test_the_tags_are_fully_qualified():
+    """A bare tag name raises 'Tag SENSITIVITY does not exist' — the tags live in CORE."""
     assert SENSITIVITY_TAG == "WARRANT.CORE.SENSITIVITY"
+    assert RETENTION_TAG == "WARRANT.CORE.RETENTION"
 
 
 def test_every_call_re_reads_the_tag(tagged_session):
@@ -67,7 +80,9 @@ def test_a_retag_between_calls_changes_the_answer():
     """The flagship demo, in miniature: ALTER TABLE ... SET TAG, then re-run."""
     live = {"WARRANT.DATA.SHIPMENTS": "open"}
     session = FakeSession(
-        responses={"SYSTEM$GET_TAG": lambda params: [Row(SENSITIVITY=live.get(params[1]))]}
+        responses={
+            "SYSTEM$GET_TAG": lambda params: [Row(SENSITIVITY=live.get(params[1]), RETENTION=None)]
+        }
     )
 
     (before,) = read_sensitivity(session, ["WARRANT.DATA.SHIPMENTS"])

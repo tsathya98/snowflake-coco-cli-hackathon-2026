@@ -107,7 +107,7 @@ def executor_session(row: Row) -> FakeSession:
     return FakeSession(
         responses={
             LOAD: [row],
-            "SYSTEM$GET_TAG": lambda p: [Row(SENSITIVITY=DEMO_TAGS.get(p[1]))],
+            "SYSTEM$GET_TAG": lambda p: [Row(SENSITIVITY=DEMO_TAGS.get(p[1]), RETENTION=None)],
         }
     )
 

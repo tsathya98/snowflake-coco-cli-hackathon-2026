@@ -24,7 +24,7 @@ thing is unit-testable without a warehouse.
 from __future__ import annotations
 
 from collections.abc import Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 from snowflake.snowpark import Session
 
@@ -82,6 +82,28 @@ def registry_objects() -> tuple[str, ...]:
     return tuple(sorted({fqn for a in ACTION_TYPES.values() for fqn in a.touched_objects}))
 
 
+def _with_override(
+    observed: TouchedObject | None,
+    fqn: str,
+    overrides: Mapping[str, str | None] | None,
+) -> TouchedObject:
+    """Apply a hypothetical sensitivity to a live reading, preserving every other axis.
+
+    Args:
+        observed: What the tag read returned, or ``None`` if the object was not read.
+        fqn: The object being resolved.
+        overrides: Hypothetical sensitivities, or ``None``.
+
+    Returns:
+        The object to resolve against. Only ``sensitivity`` is replaced — ``replace()`` rather
+        than a fresh construction, so an axis this function has never heard of still survives.
+    """
+    base = observed if observed is not None else TouchedObject(fqn=fqn)
+    if overrides is not None and fqn in overrides:
+        return replace(base, sensitivity=overrides[fqn])
+    return base
+
+
 def capabilities(
     session: Session, overrides: Mapping[str, str | None] | None = None
 ) -> list[Capability]:
@@ -89,26 +111,33 @@ def capabilities(
 
     Args:
         session: An active Snowpark session.
-        overrides: Hypothetical sensitivity per fully-qualified object name, replacing what is
-            actually tagged. ``None`` as a value models *removing* a tag, which is not the same as
-            tagging something ``open`` and must stay expressible. Objects absent from the map keep
-            their live classification. Pass ``None`` for the real, current manifest.
+        overrides: Hypothetical **sensitivity** per fully-qualified object name, replacing what
+            is actually tagged. ``None`` as a value models *removing* a tag, which is not the same
+            as tagging something ``open`` and must stay expressible. Objects absent from the map
+            keep their live classification. Pass ``None`` for the real, current manifest.
+
+            Only sensitivity is overridable. Every other governance axis — retention today,
+            whatever :data:`~warrant.authority.tiers.POLICIES` grows next — is carried through
+            from the live read untouched, so a hypothetical about one axis cannot silently
+            discard another.
 
     Returns:
         One :class:`Capability` per registered action, most restricted first, so the things the
         agent may **not** do are what a reviewer reads before the things it may.
     """
-    live: dict[str, str | None] = {
-        obj.fqn: obj.sensitivity for obj in read_sensitivity(session, registry_objects())
+    # The whole TouchedObject is kept, not just its sensitivity.
+    #
+    # Flattening to {fqn: sensitivity} and rebuilding silently dropped every other governance
+    # axis: an object under legal hold resolved as though it were not, because the retention
+    # value never survived the round trip. The live read is authoritative and an override
+    # replaces one field of it.
+    live: dict[str, TouchedObject] = {
+        obj.fqn: obj for obj in read_sensitivity(session, registry_objects())
     }
-    if overrides:
-        live.update(overrides)
 
     resolved: list[Capability] = []
     for action in ACTION_TYPES.values():
-        touched = [
-            TouchedObject(fqn=fqn, sensitivity=live.get(fqn)) for fqn in action.touched_objects
-        ]
+        touched = [_with_override(live.get(fqn), fqn, overrides) for fqn in action.touched_objects]
         decision = resolve(action.requested_tier, touched)
         resolved.append(
             Capability(

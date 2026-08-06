@@ -26,7 +26,9 @@ from .conftest import DEMO_TAGS, FakeSession
 
 def session(tags: dict | None = None) -> FakeSession:
     live = DEMO_TAGS if tags is None else tags
-    return FakeSession(responses={"SYSTEM$GET_TAG": lambda p: [Row(SENSITIVITY=live.get(p[1]))]})
+    return FakeSession(
+        responses={"SYSTEM$GET_TAG": lambda p: [Row(SENSITIVITY=live.get(p[1]), RETENTION=None)]}
+    )
 
 
 def by_action(manifest: list[Capability]) -> dict[str, Capability]:

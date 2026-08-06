@@ -73,6 +73,32 @@ Tier is resolved from object tags at runtime and **defaults down, never up.** Th
 *most demanding* object in an action's footprint binds — never the least, or one `open` table
 could dilute a `regulated` one.
 
+### And it is not one hardcoded tag
+
+The obvious objection is that `SENSITIVITY` is a single tag name spelled into the resolver and
+dressed up as governance. It is not: the resolver iterates a `POLICIES` tuple, and a second axis
+is already live.
+
+| Tag | Values | What an absent tag means |
+|---|---|---|
+| `SENSITIVITY` | `open` · `internal` · `regulated` | **Demands approval.** Everything has some sensitivity; not knowing it is itself the risk. |
+| `RETENTION` | `normal` · `legal_hold` | **Demands nothing.** A legal hold is a state somebody *adds* — treating every untagged object as held would freeze the estate on day one. |
+
+That asymmetry is deliberate, and the two axes are independent. Measured on the live account —
+same table, sensitivity untouched at `open`:
+
+```
+before   open_supplier_case   acts unsupervised   ← SHIPMENTS sensitivity='open'
+after    open_supplier_case   refused outright    ← OPS_REQUESTS retention='legal_hold'
+         notify_quality_owner acts unsupervised   ← still: a DRAFT acts on nothing
+```
+
+**An `open` table, refused — by a different tag.** The rationale names retention rather than
+sensitivity, because pointing a reviewer at the wrong tag sends them to change the wrong thing.
+Adding a third axis (residency, contractual restriction, whatever an organisation already tags)
+is a row in `POLICIES` plus a field on `TouchedObject` — no control flow changes.
+`tests/test_retention.py` holds all of it in place.
+
 ### What one pass actually does
 
 Measured on the live account, from `CALL WARRANT.CORE.RUN_LOOP('AUTO')` over 2,400 shipments,

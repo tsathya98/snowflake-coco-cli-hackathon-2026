@@ -86,7 +86,7 @@ def loop_session(
             "SELECT 1 FROM WARRANT.CORE.FINDINGS": [Row(ONE=1)] if already_investigated else [],
             "SEARCH_PREVIEW": [Row(DOC_ID="RB-001", TITLE="t", BODY="b")],
             "AI_COMPLETE": answer,
-            "SYSTEM$GET_TAG": lambda p: [Row(SENSITIVITY=live.get(p[1]))],
+            "SYSTEM$GET_TAG": lambda p: [Row(SENSITIVITY=live.get(p[1]), RETENTION=None)],
             "AS open_exceptions": [counts],
             "CURRENT_TIMESTAMP()": [Row(NOW="2026-08-05 09:00:00.000")],
             "WHERE key = 'escalation_email'": [Row(VALUE="x@example.invalid")] if email else [],

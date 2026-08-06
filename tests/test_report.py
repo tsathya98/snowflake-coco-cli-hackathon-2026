@@ -68,7 +68,7 @@ def session(*, refusals=(REFUSAL_ROW,), executed=(EXECUTED_ROW,), tags=None) -> 
             "FROM WARRANT.CORE.PENDING_ACTIONS p\n ORDER BY": [REPLAY_ROW],
             "FROM WARRANT.DATA.RUNBOOKS": [CORPUS_ROW],
             "GROUP BY phase, outcome": [Row(PHASE="refuse", OUTCOME="refused", N=2)],
-            "SYSTEM$GET_TAG": lambda p: [Row(SENSITIVITY=live.get(p[1]))],
+            "SYSTEM$GET_TAG": lambda p: [Row(SENSITIVITY=live.get(p[1]), RETENTION=None)],
         }
     )
 

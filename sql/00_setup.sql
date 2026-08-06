@@ -116,6 +116,35 @@ regulated -> agent may never act (L4); it may still read and explain
 Untagged is deliberately NOT treated as open. See src/warrant/authority/tiers.py.$$;
 
 -- ---------------------------------------------------------------------------
+-- A SECOND, independent governance axis.
+--
+-- This exists to settle the obvious objection: that SENSITIVITY is one tag name
+-- hardcoded into the resolver and dressed up as governance. It is not. The
+-- resolver iterates a POLICIES tuple, and adding an axis is a row there plus a
+-- field on TouchedObject — no control flow changes.
+--
+-- RETENTION is orthogonal to SENSITIVITY on purpose. A record under legal hold
+-- may not be altered by anything, whether the table is `open` or `regulated` —
+-- so an object tagged `open`, which sensitivity alone would wave through, can
+-- still be refused. tests/test_retention.py holds that in place.
+--
+-- Note the deliberate asymmetry in what ABSENCE means. An absent SENSITIVITY tag
+-- demands approval, because everything has some sensitivity and not knowing it is
+-- itself the risk. An absent RETENTION tag demands nothing, because a legal hold
+-- is an affirmative state somebody puts on a record — treating every untagged
+-- object as held would freeze the entire estate on day one.
+--
+-- Nothing carries this tag by default, so the axis ships live but silent.
+-- ---------------------------------------------------------------------------
+CREATE TAG IF NOT EXISTS CORE.RETENTION
+  ALLOWED_VALUES 'normal', 'legal_hold'
+  COMMENT = $$Whether this object's records may be altered at all.
+normal     -> no additional restriction beyond SENSITIVITY
+legal_hold -> no automated system may alter these records (L4), on any confidence
+Absent means "not under hold", which is NOT the same asymmetry as SENSITIVITY.
+See src/warrant/authority/tiers.py POLICIES.$$;
+
+-- ---------------------------------------------------------------------------
 -- A dedicated role, so the demo shows real RBAC rather than everything as
 -- ACCOUNTADMIN. Judges look at this.
 -- ---------------------------------------------------------------------------

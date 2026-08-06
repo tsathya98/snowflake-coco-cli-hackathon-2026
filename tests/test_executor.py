@@ -57,7 +57,7 @@ def session_for(row: Row | None, tags: dict | None = None, failures=None) -> Fak
     return FakeSession(
         responses={
             LOAD: [row] if row is not None else [],
-            "SYSTEM$GET_TAG": lambda p: [Row(SENSITIVITY=live.get(p[1]))],
+            "SYSTEM$GET_TAG": lambda p: [Row(SENSITIVITY=live.get(p[1]), RETENTION=None)],
         },
         failures=failures,
     )

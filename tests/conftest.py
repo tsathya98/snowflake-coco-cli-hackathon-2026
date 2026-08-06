@@ -132,12 +132,30 @@ Verified against ``SYSTEM$GET_TAG`` rather than transcribed from ``sql/10_synthe
 so a drift between the DDL and the account shows up as a failing test.
 """
 
+DEMO_RETENTION: dict[str, str] = {}
+"""Retention classifications in the demo account: none.
+
+Empty on purpose. A legal hold is an exceptional state somebody adds, so the ordinary account
+carries none — and that means the second policy is *live but silent*, which is the honest
+default. `tests/test_retention.py` puts a hold on and shows what changes.
+"""
+
 
 @pytest.fixture
 def tagged_session() -> FakeSession:
-    """A session whose tag reads mirror the demo account, keyed on the bound object name."""
+    """A session whose tag reads mirror the demo account, keyed on the bound object name.
+
+    One statement reads both governance tags, so the fake returns both columns. The bound
+    parameters arrive as ``[sensitivity_tag, fqn, retention_tag, fqn]``; the object name is
+    at index 1.
+    """
     return FakeSession(
         responses={
-            "SYSTEM$GET_TAG": lambda params: [Row(SENSITIVITY=DEMO_TAGS.get(params[1]))],
+            "SYSTEM$GET_TAG": lambda params: [
+                Row(
+                    SENSITIVITY=DEMO_TAGS.get(params[1]),
+                    RETENTION=DEMO_RETENTION.get(params[1]),
+                )
+            ],
         }
     )

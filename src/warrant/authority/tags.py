@@ -26,15 +26,25 @@ from snowflake.snowpark import Session
 from warrant.authority.tiers import TouchedObject
 
 SENSITIVITY_TAG = "WARRANT.CORE.SENSITIVITY"
-"""Fully-qualified name of the governance tag.
+RETENTION_TAG = "WARRANT.CORE.RETENTION"
+"""Fully-qualified names of the governance tags.
 
-Qualification is mandatory rather than stylistic: the tag lives in ``CORE`` while the
-tables it classifies live in ``DATA``, so a bare ``'SENSITIVITY'`` raises
+Qualification is mandatory rather than stylistic: the tags live in ``CORE`` while the
+tables they classify live in ``DATA``, so a bare ``'SENSITIVITY'`` raises
 ``Tag 'SENSITIVITY' does not exist or not authorized`` no matter which schema is current.
 """
 
-READ_TAG = "SELECT SYSTEM$GET_TAG(?, ?, 'TABLE') AS sensitivity"
-"""Both arguments bind, so no object name is ever interpolated into SQL text."""
+READ_TAGS = """
+SELECT SYSTEM$GET_TAG(?, ?, 'TABLE') AS sensitivity,
+       SYSTEM$GET_TAG(?, ?, 'TABLE') AS retention
+"""
+"""Every argument binds, so no object name is ever interpolated into SQL text.
+
+Both tags are read in one statement rather than one per policy: the round trip dominates,
+and reading them together means the two values are observed at the same instant. Two
+sequential reads could straddle a governance change and produce a resolution that was never
+true of the object at any single moment.
+"""
 
 
 def read_sensitivity(session: Session, fqns: Iterable[str]) -> list[TouchedObject]:
@@ -48,14 +58,21 @@ def read_sensitivity(session: Session, fqns: Iterable[str]) -> list[TouchedObjec
 
     Returns:
         One :class:`~warrant.authority.tiers.TouchedObject` per distinct name, ready to
-        hand to :func:`~warrant.authority.tiers.resolve`. An untagged object yields
-        ``sensitivity=None``, which ``resolve()`` treats as unclassified rather than as
-        cleared — so a table nobody has classified cannot be acted on unsupervised.
+        hand to :func:`~warrant.authority.tiers.resolve`. An object with no sensitivity tag
+        yields ``sensitivity=None``, which ``resolve()`` treats as unclassified rather than
+        as cleared — so a table nobody has classified cannot be acted on unsupervised. An
+        object with no retention tag yields ``retention=None``, which demands nothing,
+        because a legal hold is a state somebody adds rather than one whose absence is
+        missing information.
     """
     touched: dict[str, TouchedObject] = {}
     for fqn in fqns:
         if fqn in touched:
             continue
-        rows = session.sql(READ_TAG, params=[SENSITIVITY_TAG, fqn]).collect()
-        touched[fqn] = TouchedObject(fqn=fqn, sensitivity=rows[0][0] if rows else None)
+        rows = session.sql(READ_TAGS, params=[SENSITIVITY_TAG, fqn, RETENTION_TAG, fqn]).collect()
+        touched[fqn] = TouchedObject(
+            fqn=fqn,
+            sensitivity=rows[0][0] if rows else None,
+            retention=rows[0][1] if rows else None,
+        )
     return list(touched.values())
