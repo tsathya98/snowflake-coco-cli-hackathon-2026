@@ -53,8 +53,11 @@ This answers the fifth line of the checklist. Run it in WSL, not Windows.
 
 cortex mcp list
 
-Expect a "warrant:" block naming .venv-wsl/bin/python, args "-m, warrant_mcp.server",
-and env PYTHONPATH=<repo>/mcp. If the whole list is empty, see the recovery below.
+Expect a "warrant:" block naming ~/.venvs/warrant/bin/python, args "-m, warrant_mcp.server",
+no env line. If the whole list is empty, see the recovery below.
+
+Also activate the venv now, and warm it once, so the on-camera --surface call is fast:
+source ~/.venvs/warrant/bin/activate && python -m warrant_mcp.server --surface > /dev/null
 
 
 STEP 4 of 4 — confirm both tasks are running
@@ -80,7 +83,7 @@ If any one of these is off, fix it before recording. Do not narrate around it.
 
 If warrant is missing from cortex mcp list, run this from the repo root:
 
-cortex mcp add warrant "$PWD/.venv-wsl/bin/python" -m warrant_mcp.server -t stdio -e PYTHONPATH="$PWD/mcp"
+cortex mcp add warrant "$HOME/.venvs/warrant/bin/python" -m warrant_mcp.server -t stdio
 
 Record within the hour of the reset. SCAN_FOR_EXCEPTIONS is an hourly cron running
 RUN_LOOP('AUTO'), so at the top of the hour it repopulates FINDINGS and PENDING_ACTIONS

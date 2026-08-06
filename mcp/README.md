@@ -42,16 +42,32 @@ The server has to run where CoCo runs, because it reads the same
 own and inherits the operator's identity.
 
 ```bash
-python3 -m venv .venv-wsl && .venv-wsl/bin/pip install -e ".[mcp]"
+python3 -m venv ~/.venvs/warrant
+~/.venvs/warrant/bin/pip install -e "$PWD[mcp]"
 
-cortex mcp add warrant "$PWD/.venv-wsl/bin/python" -m warrant_mcp.server \
-  -t stdio -e PYTHONPATH="$PWD/mcp"
+cortex mcp add warrant "$HOME/.venvs/warrant/bin/python" -m warrant_mcp.server -t stdio
 cortex mcp list
 ```
 
-The `PYTHONPATH` is not optional. `pyproject.toml` ships only `src/warrant` as a wheel target, so
-the editable install brings in `fastmcp` but leaves `warrant_mcp` outside the interpreter's path —
-run from any directory, `-m warrant_mcp.server` alone raises `ModuleNotFoundError`.
+`pyproject.toml` ships `mcp/warrant_mcp` as a wheel target alongside `src/warrant`, so
+`-m warrant_mcp.server` resolves from any working directory and the registration needs no
+`PYTHONPATH`.
+
+## The virtualenv lives outside the repository, on purpose
+
+`/mnt/c` is a 9p mount. Python opens thousands of small files in `site-packages` on every
+start, and across that mount `python -m warrant_mcp.server --surface` takes 9 to 35 seconds.
+The identical command against a virtualenv on the Linux filesystem takes **1.8 seconds cold**.
+CoCo pays the same cost every time it launches the server, so this is not only about the demo.
+
+```bash
+python3 -m venv ~/.venvs/warrant
+~/.venvs/warrant/bin/pip install -e "/path/to/repo[mcp]"
+```
+
+The repository itself stays on `/mnt/c`; only the interpreter moves. Editable install means
+`__file__` still resolves inside the repository, so `--surface` still finds `.cortex/skills/`.
+
 
 Inside a session the tools appear as `mcp__warrant__governance_posture` and so on. `/mcp-status`
 shows whether the server connected.
@@ -61,8 +77,9 @@ Set `WARRANT_CONNECTION` if your connection is not named `warrant`.
 ## Running it directly
 
 ```bash
-.venv-wsl/bin/python -m warrant_mcp.server            # stdio
-.venv-wsl/bin/python -m warrant_mcp.server --http     # streamable HTTP on :8765
+~/.venvs/warrant/bin/python -m warrant_mcp.server            # stdio
+~/.venvs/warrant/bin/python -m warrant_mcp.server --http     # streamable HTTP on :8765
+~/.venvs/warrant/bin/python -m warrant_mcp.server --surface  # print tools/resources/skills, exit
 ```
 
 ## The tools
@@ -138,6 +155,6 @@ are part of the product and rot the same way documentation does.
 uv run --all-extras pytest mcp/tests -q
 ```
 
-Eight tests, no Snowflake needed. They connect a real MCP client to the server in-process and
+Nine tests, no Snowflake needed. They connect a real MCP client to the server in-process and
 assert the *protocol surface* — schema generation, annotations, resource templates, and the
 absence of any way to request authority.

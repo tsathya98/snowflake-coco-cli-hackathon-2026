@@ -139,6 +139,12 @@ SELECT (SELECT COUNT(*) FROM WARRANT.CORE.PENDING_ACTIONS WHERE decision='pendin
        (SELECT COUNT(*) FROM WARRANT.DATA.RUNBOOKS WHERE doc_id='RB-666')           AS attack_left,
        SYSTEM\$GET_TAG('WARRANT.CORE.SENSITIVITY','WARRANT.DATA.INVENTORY','TABLE')  AS inventory_tag;"
 
+# Activate the ext4 virtualenv. Without this the surface command takes 9-35 seconds
+# instead of under two, because /mnt/c is a 9p mount and Python reads site-packages
+# file by file. Run the command once here too, to warm the page cache.
+source ~/.venvs/warrant/bin/activate
+python -m warrant_mcp.server --surface > /dev/null
+
 # Confirm that the MCP server is registered and both tasks are started.
 cortex mcp list
 
@@ -227,8 +233,12 @@ what it chose.
 
 ```bash
 cortex mcp list
-uv run --extra mcp python -m warrant_mcp.server --surface
+python -m warrant_mcp.server --surface
 ```
+
+Both return in under two seconds, *provided* you activated the ext4 virtualenv in pre-flight.
+Never use `uv run` here: it re-syncs the environment, which on `/mnt/c` printed sixty-three
+package installs and took half a minute the first time it was tried.
 
 **SAY over them:**
 
@@ -463,4 +473,4 @@ Then:
 | The execution is not refused | Stop. Check that `INVENTORY` is `regulated`; do not narrate around a failed control. |
 | A Streamlit panel fails | Re-record after checking query history. Do not turn an unrelated error into a design claim. |
 | The public button cannot reach Snowflake | Run `npm run probe` from `web/`. Use a previous verified take only if the probe is green. |
-| `warrant` is absent from `cortex mcp list` | From the repo root, run `cortex mcp add warrant "$PWD/.venv-wsl/bin/python" -m warrant_mcp.server -t stdio -e PYTHONPATH="$PWD/mcp"`. |
+| `warrant` is absent from `cortex mcp list` | Run `cortex mcp add warrant "$HOME/.venvs/warrant/bin/python" -m warrant_mcp.server -t stdio`. |
