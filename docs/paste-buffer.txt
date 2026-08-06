@@ -13,7 +13,8 @@ No timings in here on purpose. They live in docs/video_script.md, which is what 
 read from; here they would only be a clock you cannot hit while pasting, and one more
 thing to fall out of sync. Work down this file in order — that is all it is for.
 
-The adversarial pytest beat has been cut from the running order.
+The adversarial pytest beat has been cut from the running order, and there are two CoCo
+prompts rather than three — a turn costs about two minutes, so a third does not fit.
 
 
 ================================================================
@@ -89,34 +90,33 @@ contradicts that.
 
 
 ================================================================
-TERMINAL — start CoCo
+TERMINAL — the MCP surface, then start CoCo
 ================================================================
 
 cortex mcp list
+
+
+uv run --extra mcp python -m warrant_mcp.server --surface
 
 
 cortex
 
 
 ================================================================
-PROMPT 1 of 3  (operate-warrant)
+PROMPT 1 of 2  ** the end-to-end run **   (expect orchestrate-loop)
 ================================================================
 
-Use the operate-warrant skill. Call governance_posture and authority_manifest, then tell me what Warrant may do right now and which Snowflake tags make that true.
+Neither prompt names a skill. CoCo routes from the descriptions; you say which
+one it chose after it shows you. Fallbacks are in on-camera-prompts.txt.
 
-
-================================================================
-PROMPT 2 of 3  (orchestrate-loop)  ** the end-to-end run **
-================================================================
-
-Using the orchestrate-loop skill, run one full AUTO pass against the live account. Summarise what detection, investigation, authority classification, routing, execution and audit did for each exception.
+Three exceptions came in overnight. Work the whole queue end to end — find them, investigate each one, decide what may actually run, act where you're allowed to, and tell me what happened to each.
 
 
 ================================================================
-PROMPT 3 of 3  (classify-authority)
+PROMPT 2 of 2   (expect classify-authority)
 ================================================================
 
-Use the classify-authority skill to compare raise_replenishment with open_supplier_case. Show the touched object, live tag, and final tier for each.
+Two of those ended up with different authority — raising a replenishment versus opening a supplier case. Why?
 
 
 ================================================================

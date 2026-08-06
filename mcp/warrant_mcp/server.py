@@ -2,7 +2,7 @@
 
 Why this exists
 ---------------
-The five Agent Skills in ``.cortex/skills/`` tell CoCo CLI *how the loop is built*. This
+The six Agent Skills in ``.cortex/skills/`` tell CoCo CLI *how the loop is built*. This
 tells any MCP client *how to operate it*. Cortex Code CLI speaks MCP, so the same
 governance that binds the Streamlit console and the Cortex Agent now binds an agent
 driving Warrant from a terminal.
@@ -34,16 +34,20 @@ Run it::
 
     uv run --extra mcp python -m warrant_mcp.server           # stdio, for CoCo CLI
     uv run --extra mcp python -m warrant_mcp.server --http    # streamable HTTP on :8765
+    uv run --extra mcp python -m warrant_mcp.server --surface # print the surface, then exit
 """
 
 from __future__ import annotations
 
 import argparse
+import asyncio
 import json
 import os
+from importlib.metadata import version
+from pathlib import Path
 from typing import Annotated, Any, Literal
 
-from fastmcp import FastMCP
+from fastmcp import Client, FastMCP
 from fastmcp.exceptions import ToolError
 from pydantic import Field
 from snowflake.snowpark import Session
@@ -54,6 +58,10 @@ from warrant.authority.tags import read_sensitivity
 from warrant.detect.exceptions import detect
 from warrant.orchestrate.loop import run_loop
 from warrant.reason.investigate import SEARCH_RUNBOOKS
+
+# Skills live beside the repository root, not inside this package: CoCo discovers them by
+# directory, and `--surface` reports what is actually there rather than a number in prose.
+SKILLS_DIR = Path(__file__).resolve().parents[2] / ".cortex" / "skills"
 
 # --------------------------------------------------------------------------- statements
 #
@@ -695,14 +703,64 @@ def read_runbook(
     return f"# {found[0]['TITLE']}\n\n{found[0]['BODY']}"
 
 
+async def surface() -> str:
+    """Describe the live surface by asking FastMCP, not by counting decorators.
+
+    Returns:
+        A short report: the FastMCP version actually installed, every registered tool with
+        the annotation that decides whether it may change anything, the resource count, and
+        the Agent Skills on disk.
+
+    Every number a reader is asked to believe about this server is quotable from here. A
+    README table can rot and a slide can be edited; this reads the registry the client
+    reads, so the only way to change the output is to change the server.
+    """
+    async with Client(mcp) as client:
+        tools = await client.list_tools()
+        resources = await client.list_resources()
+        templates = await client.list_resource_templates()
+    skills = sorted(p.name for p in SKILLS_DIR.iterdir() if p.is_dir())
+
+    # `readOnlyHint` is what decides whether a tool may change anything at all;
+    # `destructiveHint` is the narrower claim that the change is not additive. Counting
+    # the wrong one of the two turns "eleven read, two act" into "twelve read, one acts".
+    def acts(tool: Any) -> bool:
+        return getattr(tool.annotations, "readOnlyHint", True) is False
+
+    lines = [f"Warrant MCP surface — FastMCP {version('fastmcp')}", ""]
+    for tool in sorted(tools, key=lambda t: t.name):
+        destructive = getattr(tool.annotations, "destructiveHint", False)
+        mark = "ACTS*" if destructive else "ACTS " if acts(tool) else "reads"
+        lines.append(f"  {mark}  {tool.name}")
+    acting = sum(acts(t) for t in tools)
+    lines += [
+        "",
+        f"  {len(tools)} tools — {len(tools) - acting} read-only, {acting} can act"
+        " (* = declared destructive)",
+        f"  {len(resources) + len(templates)} resources"
+        f" ({len(resources)} fixed, {len(templates)} templated)",
+        f"  {len(skills)} Agent Skills: {', '.join(skills)}",
+        "",
+        "  No tool accepts an authority tier. Authority comes from Snowflake object tags.",
+    ]
+    return "\n".join(lines)
+
+
 def main() -> None:
     """Run the server over stdio, or streamable HTTP with ``--http``."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--http", action="store_true", help="serve streamable HTTP")
     parser.add_argument("--port", type=int, default=8765)
+    parser.add_argument(
+        "--surface",
+        action="store_true",
+        help="print the registered tools, resources and skills, then exit",
+    )
     args = parser.parse_args()
 
-    if args.http:
+    if args.surface:
+        print(asyncio.run(surface()))
+    elif args.http:
         mcp.run(transport="http", port=args.port)
     else:
         mcp.run()

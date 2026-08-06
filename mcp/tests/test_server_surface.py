@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import pytest
 from fastmcp import Client
-from warrant_mcp.server import GOVERNED_OBJECTS, mcp
+from warrant_mcp.server import GOVERNED_OBJECTS, mcp, surface
 
 READ_ONLY = {
     "governance_posture",
@@ -165,3 +165,27 @@ def test_governed_objects_are_fully_qualified():
     for fqn in GOVERNED_OBJECTS:
         assert fqn.count(".") == 2, f"{fqn} is not fully qualified"
         assert fqn.startswith("WARRANT.")
+
+
+async def test_the_surface_report_states_the_numbers_the_demo_quotes():
+    """``--surface`` is read aloud in the demo video, so its numbers are a gate.
+
+    The counts appear in the README, the submission deck, the public page and the recording
+    script. Every one of those is a transcription that can rot independently. This asserts
+    the one artifact that is generated from the live registry, so a tool added without its
+    documentation being updated fails here rather than on camera.
+    """
+    report = await surface()
+
+    assert f"{len(READ_ONLY) + len(ACTING)} tools" in report
+    assert f"{len(READ_ONLY)} read-only, {len(ACTING)} can act" in report
+    assert "5 resources (4 fixed, 1 templated)" in report
+    assert "6 Agent Skills" in report
+    assert "FastMCP 3" in report, "the deck claims FastMCP 3"
+    assert "No tool accepts an authority tier" in report
+
+    for name in ACTING:
+        assert name in report
+    # The destructive marker belongs to the executor alone.
+    assert "ACTS*  execute_approved_action" in report
+    assert "ACTS   run_agent_loop" in report

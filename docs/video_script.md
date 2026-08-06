@@ -3,8 +3,8 @@
 This is the recording script, not submission copy. The portal asks for a 3–5 minute screen
 recording of an end-to-end workflow executed through Cortex Code CLI, including input, processing,
 output, and two or three modular skills. Timed at the rate a person actually reads aloud while
-driving five windows, it runs **4:49**, and a trim block takes it to **4:29** if your read is
-slower. Read *Spoken length* before you record anything.
+driving five windows, it runs **4:50**, and a trim block takes it to about **4:30** if your
+read is slower. Read *Spoken length* before you record anything.
 
 The SAY blocks are written to be read **word for word, aloud** — contractions, pauses, and all.
 Read from your phone, but look up during the three key lines listed in the delivery notes. If a
@@ -19,47 +19,49 @@ safe work, asks about the consequential work, and refuses the regulated work—e
 live governance tag decides whether it may execute.
 
 **The running order, so you never have to think about it mid-take:** public story → title card →
-CoCo runs the loop → Streamlit reviewer view → tag change and refusal → adversarial tests →
+MCP surface → CoCo runs the loop → Streamlit reviewer view → tag change and refusal →
 public refusal proof.
 
 ## Spoken length — read this before you record
 
-**458 spoken words. At 125 wpm that is 3:39 of speech, plus 70 seconds of action nobody can talk
-over, so the video lands at 4:49.**
+**488 spoken words. At 125 wpm that is 3:54 of speech, plus 56 seconds of action nobody
+can talk over, so the video lands at 4:50.**
 
-125 wpm is the honest rate for reading a written script aloud, with feeling, while driving five
-windows. The earlier draft assumed 155 wpm and lumped all action into twenty seconds. That is why
-every slot overran in practice: a slot marked 1:05–1:42 really took past 2:00, and the error
-compounded down the whole timeline.
-
-Action time is now counted per beat, because it is nowhere near evenly spread — the console beat
-alone costs more than the old estimate for the entire video:
+Two things were wrong before, and they compounded. The rate was set at 155 wpm, which nobody hits
+reading a written script aloud while driving five windows — 125 is honest. And all action was
+lumped into twenty seconds for the whole video, when the console beat alone costs more than that.
+Together that is why a slot marked 1:05–1:42 really ran past 2:00.
 
 | Beat | Words | Speech | Action | Slot |
 | --- | --- | --- | --- | --- |
-| The gap, and the Monday morning | 96 | 46s | 0s | 46s |
-| Reveal | 11 | 5s | 3s | 8s |
+| The gap, and the Monday morning | 90 | 43s | 0s | 43s |
+| Reveal Warrant | 11 | 5s | 3s | 8s |
 | The promise | 49 | 24s | 0s | 24s |
-| CoCo runs the queue | 147 | 71s | 28s | 99s |
-| Console, tag change, refusal | 98 | 47s | 24s | 71s |
-| Close | 57 | 27s | 15s | 42s |
+| CoCo CLI takes the Monday queue | 191 | 92s | 14s | 106s |
+| Back to a person, then the policy moves | 90 | 43s | 24s | 67s |
+| Resolve the Monday morning | 57 | 27s | 15s | 42s |
 
-**Do one timed read of the SAY blocks alone, out loud, at the pace you will actually record.** Do
-not skip this. If your speech-only time exceeds **3:35**, you read slower than 125 wpm and the
-untrimmed script breaches five minutes. Apply the trim block below and you land at **4:29**.
+**The CoCo action figure is small because the waits are narrated, not because they are short.** A
+turn takes about two minutes; two prompts ran 4.5 minutes in rehearsal. Only the pastes, the launch
+and the two jump cuts are time nobody is talking over. This is also why there are two prompts and
+not three — a third turn cannot fit, and the surface listing already evidences all six skills in
+about a second.
 
-For reference: at 115 wpm the untrimmed script runs 5:08, and at 110 wpm it runs 5:19. That is the
-whole reason the trim block exists. Do not try to win the time back by speaking faster on camera —
-that is what makes a demo sound rushed, and it is the one failure the judges hear immediately.
+**Do one timed read of the SAY blocks alone, out loud, at the pace you will actually record.** If
+your speech-only time exceeds 4:09, you read slower than 125 wpm. Apply the trim block below and
+you land near 4:30.
 
-The adversarial pytest beat is gone from the running order. It cost 66 words plus an eight-second
-test run, and it is the only section the portal's stated requirements do not ask for. The full
-story lives on deck slide 6 and on the public page, where a judge can read it without a stopwatch.
+For reference, untrimmed: 5:10 at 115 wpm, 5:22 at 110 wpm. Do not try to win time back by
+speaking faster on camera — that is the one failure judges hear immediately.
+
+The adversarial pytest beat is out of the running order. It is the only section the portal's stated
+requirements do not ask for, and the full story lives on deck slide 6 and on the public page.
 
 ## What the judge should remember
 
 1. The hard problem is not detection; it is authority.
-2. CoCo CLI drives a real end-to-end run through modular Agent Skills and MCP tools.
+2. CoCo CLI drives a real end-to-end run, routing to modular Agent Skills on its own from
+   plain operator prompts, over an MCP surface it can print on demand.
 3. The model proposes, but live Snowflake tags decide.
 4. Authority is checked again at execution, so stale approval cannot override new policy.
 5. The hostile-document tests assume the model was fooled and prove the boundary still
@@ -94,12 +96,13 @@ story lives on deck slide 6 and on the public page, where a judge can read it wi
   beat so it is readable, then press Enter.
 - **Two separate files, and only one of them goes on camera.** Saying "let me grab my prompts out
   of notepad" out loud is better than pretending they materialise, so the notepad is in the script
-  on purpose. But it must contain *only* the three CoCo prompts and the `ALTER TABLE` line —
+  on purpose. But it must contain *only* the two CoCo prompts and the `ALTER TABLE` line —
   `docs/private/on-camera-prompts.txt`, which is git-ignored. Keep `docs/paste-buffer.txt` with its
   reset commands and pre-flight checklist on a second desktop, minimised, never visible. A viewer
   who reads "Required before you press Record" over your shoulder learns the demo was staged.
-- The reasoning calls take roughly two minutes. Start the run, explain what it is doing, then cut
-  to the completed result. Do not pretend the cut is real time.
+- Every CoCo turn takes roughly two minutes — two prompts ran 4.5 minutes in rehearsal. Start
+  the run, narrate what it is doing, then cut to the completed result. Say on camera that you
+  are cutting; never pretend the cut is real time.
 
 ### Exact window order — arrange this before pressing Record
 
@@ -111,7 +114,7 @@ recording is running.
 | 1 | Browser — Vercel viewer | Hero section with the three exceptions; later, the public refusal shortcut | Establishes the Monday scenario, then gives independent public proof. |
 | 2 | Browser — Streamlit console | Overview / pending-action screen, already signed in | Shows the human review surface inside Snowflake. |
 | 3 | Snowsight worksheet | Only the one-line `ALTER TABLE ... INVENTORY ... regulated` statement | Makes the live policy change legible without exposing the account locator. |
-| 4 | Terminal | Repository root; no prior command output containing secrets | Shows Cortex Code CLI input, processing, output, and adversarial proof. |
+| 4 | Terminal | Repository root; no prior command output containing secrets | Shows the MCP surface, then Cortex Code CLI input, processing and output. |
 | 5 | Finder / Preview | `docs/submission/warrant-video-title-card-1920x1080.png`, full-screen-ready | A 3–4 second product reveal only; never show the full deck. |
 
 ### What must be visible versus what can be cut
@@ -160,7 +163,7 @@ timeline to contain several marks. Do not quote its exact 24-hour run count; it 
 
 ---
 
-## 0:00–0:46 — The gap, and the Monday morning
+## 0:00–0:43 — The gap, and the Monday morning
 
 **DO:** Start on the public viewer hero, zoomed so the three operational examples are visible and
 the counters below are outside the frame. The pipeline is intentionally reset; the CoCo run will
@@ -173,8 +176,8 @@ create those counts. Keep the cursor still.
 >
 > I'm Sathya, Team Argmax, solo developer. Here's the Monday morning I built this for.
 >
-> An operations lead opens their queue. A quality hold, open eighty-two days. A critical part down
-> to five days of stock. A supplier suddenly at twenty-six percent on-time.
+> A quality hold, open eighty-two days. A critical part down to five days of stock. A supplier
+> suddenly at twenty-six percent on-time.
 >
 > Get the supplier call wrong and I apologise. Get the stock order wrong and that's real money
 > gone.
@@ -185,7 +188,7 @@ create those counts. Keep the cursor still.
 your name. Do not open with "Hello everyone, today I am going to present." Pause after each of the
 three exceptions. Look up from the phone on the last line.
 
-## 0:46–0:54 — Reveal Warrant
+## 0:43–0:51 — Reveal Warrant
 
 **DO:** Cut to the exported slide-1 title card. Wordmark and tagline only, 3 seconds. Do not show
 PowerPoint or advance through the deck.
@@ -194,7 +197,7 @@ PowerPoint or advance through the deck.
 
 > So that's why I built Warrant. No action without a warrant.
 
-## 0:54–1:17 — The promise
+## 0:51–1:15 — The promise
 
 **DO:** Return to the public viewer and point once across the three tag rows: `SHIPMENTS`,
 `INVENTORY`, `QUALITY_HOLDS`.
@@ -209,48 +212,51 @@ PowerPoint or advance through the deck.
 >
 > And it reads those tags again at the moment it executes.
 
-## 1:17–2:56 — CoCo CLI takes the Monday queue
+## 1:15–3:00 — CoCo CLI takes the Monday queue
 
-**DO:** Switch to the terminal and run:
+**Pacing note — read this before the take.** A CoCo turn costs roughly two minutes. Two prompts is
+therefore the budget, and both of them get a narrated wait and an honest jump cut. Do not add a
+third. If a wait runs past the narration written for it, keep going with the *Recovery* lines rather
+than sitting in silence; if an answer lands early, stop your sentence and read it.
+
+**Nothing here tells CoCo which skill to use.** Each prompt states the problem the way an operator
+would, and CoCo routes it from the skill descriptions. The skill names are spoken as observations of
+what it chose.
+
+**DO:** Switch to the terminal and run these two. Both return instantly.
 
 ```bash
 cortex mcp list
-cortex
+uv run --extra mcp python -m warrant_mcp.server --surface
 ```
 
-**SAY:**
+**SAY over them:**
 
-> This is Cortex Code CLI — CoCo — running here on WSL, with Warrant registered as its MCP server.
-> Thirteen tools, five resources, six skills. Two of them can act, and they say so in their
-> annotations.
+> This is Cortex Code CLI — CoCo — running on WSL, with Warrant registered as its MCP server.
+>
+> And rather than tell you what it exposes, here it is asking itself. FastMCP 3, thirteen tools,
+> eleven of them read-only, five resources, six Agent Skills.
+>
+> And read that last line.
 
-**DO:** Bring up the notepad holding the three prompts, then paste the first one.
-
-**SAY while you open it:**
-
-> Let me grab my prompts out of notepad.
+**DO:** Launch `cortex`, open the notepad, paste the end-to-end prompt, let it sit one beat, Enter.
 
 ```text
-Use the operate-warrant skill. Call governance_posture and authority_manifest, then tell me what Warrant may do right now and which Snowflake tags make that true.
+Three exceptions came in overnight. Work the whole queue end to end — find them, investigate each one, decide what may actually run, act where you're allowed to, and tell me what happened to each.
 ```
 
-**SAY while it responds:**
+**SAY over the first half-minute of the wait:**
 
-> And notice, none of these tools takes an authority level as an argument.
+> Now the real one. One prompt, the whole overnight queue.
+>
+> And notice I didn't tell it which skill to use. I just described the job, and it's read the
+> descriptions and picked orchestrate-loop.
+>
+> It's pulling the right procedure out of Cortex Search. This takes a couple of minutes, so I'm
+> cutting ahead.
 
-**DO:** Paste the end-to-end prompt:
-
-```text
-Using the orchestrate-loop skill, run one full AUTO pass against the live account. Summarise what detection, investigation, authority classification, routing, execution and audit did for each exception.
-```
-
-**SAY over the first few seconds:**
-
-> Now one prompt takes the whole Monday queue. The AI pulls the right procedure out of Cortex
-> Search. This takes a couple of minutes, so I'm cutting ahead.
-
-**DO:** Make an honest jump cut to the completed response. Keep the three outcomes visible. The
-same run also creates the pending SKU-1003 action used in the console section.
+**DO:** Make an honest jump cut to the completed response. Keep the three outcomes visible. The same
+run also creates the pending SKU-1003 action used in the console section.
 
 **SAY:**
 
@@ -258,22 +264,31 @@ same run also creates the pending SKU-1003 action used in the console section.
 > was prepared and then held, because `INVENTORY` is internal and a person signs that off. The
 > quality hold was escalated, and Warrant never tried to release it.
 >
-> And it doesn't need me. Two Snowflake Tasks run this loop off a stream.
+> And it doesn't need me — two Snowflake Tasks run this loop off a stream.
 
-**DO:** Paste the third, short prompt:
+**DO:** Paste the second prompt.
 
 ```text
-Use the classify-authority skill to compare raise_replenishment with open_supplier_case. Show the touched object, live tag, and final tier for each.
+Two of those ended up with different authority — raising a replenishment versus opening a supplier case. Why?
 ```
+
+**SAY over this wait:**
+
+> Again I'm not naming a skill, and it's gone to classify-authority.
+>
+> Same code, same model. The only thing that differs is the tag on the table each action
+> touches.
+
+**DO:** Jump cut to the answer if it runs long.
 
 **SAY:**
 
 > The model recommends. The tags decide.
 
-This section visibly demonstrates `operate-warrant`, `orchestrate-loop`, and `classify-authority`,
-plus multiple MCP tools and the full CLI-driven workflow.
+Two skills selected by CoCo rather than named by me — `orchestrate-loop` and `classify-authority` —
+across a full CLI-driven run, with the other four visible on the surface listing.
 
-## 2:56–4:07 — Back to a person, then the policy moves
+## 3:00–4:07 — Back to a person, then the policy moves
 
 **DO:** Switch to the Streamlit console. Show the headline tiles, then the SKU-1003 pending card
 with its evidence and model reasoning.
@@ -281,7 +296,7 @@ with its evidence and model reasoning.
 **SAY:**
 
 > So the stockout comes back to a person. This is a Streamlit console running inside Snowflake,
-> right next to the data, and it's the only surface that can actually act.
+> and it's the only surface that can actually act.
 
 **DO:** Switch to the prepared Snowsight worksheet and run:
 
@@ -293,7 +308,7 @@ ALTER TABLE WARRANT.DATA.INVENTORY
 **SAY:**
 
 > But before the reviewer decides, something changes underneath them. Governance reclassifies
-> `INVENTORY` as regulated. Nothing's been redeployed.
+> `INVENTORY` as regulated.
 
 **DO:** Return to the console, briefly show the regulated tag, open the pending action, paste this
 reviewer note, then click **Approve and execute**.
@@ -320,7 +335,7 @@ Checked in-transit is zero and SKU-1003 is not on quality hold. Quantity restore
 **IMPORTANT:** The order is queue while `internal` → reclassify to `regulated` → approve →
 execution-time tag read → refuse. Never describe it as approve first and reclassify afterwards.
 
-## 4:07–4:49 — Resolve the Monday morning
+## 4:07–4:50 — Resolve the Monday morning
 
 **DO:** Switch to the public viewer. Keep the Vercel URL visible. Click the shortcut **The refusal
 that held**, then click **Approve and execute**. Wait until the green "THE BOUNDARY HELD" result is
@@ -355,6 +370,12 @@ fully visible.
   grab my prompts out of notepad" are in the script on purpose — they sound like a person working,
   and they explain the paste instead of hiding it. Keep the notepad to the three prompts only, so
   nothing else is legible when it appears.
+- Never say "use the X skill" out loud, and never type it. Ask for the outcome and let CoCo route.
+  Naming the skill proves you read your own documentation; letting the agent pick proves the skill
+  descriptions are good enough to choose from, which is the thing being judged. Say the skill name
+  only after CoCo has shown it, as an observation.
+- Talk through every CoCo wait. Two minutes of a turning spinner is the most boring thing that can
+  happen in a demo, and the narration for each prompt exists to cover it.
 - Do not narrate every click. Say what the result means.
 - Let the refusal breathe. The two-second silence after approval is part of the story.
 - Look away from the script on these three lines:
@@ -389,8 +410,10 @@ Six whole sentences. Together they remove 42 words and about 20 seconds, taking 
 5. `So Monday's queue has an answer.`
 6. `This page is public.` — fold it into the next sentence, which names Vercel anyway.
 
-Do not cut `And notice, none of these tools takes an authority level as an argument.` Thirteen
-words, and it is the only spoken statement of the invariant the deck gives a whole panel to.
+Because the surface listing now prints `No tool accepts an authority tier` as its own last line,
+the spoken assertion of it has already been removed — `And read that last line.` points at it
+instead. Do not cut that pointer; four words for the deck's headline invariant is the best trade in
+the script.
 
 If a timed read still exceeds **4:00 of speech** after all six, drop the third CoCo prompt
 (`classify-authority`) and its one line. That costs a named skill but keeps you at two, which still
@@ -431,6 +454,9 @@ Then:
 | If | Do |
 |---|---|
 | CoCo takes too long | Keep the start and completed result, then make an honest jump cut. |
+| CoCo picks the wrong skill, or none | Do not re-record the section. Say "let me be explicit" on camera and re-prompt naming the skill: `Use the classify-authority skill to …`. An operator steering an agent is normal and the skill still runs; you lose only the auto-selection line, so drop "it's read the descriptions and picked". |
+| A turn runs past its narration | Do not sit in silence. Say: "while that finishes — every decision it's making is going into an append-only log, including the refusals." Then jump cut. |
+| You are tempted to add a third prompt | Do not. Two prompts consumed 4.5 minutes in rehearsal. The surface listing already evidences all six skills. |
 | CoCo starts wandering | Stop it, use the exact prompt again, and re-record only that terminal section. |
 | CoCo requests permission | Approve it on camera; the operator boundary is relevant evidence. |
 | No pending action appears | A prior take consumed it. Run the full pre-flight again. |

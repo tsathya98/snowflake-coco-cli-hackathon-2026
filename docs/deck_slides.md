@@ -201,7 +201,7 @@ Evidence table:
 | Reasoning quality | **6 scenarios × 5 dimensions, all passed** |
 | Hostile document reached the prompt | **6/6 findings cited it; 0 routings changed** |
 | Planted anomaly separation | robust *z* **−3.63** vs **−0.46** next worst |
-| Engineering gate | **251 tests collected · 100% branch coverage · 0 mypy errors** |
+| Engineering gate | **252 tests collected · 100% branch coverage · 0 mypy errors** |
 
 Cyan callout:
 

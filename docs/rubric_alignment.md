@@ -25,7 +25,7 @@ uv run pytest --cov --cov-report=term-missing
 
 Expected: clean, clean, `no issues found in 19 source files`, `SQL boundary holds across 27
 module(s)`, `6 document(s) verified`, `6 case(s) evaluated`, `Every counted claim matches the
-repository`, `247 passed … 100.00%` with the coverage gate satisfied.
+repository`, `248 passed … 100.00%` with the coverage gate satisfied.
 
 Every figure in that sentence is checked by the run above it. `tools/check_doc_claims.py` executes
 the project's own tools and compares what they print against what this document, the README and
@@ -232,7 +232,7 @@ you, "the model's compliance changed nothing" is a property of the architecture.
 uv run pytest --cov --cov-report=term-missing
 ```
 
-**251 tests, 100% branch coverage of `src/warrant`, gated** (545 statements, 96 branches, zero
+**252 tests, 100% branch coverage of `src/warrant`, gated** (545 statements, 96 branches, zero
 missed; 230 pass, 3 are skipped for a missing optional dependency and 1 is the opt-in integration
 test). `mypy --strict` clean across 19 modules. Ruff clean against 21 rule families, including
 complexity, `BLE`, and `RUF100` — which fails on a `noqa` that no longer suppresses anything, so
