@@ -42,7 +42,8 @@ import { Decide } from "@/components/decide";
 import { Wordmark } from "@/components/mark";
 import { Resolution } from "@/components/resolution";
 import { Coco } from "@/components/coco";
-import { OnTimeTrend, TaskTimeline } from "@/components/charts";
+import { TaskTimeline } from "@/components/charts";
+import { OnTimeTrend } from "@/components/trend";
 import { Tested } from "@/components/tested";
 import { ConsoleGallery } from "@/components/console";
 

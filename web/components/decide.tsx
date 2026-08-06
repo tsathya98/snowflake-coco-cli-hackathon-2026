@@ -46,21 +46,29 @@ export function Decide({ actionType }: { actionType: string }) {
         first — and the refusal you get back is the database&apos;s, not this page&apos;s.
       </p>
 
-      <label className="mt-4 block">
-        <span className="mb-1.5 block text-[0.62rem] font-bold uppercase tracking-[0.1em] text-[var(--text-muted)]">
-          Your reason &mdash; optional here, and it goes nowhere
-        </span>
-        <textarea
-          rows={2}
-          placeholder="Type anything, or nothing. The buttons work either way."
-          className="w-full resize-y rounded-lg border border-[var(--line)] bg-[var(--page-deep)] px-3 py-2 text-[0.88rem] text-[var(--text)] transition-colors placeholder:text-[var(--text-muted)] hover:border-[var(--line-hi)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--info)]"
-        />
-        <span className="mt-1 block text-[0.72rem] text-[var(--text-muted)]">
-          The console requires this to reject, and writes it to the audit row as{" "}
-          <code className="font-mono">decision_note</code>. Here it is never sent anywhere,
-          because there is no decision to annotate — so it is reproduced, not enforced.
-        </span>
-      </label>
+      {/* Deliberately not a textarea.
+       *
+       * This started as one, reproducing the console's reason field for fidelity. Two readers in
+       * a row stopped and asked what they were supposed to type in it — which is the answer:
+       * nothing, and a control whose correct use is "leave it alone" is the wrong control. No
+       * amount of label rewriting fixed that, because the input itself is the thing making the
+       * promise. So the field became an exhibit of what a reviewer writes, which is the only part
+       * that was ever worth showing. */}
+      <div className="mt-4">
+        <div className="mb-1.5 text-[0.62rem] font-bold uppercase tracking-[0.1em] text-[var(--text-muted)]">
+          In the console, a reviewer also writes their reason
+        </div>
+        <blockquote className="m-0 rounded-lg border border-dashed border-[var(--line-hi)] bg-[var(--page-deep)] px-3.5 py-2.5 text-[0.86rem] italic leading-relaxed text-[var(--text-soft)]">
+          &ldquo;Checked in-transit is zero and SKU-1003 is not on quality hold. Quantity restores
+          to safety-stock minimum.&rdquo;
+        </blockquote>
+        <p className="mt-1.5 text-[0.75rem] leading-relaxed text-[var(--text-muted)]">
+          Required to reject, and written to the audit row as{" "}
+          <code className="font-mono">decision_note</code> — so a later reader learns what was
+          checked, not just what was decided. There is no box here because there is no decision to
+          annotate: press a button and Snowflake refuses it.
+        </p>
+      </div>
 
       <div className="mt-3 flex flex-wrap gap-2.5">
         {CHOICES.map(([decision, label, tone]) => (
