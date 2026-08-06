@@ -240,6 +240,10 @@ a[data-active="true"] {
 }
 .scroller::-webkit-scrollbar {
   height: 8px;
+  /* Width as well as height. A table capped with maxRows scrolls vertically, and a bar styled
+     on one axis only renders as the browser default on the other — which on Windows is a wide
+     grey slab that does not belong to this page. */
+  width: 8px;
 }
 .scroller::-webkit-scrollbar-track {
   background: var(--surface);

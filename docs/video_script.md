@@ -79,15 +79,20 @@ stumble, change the words to yours. Short sentences survive nerves.
 
 **DO:** Repo README on screen, or just the terminal. Nothing moving yet.
 
-**SAY:**
+**SAY:** *(slow down on the three numbers — they are the hook)*
 
-> Enterprise ops teams don't lack insight. They lack action. And the reason agents that can act
-> never get deployed isn't capability. It's trust. Nobody will hand an autonomous agent blanket
-> authority over regulated data.
+> A quality hold has been open eighty-two days. A SKU is five days from running out. And a
+> supplier's on-time delivery just fell to twenty-six percent.
 >
-> So I built Warrant. The idea is simple. The agent's authority comes from the data itself, from
-> the governance tags already sitting on the tables. Change a tag, and what the agent may do
-> changes with it. No code change. No deploy.
+> All three of those are on a dashboard right now. And none of them is fixed. Because a dashboard
+> tells you something, and then it waits for a person.
+>
+> An agent could do this work. It doesn't get deployed, because in a regulated operation the first
+> question is always the same. "So it can change a quality record?" And if the answer is yes,
+> nobody signs off.
+>
+> The blocker was never capability. It was authority. So I built Warrant, and Warrant takes that
+> answer from the data itself.
 
 ## 0:25–1:35 · INPUT and PROCESSING — CoCo CLI drives it
 
@@ -139,8 +144,12 @@ Using the orchestrate-loop skill, run one full pass of the Warrant agent against
 
 **SAY:**
 
-> Six exceptions. Five it handled on its own. One it stopped and escalated. Same loop for every
-> table. No special cases.
+> Six exceptions. And watch what it did with them. The supplier case, it just handled — shipments
+> are tagged open, so nobody was asked. The stockout, it prepared in full and then stopped, because
+> inventory is tagged internal and a replenishment commits money. And the quality hold it
+> surfaced and explained, but would not touch, because that table is tagged regulated.
+>
+> Three different endings. Same code path. There is no "if table name" anywhere in this.
 
 **DO:** Prompt 3, the differentiator:
 

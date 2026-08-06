@@ -27,6 +27,62 @@ governed console sends, and what comes back is Snowflake refusing them — not a
 
 </div>
 
+---
+
+## The problem, in one scene
+
+A quality hold has been open **82 days**. A SKU is **five days** from stockout. A supplier's
+on-time delivery just collapsed to **26%**.
+
+All three are on a dashboard right now. None of them is fixed — because a dashboard tells you, and
+then waits for a person. That person opens six tabs on Monday morning, works out which of the
+forty open holds actually matters, writes the supplier email, raises the replenishment, and files
+the note. Analytics stopped at the insight. The work started after.
+
+An agent could do all of it. It doesn't get deployed, because in a regulated operation the first
+question is always the same:
+
+> *"So it can change a quality record?"*
+
+If the answer is **yes**, nobody signs off. If the answer is **no, it only drafts emails**, it
+isn't worth building. So the automation that would actually help is the one that never ships, and
+teams settle for another dashboard.
+
+**The blocker was never capability. It was authority** — and nobody could say, in advance and in
+writing, what the agent was allowed to touch.
+
+## The answer: take the authority from the data
+
+Every regulated organisation already classifies its data. That classification is sitting on the
+tables, maintained by the people whose job it is, and it is the answer to the question nobody could
+answer. So Warrant reads it — `SYSTEM$GET_TAG`, live, on every single decision.
+
+The same agent, the same code path, on one pass, produces three different endings:
+
+| The exception | Table it must touch | Tag on that table | What happens |
+|---|---|---|---|
+| SUP-002's on-time delivery fell to 26% | `SHIPMENTS` | `open` | **Handled.** Supplier case opened, nobody asked, logged |
+| SKU-1003 is 5 days from stockout | `INVENTORY` | `internal` | **Escalated.** Prepared in full, with evidence and an undo path — then stopped, because a replenishment commits spend |
+| QH-0034 has been on hold 82 days | `QUALITY_HOLDS` | `regulated` | **Refused.** It may surface the hold and explain it. Releasing it is never the agent's, at any confidence |
+
+**There is no `if table_name ==` anywhere in the code.** Retag `INVENTORY` as `regulated` and the
+middle row stops being an escalation and becomes a refusal — no code change, no deploy. That is the
+difference between an agent with *permissions* and an agent with a *warrant*.
+
+### The seven stages
+
+| | Stage | | |
+|---|---|---|---|
+| 01 | **Watch** | Rolling baselines over shipments, inventory and holds | unattended |
+| 02 | **Detect** | An exception, with the runbook clause that set the threshold | unattended |
+| 03 | **Investigate** | Grounded reasoning over the procedures; cites its source | unattended |
+| 04 | **Classify** | Read the governance tags on every table the action touches | **the gate** |
+| 05 | **Route** | Act, queue for a human, or refuse — decided by the tags | **the gate** |
+| 06 | **Execute** | Re-read the tags. An approval does not survive a policy change | **the gate** |
+| 07 | **Audit** | Append-only. Refusals recorded with the same care as actions | unattended |
+
+Stages 1–3 are a pipeline any competent team would build. **Stages 4–6 are the submission.**
+
 ![The Warrant viewer: the headline claim beside three tables resolved live to L4, L3 and L2
 authority](docs/images/web/hero.png)
 

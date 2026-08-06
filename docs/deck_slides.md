@@ -55,24 +55,33 @@ One line beneath, if it fits above the footer:
 ## Slide 2 — Problem Brief
 
 **Eyebrow:** PROBLEM BRIEF
-**Title:** Agents that can act don't get deployed
+**Title:** The automation that would actually help is the one that never ships
 
-**Lead paragraph**
+**Open with the scene, not the thesis.** Three numbers, big, across the top — every one of them
+real and live on the deployed site:
 
-Enterprise operations teams do not lack insight. They lack *action*. Someone still has to notice the
-red KPI, work out why, decide what to do, and do it — analytics stops exactly where the work starts.
+| 82 days | 5 days | 26% |
+|---|---|---|
+| A QUALITY HOLD, STILL OPEN | OF STOCK COVER LEFT ON ONE SKU | ON-TIME DELIVERY AT ONE SUPPLIER |
+
+**Say, don't write:** *"All three of these are on a dashboard right now. None of them is fixed.
+Because a dashboard tells you — and then waits for a person."*
 
 **The paragraph that does the work**
 
-Every agentic pilot that dies in a regulated operation dies at the same place. Someone in quality
-asks *"so it can write to the inventory system?"* and the answer is either **yes** (rejected) or
-**no, it only drafts emails** (pointless). The capability was never the bottleneck. **Trust was.**
+That person opens six tabs on Monday morning, works out which of the forty open holds actually
+matters, writes the supplier email, raises the replenishment, files the note. Analytics stopped at
+the insight. The work starts after.
 
-**And the usual fix makes it permanent**
+An agent could do all of it. It doesn't get deployed, because in a regulated operation the first
+question is always the same — **"so it can change a quality record?"** If the answer is *yes*,
+nobody signs off. If the answer is *no, it only drafts emails*, it isn't worth building.
 
-Authority gets encoded as a rules list in application code. It drifts from the real data-governance
-policy the moment either changes — and a control that has drifted is worse than no control, because
-people still believe it.
+**Red callout — THE REAL BLOCKER**
+
+> The blocker was never capability. It was **authority**. Nobody could say, in advance and in
+> writing, what the agent was allowed to touch — so the automation that would actually help is the
+> one that never ships.
 
 **Three personas, as three cards**
 
@@ -82,8 +91,8 @@ people still believe it.
 | Quality / compliance owner | A defensible answer to "what is this agent allowed to do, and who decided?" |
 | Data platform owner | Refuses to maintain a second copy of the access policy inside an application. |
 
-**Domain footer:** Supply chain and manufacturing operations. 100% synthetic data — 2,400 shipments,
-6 suppliers, 40 quality holds, 6 SKUs, 5 operating procedures.
+**Domain footer:** Supply chain and manufacturing operations. 100% synthetic data — 2,400
+shipments, 6 suppliers, 40 quality holds, 6 SKUs, 5 operating procedures.
 
 ---
 
@@ -98,6 +107,18 @@ An action's permission tier is resolved at runtime from the Snowflake `SENSITIVI
 every table it touches — read live with `SYSTEM$GET_TAG`, never cached, never from `ACCOUNT_USAGE`
 (which lags two hours). Retag a table and the agent's next decision changes. No code change, no
 redeploy, no rules list.
+
+**Lead with the three lanes — this is the slide's best moment**
+
+One pass, one code path, three endings, decided entirely by the tag on the data:
+
+| The exception | Table it touches | Tag | Ending |
+|---|---|---|---|
+| SUP-002 on-time down to 26% | `SHIPMENTS` | `open` | **Handled**, nobody asked |
+| SKU-1003 five days from stockout | `INVENTORY` | `internal` | **Escalated**, prepared in full then stopped |
+| QH-0034 on hold 82 days | `QUALITY_HOLDS` | `regulated` | **Refused**, and it says why |
+
+Say out loud: *"There is no `if table_name` anywhere in this code."*
 
 **Table — the whole model in five rows**
 

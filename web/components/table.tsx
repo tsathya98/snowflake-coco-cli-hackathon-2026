@@ -22,14 +22,28 @@ export function DataTable({
   columns,
   rows,
   caption,
+  maxRows,
 }: {
   columns: [string, string, boolean?][];
   rows: Record<string, unknown>[];
   caption?: string;
+  /**
+   * Cap the visible height at roughly this many rows and scroll the rest inside the table.
+   *
+   * Without it a forty-row log is forty rows of page: the reader scrolls the whole document
+   * past it to reach anything below, and the table's own length becomes the site's problem.
+   * With it the table owns its overflow, the header stays put, and the section keeps a
+   * predictable size. Only set it where the row count is unbounded — a six-row table that
+   * scrolls is worse than one that does not.
+   */
+  maxRows?: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [edges, setEdges] = useState("");
   const [scrollable, setScrollable] = useState(false);
+  // ~41px a row plus the header. Approximate on purpose: the point is to cut the table off
+  // mid-row so it visibly continues, rather than to land exactly on a boundary and look complete.
+  const capped = maxRows ? { maxHeight: `${maxRows * 41 + 42}px`, overflowY: "auto" as const } : undefined;
 
   const measure = useCallback(() => {
     const el = ref.current;
@@ -80,9 +94,21 @@ export function DataTable({
           {caption ?? "Scroll sideways for the remaining columns"}
         </figcaption>
       ) : null}
+      {maxRows && rows.length > maxRows ? (
+        <figcaption className="mb-1.5 text-[0.72rem] text-[var(--text-muted)]">
+          {rows.length} rows — scroll inside the table
+        </figcaption>
+      ) : null}
 
       <div className="table-wrap" data-overflow={edges}>
-        <div ref={ref} className="scroller" tabIndex={0} role="region" aria-label={caption}>
+        <div
+          ref={ref}
+          className="scroller"
+          style={capped}
+          tabIndex={0}
+          role="region"
+          aria-label={caption}
+        >
           <table className="w-full min-w-[660px] border-separate border-spacing-0 text-[0.84rem]">
             <thead>
               <tr>

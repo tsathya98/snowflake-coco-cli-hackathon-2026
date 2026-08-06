@@ -46,6 +46,7 @@ import { TaskTimeline } from "@/components/charts";
 import { OnTimeTrend } from "@/components/trend";
 import { Tested } from "@/components/tested";
 import { ConsoleGallery } from "@/components/console";
+import { Workflow } from "@/components/workflow";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -59,6 +60,7 @@ const TIER_MEANING: Record<string, string> = {
 };
 
 const NAV = [
+  ["workflow", "The workflow"],
   ["pass", "One pass"],
   ["evidence", "Evidence"],
   ["console", "Console"],
@@ -157,15 +159,26 @@ export default async function Page() {
               </span>
               .
             </h1>
+            {/* A scene, not an observation.
+             *
+             * This opened with "agents that can act don't get deployed", which is true, abstract,
+             * and gives a reader nothing to picture. Every figure below is real and live on this
+             * page further down — the reader can check the claim that opened the argument, which
+             * is the habit the whole site is trying to establish. */}
             <p className="mt-4 max-w-[62ch] text-[1.02rem] leading-relaxed sm:text-[1.14rem]">
-              Agents that <em>can</em> act don&rsquo;t get deployed, because nobody can say in
-              advance what they&rsquo;re allowed to do.
+              A quality hold has been open <strong>82 days</strong>. A SKU is{" "}
+              <strong>five days</strong> from stockout. A supplier&rsquo;s on-time delivery just
+              collapsed to <strong>26%</strong>. All three are on a dashboard right now. None of
+              them is fixed — because a dashboard tells you, and then waits for a person.
             </p>
             <p className="mt-3 max-w-[68ch] text-[0.96rem] leading-relaxed text-[var(--text-soft)] sm:text-[1.02rem]">
-              Warrant takes that answer from the data itself. Every action&rsquo;s authority is
-              read from the Snowflake object tags on the tables it touches — live, and again at
-              execution time, so a human&rsquo;s approval cannot outlive the policy it was granted
-              under. Change a tag, and what the agent may do changes with it. No code, no deploy.
+              An agent could do this work. It doesn&rsquo;t get deployed, because the first question
+              in a regulated operation is always <em>&ldquo;so it can change a quality
+              record?&rdquo;</em> — and if the answer is yes, nobody signs off.{" "}
+              <strong>Warrant answers that question from the data itself.</strong> Every
+              action&rsquo;s authority is read from the Snowflake governance tags on the tables it
+              touches, live, and again at execution time. So it chases the supplier on its own,
+              stops and asks about the stockout, and will never release the hold.
             </p>
             <p className="mt-4 text-[0.82rem] text-[var(--text-muted)]">
               Team Argmax &middot; CoCo CLI Hackathon 2026, Problem Statement 1 &middot;{" "}
@@ -212,6 +225,22 @@ export default async function Page() {
             , they send the real statements, and Snowflake refuses them in front of you.
           </Note>
         </div>
+
+        <Section
+          id="workflow"
+          eyebrow="What it actually does"
+          title="An operations workflow that finishes, or stops and says why"
+          lede={
+            <>
+              Exceptions are the part of an operations workflow that needs a person: the hold
+              nobody dispositioned, the stock nobody reordered, the supplier nobody chased. Warrant
+              runs that lane end to end — watch, detect, investigate, decide, act, record — and the
+              decision about <em>who may decide</em> comes from the data, not from its own code.
+            </>
+          }
+        >
+          <Workflow />
+        </Section>
 
         <Section
           id="pass"
@@ -623,6 +652,7 @@ export default async function Page() {
                 ["RATIONALE", "Rationale"],
               ]}
               rows={audit}
+              maxRows={12}
             />
           </Reveal>
         </Section>

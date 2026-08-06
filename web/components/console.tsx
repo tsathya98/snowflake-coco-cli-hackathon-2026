@@ -60,18 +60,28 @@ const SHOTS: [string, string, string][] = [
 export function ConsoleGallery() {
   return (
     <>
-      <p className="mb-4 text-[0.82rem] text-[var(--text-muted)]">
-        A console is dense, and a thumbnail of one is unreadable.{" "}
-        <strong className="text-[var(--text-soft)]">Click any shot to open it full size.</strong>
+      <p className="mb-3 text-[0.82rem] text-[var(--text-muted)]">
+        Eight views of the governed console. <strong className="text-[var(--text-soft)]">Swipe
+        or scroll sideways</strong>, and click any shot to open it full size.
       </p>
-      {/* Two-up only from lg. These are 1400px-wide screenshots of a data-dense app: at the sm
-          breakpoint a half-width column is ~300px, which is a picture of a console rather than
-          a console you can read. */}
-      <div className="grid gap-5 lg:grid-cols-2">
+
+      {/* A horizontal rail, not a vertical stack.
+       *
+       * Eight 1400px screenshots stacked two-up ran to about 2,400px of page — a quarter of the
+       * site spent on supporting evidence that most readers will glance at once. A rail costs one
+       * viewport regardless of how many shots there are, and the horizontal axis is otherwise
+       * unused on a page that is already long.
+       *
+       * Built on scroll-snap and native overflow rather than a carousel library: it works before
+       * hydration, it works with a trackpad, a touch screen, shift+wheel and the keyboard, and it
+       * degrades to a plain scrolling row if anything about it fails. There are no arrow buttons
+       * because there is no state to manage — the scrollbar is the control, and .scroller keeps
+       * it permanently visible instead of the overlay kind that fades. */}
+      <div className="scroller table-wrap -mx-1 flex snap-x snap-mandatory gap-4 px-1 pb-3">
         {SHOTS.map(([file, title, note]) => (
           <figure
             key={file}
-            className="m-0 overflow-hidden rounded-xl border border-[var(--line)] bg-[var(--surface)]"
+            className="m-0 w-[min(86vw,620px)] shrink-0 snap-start overflow-hidden rounded-xl border border-[var(--line)] bg-[var(--surface)]"
             data-glow
           >
             <a
@@ -87,7 +97,7 @@ export function ConsoleGallery() {
                 width={1400}
                 height={800}
                 className="h-auto w-full border-b border-[var(--line)] transition-opacity group-hover:opacity-80"
-                sizes="(max-width: 1024px) 100vw, 50vw"
+                sizes="(max-width: 640px) 86vw, 620px"
               />
               <span className="pointer-events-none absolute bottom-2 right-2 rounded-md border border-[var(--line-hi)] bg-[var(--page-deep)] px-2 py-1 text-[0.66rem] font-bold uppercase tracking-[0.08em] text-[var(--text-soft)] opacity-0 transition-opacity group-hover:opacity-100">
                 Open full size &#8599;
