@@ -1,9 +1,9 @@
-# Warrant demo video — natural 4½-minute script
+# Warrant demo video — natural five-minute script
 
 This is the recording script, not submission copy. The portal asks for a 3–5 minute screen
 recording of an end-to-end workflow executed through Cortex Code CLI, including input, processing,
-output, and two or three modular skills. This version targets **4:45–4:55** and leaves room for
-natural pauses.
+output, and two or three modular skills. This version runs **4:58** — inside the ceiling with two
+seconds to spare, which is why the cut list matters.
 
 The SAY blocks are written to be read **word for word, aloud** — contractions, pauses, and all.
 Read from your phone, but look up during the three key lines listed in the delivery notes. If a
@@ -23,13 +23,16 @@ public refusal proof.
 
 ## Spoken length
 
-642 spoken words. Read straight through that is **4:08 at 155 wpm** — but a full minute of it is
-spoken *over* typing and the model wait (the CLI section alone is 166 words across 73 seconds), so
-speech and screen time overlap rather than add. The section timings below sum to **4:50**, which is
-the real budget against the portal's five-minute ceiling.
+672 spoken words. Read straight through that is **4:20 at 155 wpm** — but most of it is spoken
+*over* typing, clicking and the model wait, so speech and screen time overlap rather than add. The
+section timings below sum to **4:58**, which is the real budget against the portal's five-minute
+ceiling.
 
-Do one timed read-through before recording. If your voice alone passes **4:15**, apply the cut
-list now — do not try to win the time back by speaking faster on camera.
+**This is now at the ceiling, not near it.** Do one timed read-through before recording. If your
+voice alone passes **4:25**, apply the cut list before you record — do not try to win the time back
+by speaking faster on camera. Two sections are deliberately tight: the CLI section carries 203
+words in 85 seconds, and the close carries 84 in 35, so paste prompts rather than typing them and
+keep window switches to a single keystroke.
 
 ## What the judge should remember
 
@@ -62,6 +65,12 @@ list now — do not try to win the time back by speaking faster on camera.
 - Hide or crop the Snowsight address bar because it contains the account locator. The Vercel URL
   is safe and useful to show.
 - Switch with Cmd+Tab. Clean jump cuts are fine.
+- **Paste the prompts and the SQL; do not type them.** Keep all three CoCo prompts and the
+  `ALTER TABLE` line in one scratch file, and paste each with a single keystroke. Typing a
+  180-character prompt on camera costs twenty seconds the budget does not have, invites a typo
+  that forces a retake, and proves nothing — the judge needs to read the prompt, not watch it
+  appear. Paste, let it sit still for one beat so it is readable, then press Enter. Never show the
+  scratch file itself; keep it on a second desktop or minimised.
 - The reasoning calls take roughly two minutes. Start the run, explain what it is doing, then cut
   to the completed result. Do not pretend the cut is real time.
 
@@ -127,10 +136,9 @@ create those counts. Keep the cursor still.
 
 **SAY:**
 
-> Hi, I'm Sathya from Team Argmax — solo developer. Let me show you the Monday morning I built
-> this for.
+> Hi, I'm Sathya from Team Argmax — solo developer. Here's the Monday morning I built this for.
 >
-> An operations lead opens the exception queue — three things waiting.
+> An operations lead opens the queue — three things waiting.
 >
 > A quality hold, sitting open for eighty-two days. A critical part with five days of stock left.
 > And a reliable supplier who's suddenly down to twenty-six percent on-time delivery.
@@ -163,7 +171,7 @@ Do not show PowerPoint or advance through the deck.
 
 > That's why I built Warrant. No action without a warrant.
 
-## 1:01–1:22 — The promise
+## 1:01–1:25 — The promise
 
 **DO:** Return to the public viewer and point once across the three tag rows: `SHIPMENTS`,
 `INVENTORY`, `QUALITY_HOLDS`.
@@ -178,7 +186,7 @@ Do not show PowerPoint or advance through the deck.
 >
 > And it re-reads those tags at the moment of execution. Remember that — it matters in a minute.
 
-## 1:22–2:35 — CoCo CLI takes the Monday queue
+## 1:25–2:50 — CoCo CLI takes the Monday queue
 
 **DO:** Switch to the terminal and run:
 
@@ -189,8 +197,10 @@ cortex
 
 **SAY:**
 
-> This is Cortex Code CLI — CoCo — with Warrant as an MCP server. First question: what is it
-> allowed to do right now?
+> This is Cortex Code CLI — CoCo — and Warrant is its MCP server. Thirteen tools, five resources,
+> six skills. Eleven of those tools only read; two can act, and they say so in their annotations.
+>
+> First question: what is it allowed to do right now?
 
 **DO:** Enter this first prompt:
 
@@ -214,7 +224,7 @@ Using the orchestrate-loop skill, run one full AUTO pass against the live accoun
 > Now the real thing — one prompt takes the whole Monday queue.
 >
 > The AI does the messy part: reading the evidence, pulling the right procedure through Cortex
-> Search. It never decides its own permission.
+> Search.
 >
 > These calls take a couple of minutes, so here's an honest cut to the result.
 
@@ -230,6 +240,9 @@ this point the same run has also created the pending SKU-1003 action used in the
 > hold? Flagged and escalated — but releasing it isn't even in Warrant's vocabulary.
 >
 > Same code ran all three. The tags wrote the endings.
+>
+> And this loop doesn't need me. Two Snowflake Tasks run it on a stream — unattended, whether
+> anyone's watching or not.
 
 **DO:** Enter the third, short prompt:
 
@@ -244,7 +257,7 @@ Use the classify-authority skill to compare raise_replenishment with open_suppli
 This section visibly demonstrates `operate-warrant`, `orchestrate-loop`, and
 `classify-authority`, plus multiple MCP tools and the full CLI-driven workflow.
 
-## 2:35–3:00 — The decision that comes back to a person
+## 2:50–3:12 — The decision that comes back to a person
 
 **DO:** Switch to the Streamlit console. Show the headline tiles, then the SKU-1003 pending card.
 Point first to the detector evidence, then the model-generated reasoning and citation.
@@ -256,7 +269,7 @@ Point first to the detector evidence, then the model-generated reasoning and cit
 >
 > Evidence on the left, the model's reasoning on the right. Ready… but it hasn't happened.
 
-## 3:00–3:50 — Change the policy underneath the decision
+## 3:12–3:57 — Change the policy underneath the decision
 
 **DO:** Switch to the prepared Snowsight worksheet and run:
 
@@ -298,7 +311,7 @@ Click **Approve and execute**.
 **IMPORTANT:** The order is queue while `internal` → reclassify to `regulated` → approve →
 execution-time tag read → refuse. Never describe it as approve first and reclassify afterwards.
 
-## 3:50–4:16 — What if the model is manipulated?
+## 3:57–4:23 — What if the model is manipulated?
 
 **DO:** Switch to the terminal and run:
 
@@ -316,7 +329,7 @@ uv run pytest tests/test_adversarial.py -q
 > A model refusing an attack is encouraging. A model falling for it, and nothing changing —
 > that's a boundary.
 
-## 4:16–4:50 — Resolve the Monday morning
+## 4:23–4:58 — Resolve the Monday morning
 
 **DO:** Switch to the public viewer. Keep the Vercel URL visible. Click the shortcut **The refusal
 that held**, then click **Approve and execute**. Wait until the green “THE BOUNDARY HELD” result is
@@ -328,8 +341,8 @@ fully visible.
 > evidence attached. Regulated record — protected.
 >
 > And this page is public — Vercel, outside Snowflake — but the buttons are real. They send the
-> actual statements, with a role that cannot act. A missing button proves nothing. A refusal you
-> can watch — that's the boundary.
+> actual statements, with a role that cannot act. A refusal you can watch is the only proof that
+> counts.
 
 **DO:** Click. Pause while the response loads.
 
@@ -380,8 +393,10 @@ Cut in this order:
    pointing at it anyway.
 3. “These tests assume the model believed every word, then check that nothing could happen
    anyway.” in the adversarial section.
-4. “A missing button proves nothing. A refusal you can watch — that's the boundary.” in the
-   close; keep the Monday resolution and final lines.
+4. “A refusal you can watch is the only proof that counts.” in the close; keep the Monday
+   resolution and final lines.
+5. “Eleven of those tools only read; two can act, and they say so in their annotations.” — the
+   thirteen-five-six count survives on its own.
 
 Do not cut “no tool here takes an authority level as input” to save four seconds. It is the only
 spoken statement of the invariant the deck gives a whole panel to.
