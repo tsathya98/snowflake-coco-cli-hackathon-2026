@@ -143,6 +143,56 @@ export function Card({
   );
 }
 
+/**
+ * Progressive disclosure for reference-grade material.
+ *
+ * The page had thirteen sections and ran to nineteen screens, which is a twenty-minute read
+ * put in front of someone who has three minutes. The depth is the point and cutting it would
+ * cost more than the length does, so the reference material folds instead.
+ *
+ * Two rules hold this honest. The summary states the claim, so a reader who never opens one
+ * has still read what is being asserted and only the proof is a click away. And only static
+ * material goes inside — nothing a reader can interact with should sit behind something they
+ * have to discover first.
+ *
+ * Native `<details>`: it works before hydration, keyboard and screen readers already know it,
+ * and the contents stay in the DOM, so this hides pixels rather than evidence.
+ */
+export function Details({
+  summary,
+  hint,
+  children,
+}: {
+  summary: string;
+  hint?: string;
+  children: ReactNode;
+}) {
+  return (
+    <details className="group rounded-xl border border-[var(--line)] bg-[var(--surface)]" data-glow>
+      <summary className="flex min-h-[44px] cursor-pointer list-none flex-wrap items-center gap-x-2.5 gap-y-0.5 px-4 py-3 text-[0.87rem] font-semibold transition-colors hover:text-[var(--info)] [&::-webkit-details-marker]:hidden">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+          className="h-3.5 w-3.5 shrink-0 transition-transform duration-200 group-open:rotate-90"
+          style={{ color: "var(--info)" }}
+        >
+          <path d="M9 18l6-6-6-6" />
+        </svg>
+        <span>{summary}</span>
+        {hint ? (
+          <span className="text-[0.79rem] font-normal text-[var(--text-muted)]">{hint}</span>
+        ) : null}
+      </summary>
+      <div className="border-t border-[var(--line)] p-4 sm:p-5">{children}</div>
+    </details>
+  );
+}
+
 export function Section({
   id,
   eyebrow,

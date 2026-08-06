@@ -34,7 +34,7 @@ import {
   type TaskActivity,
 } from "@/lib/queries";
 import { PointerGlow } from "@/components/pointer";
-import { Card, Chip, ModelText, Note, Reveal, Section, Tag, Tiles } from "@/components/ui";
+import { Card, Chip, Details, ModelText, Note, Reveal, Section, Tag, Tiles } from "@/components/ui";
 import { DataTable } from "@/components/table";
 import { ScrollSpy, ThemeToggle } from "@/components/theme";
 import { WhatIf } from "@/components/whatif";
@@ -59,19 +59,36 @@ const TIER_MEANING: Record<string, string> = {
   regulated: "read and explain, never act (L4)",
 };
 
+/**
+ * Nine entries, not thirteen. A nav this long is itself a deterrent — it tells a reviewer
+ * before they read a word that this will take a while. Replay, refusals and the audit log
+ * were three headings making one argument and are now one; governance is the input to
+ * authority and now sits inside it.
+ */
 const NAV = [
   ["workflow", "The workflow"],
   ["pass", "One pass"],
   ["evidence", "Evidence"],
   ["console", "Console"],
   ["authority", "Authority"],
-  ["replay", "Replay"],
-  ["refusals", "Refusals"],
+  ["record", "The record"],
   ["tested", "Tested"],
-  ["governance", "Governance"],
   ["unattended", "Unattended"],
   ["cli", "CoCo CLI"],
 ] as const;
+
+/**
+ * The short path, for the reviewer who has a minute.
+ *
+ * Everything below is worth reading and almost nobody will read all of it. Rather than
+ * guess which third to cut, name the three anchors that carry the whole argument and let
+ * the reader choose — the long page stops being a tax on the person in a hurry.
+ */
+const SHORTCUTS: [string, string, string][] = [
+  ["workflow", "The workflow it runs", "watch → detect → decide → act, and where it stops"],
+  ["evidence", "The refusal that held", "approve it yourself and watch Snowflake say no"],
+  ["cli", "Driven from the CLI", "13 governed MCP tools, none of which takes a tier"],
+];
 
 const str = (v: unknown) => String(v ?? "");
 const num = (v: unknown) => Number(v ?? 0);
@@ -208,17 +225,34 @@ export default async function Page() {
           </p>
         </div>
 
-        <div className="mt-7">
+        {/* Three doors, for the reviewer with a minute. */}
+        <div className="mt-7 grid gap-2.5 sm:grid-cols-3">
+          {SHORTCUTS.map(([id, label, what], i) => (
+            <Reveal key={id} delay={i * 70}>
+              <a
+                href={`#${id}`}
+                data-glow
+                className="flex h-full flex-col rounded-xl border border-[var(--line)] bg-[var(--surface)] px-4 py-3 transition-colors hover:border-[var(--info)]"
+              >
+                <span className="text-[0.62rem] font-bold uppercase tracking-[0.11em] text-[var(--text-muted)]">
+                  {`0${i + 1}`}
+                </span>
+                <span className="mt-1 text-[0.92rem] font-bold" style={{ color: "var(--info)" }}>
+                  {label} &#8595;
+                </span>
+                <span className="mt-1 text-[0.79rem] leading-relaxed text-[var(--text-muted)]">
+                  {what}
+                </span>
+              </a>
+            </Reveal>
+          ))}
+        </div>
+
+        <div className="mt-4">
           <Note tone="info">
             <strong>This page is read-only, and not by convention.</strong> It authenticates as{" "}
-            <code className="font-mono text-[0.85em]">WARRANT_PUBLIC</code>, a role holding{" "}
-            <code className="font-mono text-[0.85em]">SELECT</code> on a handful of objects and{" "}
-            <code className="font-mono text-[0.85em]">USAGE</code> on the procedures that only
-            compute. It has no grant on{" "}
-            <code className="font-mono text-[0.85em]">EXECUTE_ACTION</code>. Approving is a
-            governed act and belongs to the console inside Snowflake, where the reviewer has an
-            identity of their own — the same reason the conversational agent is given no tool bound
-            to the executor. Don&apos;t take that on trust:{" "}
+            <code className="font-mono text-[0.85em]">WARRANT_PUBLIC</code>, a role with no grant on{" "}
+            <code className="font-mono text-[0.85em]">EXECUTE_ACTION</code> — so{" "}
             <a href="#evidence" className="font-semibold underline underline-offset-2">
               the approve, reject and defer buttons below are live
             </a>
@@ -232,10 +266,9 @@ export default async function Page() {
           title="An operations workflow that finishes, or stops and says why"
           lede={
             <>
-              Exceptions are the part of an operations workflow that needs a person: the hold
-              nobody dispositioned, the stock nobody reordered, the supplier nobody chased. Warrant
-              runs that lane end to end — watch, detect, investigate, decide, act, record — and the
-              decision about <em>who may decide</em> comes from the data, not from its own code.
+              Warrant runs the exception lane end to end — watch, detect, investigate, decide, act,
+              record — and the decision about <em>who may decide</em> comes from the data, not from
+              its own code.
             </>
           }
         >
@@ -352,14 +385,7 @@ export default async function Page() {
           id="console"
           eyebrow="Where a human actually decides"
           title="The governed console, which you cannot open — so here it is"
-          lede={
-            <>
-              Approving is a governed act, so it lives in Streamlit in Snowflake, behind an
-              account. That surface cannot be shared with anyone who does not have one, and it is
-              the surface where the governance bites. Screenshots are a poor substitute for a live
-              app and a much better one than leaving it invisible.
-            </>
-          }
+          lede="Approving is a governed act, so it lives in Streamlit in Snowflake — the one surface where the governance bites and the one nobody without an account can open."
         >
           <ConsoleGallery />
         </Section>
@@ -380,51 +406,100 @@ export default async function Page() {
           <div className="mt-6">
             <WhatIf initial={manifest} />
           </div>
-        </Section>
 
-        <Section
-          id="replay"
-          eyebrow="Decision replay"
-          title="Would today's policy still allow what already happened?"
-          lede="Every recorded action re-resolved against the classifications in force now — not a report over stored tiers, but the real resolver over the real registry with current tags. The question an auditor actually asks."
-        >
-          <Tiles
-            figures={[
-              ["Replayed", replay.summary.replayed, "muted"],
-              ["Would differ today", replay.summary.diverged, "info"],
-              ["Now forbidden", replay.summary.now_forbidden, "warn"],
-              [
-                "Needs attention",
-                replay.summary.needs_attention,
-                replay.summary.needs_attention ? "bad" : "good",
-              ],
-            ]}
-          />
-          <div className="mt-4">
-            <Reveal>
+          {/* The governance tables used to be a section of their own, three screens down. They are
+           *  not a separate argument — they are the input this section resolves against, and the
+           *  hero widget already shows the three classifications that matter. Folded, so the claim
+           *  reads and the proof is one click rather than one screen. */}
+          <div className="mt-5 space-y-2.5">
+            <Details
+              summary="The classifications all of this is resolved from"
+              hint={`${governance.length} objects, read live on this request`}
+            >
+              <p className="mb-3.5 max-w-[80ch] text-[0.88rem] leading-relaxed text-[var(--text-soft)]">
+                Read with <code className="font-mono text-[0.88em]">SYSTEM$GET_TAG</code> on every
+                request — never from{" "}
+                <code className="font-mono text-[0.88em]">ACCOUNT_USAGE</code>, which lags by up to
+                two hours, and never cached. Change a tag and the agent&rsquo;s next decision
+                changes with it, with no code change and no redeploy.
+              </p>
               <DataTable
                 columns={[
-                  ["action_type", "Action"],
-                  ["execution_result", "Ran as"],
-                  ["then", "Tier then"],
-                  ["now", "Tier now"],
-                  ["attention", "Needs attention"],
+                  ["OBJECT", "Object"],
+                  ["SENSITIVITY", "Sensitivity"],
+                  ["MAY", "The agent may"],
                 ]}
-                rows={replay.decisions.map((d) => ({
-                  ...d,
-                  then: TIER_NAMES[d.tier_then] ?? "-",
-                  now: TIER_NAMES[d.tier_now] ?? "-",
-                  attention: d.needs_attention ? "YES" : "no",
+                rows={governance.map((row) => ({
+                  ...row,
+                  MAY: TIER_MEANING[str(row.SENSITIVITY)] ?? "act only with human approval (L3)",
                 }))}
               />
-            </Reveal>
+              <p className="mt-2.5 text-[0.8rem] text-[var(--text-muted)]">
+                Untagged is deliberately not treated as open: an object nobody has classified is not
+                the same as an object someone classified as safe.
+              </p>
+            </Details>
+
+            <Details
+              summary="What it may see, as opposed to what it may do"
+              hint="a masking policy on QUALITY_HOLDS.lot_ref"
+            >
+              <p className="mb-3.5 max-w-[80ch] text-[0.88rem] leading-relaxed text-[var(--text-soft)]">
+                The sensitivity tag stops the agent <strong>acting</strong> on a regulated record.
+                It does not stop it <strong>reading</strong> one, deliberately, or it could never
+                surface an aging hold and explain it. Those are two controls, so there is a second.
+              </p>
+              <DataTable
+                columns={[
+                  ["HOLD", "Hold"],
+                  ["LOT_REFERENCE", "Lot reference"],
+                  ["SITE", "Site"],
+                  ["SKU", "SKU"],
+                  ["DAYS_OPEN", "Days open", true],
+                  ["REASON", "Reason"],
+                ]}
+                rows={holds}
+              />
+              <p className="mt-2.5 max-w-[80ch] text-[0.8rem] leading-relaxed text-[var(--text-muted)]">
+                The policy is attached to the column and follows the <em>role</em>, not the client —
+                so it holds even here, outside Snowflake. This page reads as{" "}
+                <code className="font-mono">WARRANT_PUBLIC</code>, which is not the quality owner,
+                and sees exactly what the agent sees.
+              </p>
+            </Details>
+
+            <Details
+              summary="The governed metric layer"
+              hint="read through SEMANTIC_VIEW(...), not the base tables"
+            >
+              <p className="mb-3.5 max-w-[80ch] text-[0.88rem] leading-relaxed text-[var(--text-soft)]">
+                Classification governs what the agent may <em>do</em>; the semantic view governs
+                what the numbers <em>mean</em>.
+              </p>
+              <DataTable
+                columns={[
+                  ["SUPPLIER", "Supplier"],
+                  ["TIER", "Tier"],
+                  ["ON_TIME_PCT", "On-time %", true],
+                  ["SHIPMENTS", "Shipments", true],
+                  ["AVG_DAYS_LATE", "Avg days late", true],
+                ]}
+                rows={metrics}
+              />
+            </Details>
           </div>
         </Section>
 
+        {/* One section, not three.
+         *
+         * The refusal ledger, decision replay and the append-only log were three headings making
+         * a single argument: this thing keeps a record honest enough to be audited. Read as three
+         * they competed; read as one they compound. The refusals stay open because they are the
+         * claim nobody else can make, and the two tables behind them are the proof. */}
         <Section
-          id="refusals"
-          eyebrow="The refusal ledger"
-          title="Every action the agent declined to take"
+          id="record"
+          eyebrow="The record"
+          title="What it refused — and whether today's policy still agrees with yesterday's actions"
           lede="A refusal is a result, not an error, so it is recorded with the same care as an action. This is the question most agents cannot answer about themselves."
         >
           {refusals.length === 0 ? (
@@ -454,6 +529,70 @@ export default async function Page() {
               ))}
             </div>
           )}
+
+          <h3 className="mt-9 text-[1.05rem] font-bold tracking-[-0.015em]">
+            Would today&rsquo;s policy still allow what already happened?
+          </h3>
+          <p className="mt-2 max-w-[80ch] text-[0.9rem] leading-relaxed text-[var(--text-soft)]">
+            Every recorded action re-resolved against the classifications in force now — not a
+            report over stored tiers, but the real resolver over the real registry with current
+            tags.
+          </p>
+          <div className="mt-4">
+            <Tiles
+              figures={[
+                ["Replayed", replay.summary.replayed, "muted"],
+                ["Would differ today", replay.summary.diverged, "info"],
+                ["Now forbidden", replay.summary.now_forbidden, "warn"],
+                [
+                  "Needs attention",
+                  replay.summary.needs_attention,
+                  replay.summary.needs_attention ? "bad" : "good",
+                ],
+              ]}
+            />
+          </div>
+
+          <div className="mt-4 space-y-2.5">
+            <Details
+              summary="Every replayed decision, tier then against tier now"
+              hint={`${replay.decisions.length} actions`}
+            >
+              <DataTable
+                columns={[
+                  ["action_type", "Action"],
+                  ["execution_result", "Ran as"],
+                  ["then", "Tier then"],
+                  ["now", "Tier now"],
+                  ["attention", "Needs attention"],
+                ]}
+                rows={replay.decisions.map((d) => ({
+                  ...d,
+                  then: TIER_NAMES[d.tier_then] ?? "-",
+                  now: TIER_NAMES[d.tier_now] ?? "-",
+                  attention: d.needs_attention ? "YES" : "no",
+                }))}
+              />
+            </Details>
+
+            <Details
+              summary="The append-only log — every phase of every run, written once"
+              hint={`${audit.length} most recent, including every refusal; never updated, never deleted`}
+            >
+              <DataTable
+                columns={[
+                  ["AT", "At"],
+                  ["PHASE", "Phase"],
+                  ["OUTCOME", "Outcome"],
+                  ["TIER", "Tier"],
+                  ["ACTOR", "Actor"],
+                  ["RATIONALE", "Rationale"],
+                ]}
+                rows={audit}
+                maxRows={12}
+              />
+            </Details>
+          </div>
         </Section>
 
         <Section
@@ -463,99 +602,12 @@ export default async function Page() {
           lede={
             <>
               A system that behaves well is not evidence until someone has tried to make it behave
-              badly. Two things below: a hostile document put through the real retrieval path, and
-              the agent&rsquo;s judgment graded case by case. Neither is live — the first is a
-              drill an operator runs, the second a recorded measurement — and both say so.
+              badly: a hostile document put through the real retrieval path, and the agent&rsquo;s
+              judgment graded case by case. Neither is live, and both say so.
             </>
           }
         >
           <Tested />
-        </Section>
-
-        <Section
-          id="governance"
-          eyebrow="Governance"
-          title="The classifications in force, read live"
-          lede={
-            <>
-              Read with <code className="font-mono text-[0.88em]">SYSTEM$GET_TAG</code> on every
-              request — never from <code className="font-mono text-[0.88em]">ACCOUNT_USAGE</code>,
-              which lags by up to two hours, and never cached. Change a tag and the agent&rsquo;s
-              next decision changes with it, with no code change and no redeploy.
-            </>
-          }
-        >
-          <Reveal>
-            <DataTable
-              columns={[
-                ["OBJECT", "Object"],
-                ["SENSITIVITY", "Sensitivity"],
-                ["MAY", "The agent may"],
-              ]}
-              rows={governance.map((row) => ({
-                ...row,
-                MAY: TIER_MEANING[str(row.SENSITIVITY)] ?? "act only with human approval (L3)",
-              }))}
-            />
-          </Reveal>
-          <p className="mt-2.5 text-[0.8rem] text-[var(--text-muted)]">
-            Untagged is deliberately not treated as open: an object nobody has classified is not the
-            same as an object someone classified as safe.
-          </p>
-
-          <h3 className="mt-9 text-[1.05rem] font-bold tracking-[-0.015em]">
-            What it may <em>see</em>, as opposed to what it may <em>do</em>
-          </h3>
-          <p className="mt-2 max-w-[80ch] text-[0.9rem] leading-relaxed text-[var(--text-soft)]">
-            The sensitivity tag stops the agent <strong>acting</strong> on a regulated record. It
-            does not stop it <strong>reading</strong> one, deliberately, or it could never surface
-            an aging hold and explain it. Those are two controls, so there is a second: a masking
-            policy on <code className="font-mono text-[0.88em]">QUALITY_HOLDS.lot_ref</code>.
-          </p>
-          <div className="mt-4">
-            <Reveal>
-              <DataTable
-                columns={[
-                  ["HOLD", "Hold"],
-                  ["LOT_REFERENCE", "Lot reference"],
-                  ["SITE", "Site"],
-                  ["SKU", "SKU"],
-                  ["DAYS_OPEN", "Days open", true],
-                  ["REASON", "Reason"],
-                ]}
-                rows={holds}
-              />
-            </Reveal>
-          </div>
-          <p className="mt-2.5 max-w-[80ch] text-[0.8rem] leading-relaxed text-[var(--text-muted)]">
-            The policy is attached to the column and follows the <em>role</em>, not the client — so
-            it holds even here, outside Snowflake. This page reads as{" "}
-            <code className="font-mono">WARRANT_PUBLIC</code>, which is not the quality owner, and
-            sees exactly what the agent sees.
-          </p>
-
-          <h3 className="mt-9 text-[1.05rem] font-bold tracking-[-0.015em]">
-            The governed metric layer
-          </h3>
-          <p className="mt-2 max-w-[80ch] text-[0.9rem] leading-relaxed text-[var(--text-soft)]">
-            Read through <code className="font-mono text-[0.88em]">SEMANTIC_VIEW(...)</code>, not
-            the base tables. Classification governs what the agent may <em>do</em>; the semantic
-            view governs what the numbers <em>mean</em>.
-          </p>
-          <div className="mt-4">
-            <Reveal>
-              <DataTable
-                columns={[
-                  ["SUPPLIER", "Supplier"],
-                  ["TIER", "Tier"],
-                  ["ON_TIME_PCT", "On-time %", true],
-                  ["SHIPMENTS", "Shipments", true],
-                  ["AVG_DAYS_LATE", "Avg days late", true],
-                ]}
-                rows={metrics}
-              />
-            </Reveal>
-          </div>
         </Section>
 
         <Section
@@ -633,28 +685,6 @@ export default async function Page() {
           }
         >
           <Coco />
-        </Section>
-
-        <Section
-          id="log"
-          eyebrow="The append-only log"
-          title="Every phase of every run, written once"
-          lede="Including every refusal. Never updated, never deleted. The most recent 40."
-        >
-          <Reveal>
-            <DataTable
-              columns={[
-                ["AT", "At"],
-                ["PHASE", "Phase"],
-                ["OUTCOME", "Outcome"],
-                ["TIER", "Tier"],
-                ["ACTOR", "Actor"],
-                ["RATIONALE", "Rationale"],
-              ]}
-              rows={audit}
-              maxRows={12}
-            />
-          </Reveal>
         </Section>
 
         <footer className="mt-6 border-t border-[var(--line)] pt-6 text-[0.8rem] leading-relaxed text-[var(--text-muted)]">

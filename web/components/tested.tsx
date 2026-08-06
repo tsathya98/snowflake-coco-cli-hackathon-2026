@@ -12,6 +12,8 @@
  * The numbers here are asserted against eval/scorecard.json by tools/check_doc_claims.py.
  */
 
+import { Details } from "@/components/ui";
+
 const RATES: [string, string][] = [
   ["action_selected", "chose the action the runbook calls for"],
   ["entity_targeted", "aimed it at the right entity"],
@@ -142,17 +144,22 @@ export function Tested() {
           ))}
         </div>
 
-        <div className="mt-4 text-[0.62rem] font-bold uppercase tracking-[0.11em] text-[var(--text-muted)]">
-          The cases
+        {/* Which cases, and why each one. Worth reading and not worth a screen — the five rates
+         *  above are the finding; this is the working. */}
+        <div className="mt-4">
+          <Details summary="The cases, and the failure each is chosen to catch" hint={`${CASES.length} scenarios`}>
+            <ul className="m-0 list-none space-y-1.5 p-0">
+              {CASES.map(([id, why]) => (
+                <li key={id}>
+                  <code className="font-mono text-[0.77rem] font-bold">{id}</code>
+                  <div className="text-[0.77rem] leading-relaxed text-[var(--text-muted)]">
+                    {why}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </Details>
         </div>
-        <ul className="mt-2 list-none space-y-1.5 p-0">
-          {CASES.map(([id, why]) => (
-            <li key={id}>
-              <code className="font-mono text-[0.77rem] font-bold">{id}</code>
-              <div className="text-[0.77rem] leading-relaxed text-[var(--text-muted)]">{why}</div>
-            </li>
-          ))}
-        </ul>
 
         <p className="mt-3.5 text-[0.82rem] leading-relaxed text-[var(--text-muted)]">
           <strong>Six of six is a small sample, and a perfect score should make you suspicious

@@ -51,7 +51,7 @@ output/
 # orphan commit rather than relying on this file.
 # ---------------------------------------------------------------------------
 PRE_SUBMISSION.md
-docs/research/
+# docs/research/
 docs/submission_template/
 docs/agent_onboarding_prompt.md
 docs/notes_from_video_sessions.md
