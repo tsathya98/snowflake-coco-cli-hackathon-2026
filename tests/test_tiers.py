@@ -77,7 +77,6 @@ def test_most_demanding_object_binds():
     decision = resolve(Tier.LOW_RISK_ACT, [OPEN, INTERNAL, TouchedObject("DB.S.ALSO_OPEN", "open")])
     assert decision.tier is Tier.APPROVAL_REQUIRED
     assert decision.binding_object == "DB.S.INT"
-    assert decision.needs_approval
 
 
 def test_regulated_object_is_not_diluted_by_an_open_one():
@@ -127,18 +126,21 @@ def test_every_decision_explains_itself(requested, touched, must_contain):
         assert fragment in rationale
 
 
+# Two predicates, not three: a `needs_approval` property also existed, used by nothing but
+# this test — dead code wearing a coverage badge. The approval case is simply the tier where
+# neither of the real predicates is true, which is what the executor and the loop actually
+# branch on.
 @pytest.mark.parametrize(
-    ("tier", "auto", "approval", "refused"),
+    ("tier", "auto", "refused"),
     [
-        (Tier.READ_ONLY, True, False, False),
-        (Tier.DRAFT, True, False, False),
-        (Tier.LOW_RISK_ACT, True, False, False),
-        (Tier.APPROVAL_REQUIRED, False, True, False),
-        (Tier.FORBIDDEN, False, False, True),
+        (Tier.READ_ONLY, True, False),
+        (Tier.DRAFT, True, False),
+        (Tier.LOW_RISK_ACT, True, False),
+        (Tier.APPROVAL_REQUIRED, False, False),
+        (Tier.FORBIDDEN, False, True),
     ],
 )
-def test_decision_predicates_are_mutually_consistent(tier, auto, approval, refused):
+def test_decision_predicates_are_mutually_consistent(tier, auto, refused):
     decision = Decision(tier=tier, binding_object=None, rationale="")
     assert decision.is_auto_executable is auto
-    assert decision.needs_approval is approval
     assert decision.is_refused is refused

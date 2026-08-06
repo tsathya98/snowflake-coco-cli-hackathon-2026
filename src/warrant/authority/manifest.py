@@ -66,11 +66,6 @@ class Capability:
             return APPROVAL
         return AUTO
 
-    @property
-    def is_permitted(self) -> bool:
-        """Whether the action could proceed at all, with or without a human."""
-        return self.effective_tier is not Tier.FORBIDDEN
-
 
 def registry_objects() -> tuple[str, ...]:
     """Every distinct object any registered action touches.

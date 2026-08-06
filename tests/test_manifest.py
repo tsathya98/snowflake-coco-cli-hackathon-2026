@@ -85,7 +85,6 @@ def test_each_capability_reports_the_classifications_actually_used():
     """What a row says and what the resolver used must not be able to drift."""
     capability = by_action(capabilities(session()))["release_quality_hold"]
     assert capability.classifications == (("WARRANT.DATA.QUALITY_HOLDS", "regulated"),)
-    assert capability.is_permitted is False
 
 
 def test_an_untagged_object_is_labelled_untagged_not_blank():

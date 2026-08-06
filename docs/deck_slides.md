@@ -3,10 +3,28 @@
 Build source for the submission PPT. **Gitignored** — this is working material, not a judge-facing
 document.
 
-**Target: 9 slides.** Slide 1 is the organizer's mandated cover. Slide 2 must carry all three
-sections they name (Problem Brief · Architecture Diagram · Impact Statement) — but nothing stops
-those from spanning several slides, and a judge reading eight breathing slides takes more away than
-from one dense one. Slides 3–8 *are* those three sections, expanded.
+**The template's real envelope is 6 slides** — measured from the organizer's own PPTX
+(`docs/submission_template/`): a cover, a guidelines slide listing the three mandated sections
+(Problem Brief · Architecture Diagram · Impact Statement), three blank content slides, and one
+literally titled "Additional Slide", singular. So the deck they expect is **cover + 3 sections +
+1–2 extra ≈ 6–7 slides**, and a judge skimming thirty decks will hold you to that shape even if
+nobody enforces it.
+
+The 9 sections below are therefore **content blocks, not a slide count**. Build 6–7:
+
+| Template slot | Take it from |
+|---|---|
+| 1 · Cover | Slide 1 below |
+| 2 · Problem Brief | Slide 2 below |
+| 3 · Architecture Diagram | Slide 4, with slide 3's mechanism table folded in as the diagram's caption — the tag → tier table *is* the architecture's point |
+| 4 · Impact Statement | Slide 5, plus the two-line verification note from slide 6 |
+| 5 · Additional: CoCo CLI + MCP | Slide 7, uncut — it answers the 40% criterion |
+| 6 · Additional: the boundary | Slide 8's refusal table + slide 9's closing line |
+
+What that drops: slide 6's full verification table (keep the one-liner "every claim is a CI
+gate — clone and run one command") and slide 9's limitations panel (move the honest-limitations
+bullets to the speaker notes; say them out loud instead). If a seventh slide is tolerated, restore
+the limitations panel — judges reward stated limitations, but not at the cost of the CLI slide.
 
 Every figure below was measured on the live account. Nothing is projected, illustrative or rounded
 in our favour. Where something is unproven, it says so — slide 8 exists for that.

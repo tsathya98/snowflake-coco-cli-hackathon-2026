@@ -213,10 +213,6 @@ class Decision:
         return self.tier <= Tier.LOW_RISK_ACT
 
     @property
-    def needs_approval(self) -> bool:
-        return self.tier == Tier.APPROVAL_REQUIRED
-
-    @property
     def is_refused(self) -> bool:
         return self.tier == Tier.FORBIDDEN
 
