@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * The governed console, for people who cannot open it.
  *
@@ -12,6 +14,7 @@
  * copies are byte-identical, so the pair cannot drift.
  */
 
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 
 const SHOTS: [string, string, string][] = [
@@ -58,26 +61,139 @@ const SHOTS: [string, string, string][] = [
 ];
 
 export function ConsoleGallery() {
+  const rail = useRef<HTMLDivElement>(null);
+  const [at, setAt] = useState({ start: true, end: false });
+
+  /**
+   * Which ends we are against, so the buttons disable rather than dead-click.
+   *
+   * The tolerance is 24px, not 1 or 2. The rail has `px-1` padding and snaps to card edges, so
+   * it rests at scrollLeft 4 rather than 0 and stops 10px short of its maximum — measured in a
+   * real browser. A tight threshold meant neither end ever registered and both buttons stayed
+   * enabled forever, which is the exact dead-click this state exists to prevent.
+   */
+  const measure = useCallback(() => {
+    const el = rail.current;
+    if (!el) return;
+    const slack = 24;
+    setAt({
+      start: el.scrollLeft <= slack,
+      end: el.scrollLeft >= el.scrollWidth - el.clientWidth - slack,
+    });
+  }, []);
+
+  useEffect(() => {
+    const el = rail.current;
+    if (!el) return;
+    measure();
+    el.addEventListener("scroll", measure, { passive: true });
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    return () => {
+      el.removeEventListener("scroll", measure);
+      observer.disconnect();
+    };
+  }, [measure]);
+
+  /**
+   * Advance one card.
+   *
+   * The card width is read rather than assumed, so the step stays correct when the viewport
+   * clamps it on a narrow screen.
+   *
+   * The animation is hand-rolled: suspend snap, drive scrollLeft frame by frame, restore snap on
+   * the last frame — by which point the rail is already on a snap point, so nothing jumps.
+   * Snapping still does its job for trackpad, touch and wheel, which is what it exists for.
+   *
+   * `scrollBy({behavior: "smooth"})` would be the obvious alternative and may well work; it is
+   * avoided because a mandatory-snap container re-snapping mid-animation is a documented rough
+   * edge, and driving the scroll directly removes the question. Doing it by frame also makes the
+   * reduced-motion path above a plain assignment rather than a second code path.
+   */
+  const step = (direction: 1 | -1) => {
+    const el = rail.current;
+    if (!el) return;
+
+    const card = el.querySelector("figure");
+    const by = (card ? card.getBoundingClientRect().width + 16 : el.clientWidth * 0.8) * direction;
+    const from = el.scrollLeft;
+    const to = Math.max(0, Math.min(el.scrollWidth - el.clientWidth, from + by));
+    if (to === from) return;
+
+    // Respect the reader's preference: no animation, just arrive.
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      el.scrollLeft = to;
+      return;
+    }
+
+    el.style.scrollSnapType = "none";
+    const started = performance.now();
+    const DURATION = 380;
+
+    const frame = (now: number) => {
+      const t = Math.min(1, (now - started) / DURATION);
+      const eased = 1 - Math.pow(1 - t, 3);
+      el.scrollLeft = from + (to - from) * eased;
+      if (t < 1) {
+        requestAnimationFrame(frame);
+      } else {
+        el.style.scrollSnapType = "";
+      }
+    };
+    requestAnimationFrame(frame);
+  };
+
   return (
     <>
-      <p className="mb-3 text-[0.82rem] text-[var(--text-muted)]">
-        Eight views of the governed console. <strong className="text-[var(--text-soft)]">Swipe
-        or scroll sideways</strong>, and click any shot to open it full size.
-      </p>
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+        <p className="m-0 text-[0.82rem] text-[var(--text-muted)]">
+          Eight views of the governed console.{" "}
+          <strong className="text-[var(--text-soft)]">Click any shot to open it full size.</strong>
+        </p>
 
-      {/* A horizontal rail, not a vertical stack.
+        {/* Buttons, because dragging a scrollbar is a bad way to page through anything.
+         *  The rail still scrolls natively — this is an addition for people using a mouse, not a
+         *  replacement for trackpad, touch or keyboard. */}
+        <div className="flex shrink-0 gap-2">
+          {([
+            [-1, "Previous", "M15 18l-6-6 6-6", at.start],
+            [1, "Next", "M9 18l6-6-6-6", at.end],
+          ] as const).map(([direction, label, path, disabled]) => (
+            <button
+              key={label}
+              type="button"
+              onClick={() => step(direction)}
+              disabled={disabled}
+              aria-label={`${label} screenshot`}
+              className="flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--line-hi)] bg-[var(--surface-hi)] text-[var(--text-soft)] transition-colors hover:border-[var(--info)] hover:text-[var(--text)] disabled:cursor-default disabled:opacity-30 disabled:hover:border-[var(--line-hi)]"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-4 w-4"
+                aria-hidden="true"
+              >
+                <path d={path} />
+              </svg>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* A horizontal rail, not a vertical stack. Eight 1400px screenshots stacked two-up ran to
+       *  about 2,400px of page — a quarter of the site spent on evidence most readers glance at
+       *  once. A rail costs one viewport however many shots there are.
        *
-       * Eight 1400px screenshots stacked two-up ran to about 2,400px of page — a quarter of the
-       * site spent on supporting evidence that most readers will glance at once. A rail costs one
-       * viewport regardless of how many shots there are, and the horizontal axis is otherwise
-       * unused on a page that is already long.
-       *
-       * Built on scroll-snap and native overflow rather than a carousel library: it works before
-       * hydration, it works with a trackpad, a touch screen, shift+wheel and the keyboard, and it
-       * degrades to a plain scrolling row if anything about it fails. There are no arrow buttons
-       * because there is no state to manage — the scrollbar is the control, and .scroller keeps
-       * it permanently visible instead of the overlay kind that fades. */}
-      <div className="scroller table-wrap -mx-1 flex snap-x snap-mandatory gap-4 px-1 pb-3">
+       *  Scroll-snap and native overflow rather than a carousel library: it works before
+       *  hydration, and with trackpad, touch, shift+wheel and keyboard alike. */}
+      <div
+        ref={rail}
+        className="scroller table-wrap -mx-1 flex snap-x snap-mandatory gap-4 px-1 pb-3"
+      >
         {SHOTS.map(([file, title, note]) => (
           <figure
             key={file}

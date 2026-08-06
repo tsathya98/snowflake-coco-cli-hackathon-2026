@@ -29,7 +29,7 @@ governed console sends, and what comes back is Snowflake refusing them — not a
 
 ---
 
-## The problem, in one scene
+## 1 · The problem, in one scene
 
 A quality hold has been open **82 days**. A SKU is **five days** from stockout. A supplier's
 on-time delivery just collapsed to **26%**.
@@ -51,7 +51,9 @@ teams settle for another dashboard.
 **The blocker was never capability. It was authority** — and nobody could say, in advance and in
 writing, what the agent was allowed to touch.
 
-## The answer: take the authority from the data
+---
+
+## 2 · The answer: take the authority from the data
 
 Every regulated organisation already classifies its data. That classification is sitting on the
 tables, maintained by the people whose job it is, and it is the answer to the question nobody could
@@ -69,7 +71,13 @@ The same agent, the same code path, on one pass, produces three different ending
 middle row stops being an escalation and becomes a refusal — no code change, no deploy. That is the
 difference between an agent with *permissions* and an agent with a *warrant*.
 
-### The seven stages
+![The seven stages of the loop, with the three governed ones marked, and the same pipeline run
+three times ending in handled, escalated and refused](docs/images/web/story-workflow.png)
+
+*The same seven stages, run three times on one pass. The only thing that differs between the lanes
+is the tag on the table each action would touch.*
+
+### 2.1 · The seven stages
 
 | | Stage | | |
 |---|---|---|---|
@@ -139,43 +147,22 @@ refused — and the count it leads with is the refusals, not the throughput.</em
 > the command that settles it, and [`docs/judges_walkthrough.md`](docs/judges_walkthrough.md) is a
 > reproduction with expected output. Most of both needs no Snowflake account.
 
-| Where to go | What you get |
-|---|---|
-| [The problem](#the-problem) · [What Warrant does](#what-warrant-does) | why an agent that *can* act still doesn't get deployed |
-| [Authority tiers](#authority-tiers) · [What one pass does](#what-one-pass-actually-does) | the model, and one measured run through it |
-| [Architecture](#architecture) | the loop, and the two reads that matter |
-| [The agent can answer for itself](#the-agent-can-answer-for-itself) | capability manifest, policy what-if, decision replay |
-| [The corpus is untrusted input](#the-corpus-is-untrusted-input) | a planted attack, and why the tests assume it worked |
-| [The data](docs/the_data.md) | the domain in plain terms, and what was planted |
-| [Snowflake services used](#snowflake-services-used) | 19 services, each cited to a file |
-| [Quick start](#quick-start) · [Development](#development) | five commands, and the gates CI runs |
+This README is the submission in long form, and it runs in the same five beats as the deck and the
+demo video. Read the first two and you have the whole argument; the rest is evidence.
+
+| | Beat | What it settles |
+|---|---|---|
+| **1** | [The problem, in one scene](#1--the-problem-in-one-scene) | why the automation that would actually help is the one that never ships |
+| **2** | [The answer](#2--the-answer-take-the-authority-from-the-data) | authority read from the data's own tags — the seven stages, the five tiers, the architecture, the ordering |
+| **3** | [Impact](#3--impact-what-one-pass-actually-does) | one measured run, and the three things the agent can prove about itself |
+| **4** | [Driven from the CLI](#4--driven-from-the-cli-six-skills-thirteen-tools) | six Agent Skills, an MCP server, and the invariant that no tool takes a tier |
+| **5** | [Three surfaces](#5--three-surfaces-and-only-one-of-them-can-act) | which surface may act, and how you can check that yourself |
+| — | [Snowflake services](#snowflake-services-used) · [Quick start](#quick-start) · [Development](#development) | 19 services each cited to a file, five commands, and the gates CI runs |
+| — | [The data](docs/the_data.md) · [Rubric alignment](docs/rubric_alignment.md) · [Judge walkthrough](docs/judges_walkthrough.md) | the domain in plain terms, claim-to-command map, and a full reproduction |
 
 ---
 
-## The problem
-
-Enterprise operations teams drown in dashboards. Someone still has to notice the red KPI,
-work out why, decide what to do, and do it. Analytics stops at the insight; the work starts after.
-
-The obvious fix — let an AI agent take the action — runs into the reason it hasn't happened:
-**in a regulated operation, nobody will grant an autonomous agent blanket authority.** An agent
-that can chase a late shipment must not also be able to alter a validated quality record.
-
-## What Warrant does
-
-Warrant closes the loop from detection to action, and bounds it with an authority model derived
-from the data platform's own governance metadata rather than from hardcoded rules.
-
-```
-DETECT → REASON → CLASSIFY AUTHORITY → ACT or ESCALATE → AUDIT
-```
-
-The differentiating idea: **an action's authority tier is read from Snowflake object tags on the
-data it touches.** Tag a table `sensitivity = 'regulated'` and every proposed action against it
-automatically requires human approval — no code change, no rules list to maintain. Governance
-policy and agent behaviour stay in sync because they are the same artifact.
-
-### Authority tiers
+### 2.2 · The five tiers
 
 | Tier | Meaning | Path |
 |---|---|---|
@@ -189,7 +176,7 @@ Tier is resolved from object tags at runtime and **defaults down, never up.** Th
 *most demanding* object in an action's footprint binds — never the least, or one `open` table
 could dilute a `regulated` one.
 
-### And it is not one hardcoded tag
+### 2.3 · And it is not one hardcoded tag
 
 The obvious objection is that `SENSITIVITY` is a single tag name spelled into the resolver and
 dressed up as governance. It is not: the resolver iterates a `POLICIES` tuple, and a second axis
@@ -215,48 +202,7 @@ Adding a third axis (residency, contractual restriction, whatever an organisatio
 is a row in `POLICIES` plus a field on `TouchedObject` — no control flow changes.
 `tests/test_retention.py` holds all of it in place.
 
-### What one pass actually does
-
-Measured on the live account, from `CALL WARRANT.CORE.RUN_LOOP('AUTO')` over 2,400 shipments,
-40 quality holds and 6 SKUs. One loop, no branching on table names:
-
-![Weekly on-time delivery for six suppliers; five hold their baseline while SUP-002 falls through
-the RB-001 detection threshold](docs/images/web/one-pass.png)
-
-*The signal, drawn from the raw shipments rather than the aggregate. Over all history every
-supplier sits between 85% and 92% — the collapse only exists in a rolling window, which is why
-the detector uses one and why this chart does too.*
-
-| Exception | Action proposed | Tag on the data | Outcome |
-|---|---|---|---|
-| SUP-002 on-time 40.5% vs 90.8% baseline (−50.3pp, robust *z* −3.63) | `open_supplier_case` | `open` | **Executed unsupervised** |
-| SKU-1003 at 5.0 days of cover, 49k below safety stock | `raise_replenishment` | `internal` | **Queued for a human** |
-| 4 quality holds open 61–82 days | `notify_quality_owner` | `regulated` | **Permitted — it only drafts** |
-| The same holds, if release were proposed | `release_quality_hold` | `regulated` | **Refused** |
-
-![The escalated action, with the detector's observation on the left and the model's reasoning on
-the right](docs/images/evidence-and-reasoning.png)
-
-*The escalated one. Left is what the detector measured; right is what the model concluded, marked
-**model-generated** so a reviewer never has to guess. It cites RB-002 §5 — a clause in a PDF the
-pipeline parsed at setup time — and the tier rationale names the tag that forced the escalation.
-The model contributed the parameter values; it never contributed SQL text.*
-
-Detection to proposed action: **20–95 seconds**, against an operating rhythm where these
-surface on a daily review. Every row above, including the refusal, is a row in an append-only
-log — and the refusal survives a human approving it, because authority is re-resolved at
-execution time rather than trusted from proposal time.
-
-![A human approved the action and it was still refused at execution
-time](docs/images/refusal-banner.png)
-
-*That last clause, demonstrated. Between the action being queued and the reviewer approving it,
-`INVENTORY` was reclassified `regulated`. The approval is recorded. The action did not happen.
-No agent was asked to be honest about this — the tag is read again before the write.*
-
----
-
-## Architecture
+### 2.4 · Architecture
 
 ```mermaid
 flowchart LR
@@ -298,7 +244,7 @@ The two dotted edges are the whole idea: authority is read from the governance t
 time **and read again at execution time**, so an approval cannot outlive the policy it was
 granted under.
 
-### The same claim, in order
+### 2.5 · The same claim, in order
 
 A flowchart shows what connects to what. It cannot show *when* — and the entire argument here is
 about ordering. This is the escalated action from the run above, with a governance change landing
@@ -379,7 +325,59 @@ the check that catches it is a tag read the model is not party to.
 
 Everything runs inside Snowflake. No external inference, no external orchestration.
 
-### The agent can answer for itself
+---
+
+## 3 · Impact: what one pass actually does
+
+Measured on the live account, from `CALL WARRANT.CORE.RUN_LOOP('AUTO')` over 2,400 shipments,
+40 quality holds and 6 SKUs. One loop, no branching on table names:
+
+![Weekly on-time delivery for six suppliers; five hold their baseline while SUP-002 falls through
+the RB-001 detection threshold](docs/images/web/one-pass.png)
+
+*The signal, drawn from the raw shipments rather than the aggregate. Over all history every
+supplier sits between 85% and 92% — the collapse only exists in a rolling window, which is why
+the detector uses one and why this chart does too.*
+
+| Exception | Action proposed | Tag on the data | Outcome |
+|---|---|---|---|
+| SUP-002 on-time 40.5% vs 90.8% baseline (−50.3pp, robust *z* −3.63) | `open_supplier_case` | `open` | **Executed unsupervised** |
+| SKU-1003 at 5.0 days of cover, 49k below safety stock | `raise_replenishment` | `internal` | **Queued for a human** |
+| 4 quality holds open 61–82 days | `notify_quality_owner` | `regulated` | **Permitted — it only drafts** |
+| The same holds, if release were proposed | `release_quality_hold` | `regulated` | **Refused** |
+
+![The escalated action, with the detector's observation on the left and the model's reasoning on
+the right](docs/images/evidence-and-reasoning.png)
+
+*The escalated one. Left is what the detector measured; right is what the model concluded, marked
+**model-generated** so a reviewer never has to guess. It cites RB-002 §5 — a clause in a PDF the
+pipeline parsed at setup time — and the tier rationale names the tag that forced the escalation.
+The model contributed the parameter values; it never contributed SQL text.*
+
+Detection to proposed action: **20–95 seconds**, against an operating rhythm where these
+surface on a daily review. Every row above, including the refusal, is a row in an append-only
+log — and the refusal survives a human approving it, because authority is re-resolved at
+execution time rather than trusted from proposal time.
+
+![A human approved the action and it was still refused at execution
+time](docs/images/refusal-banner.png)
+
+*That last clause, demonstrated. Between the action being queued and the reviewer approving it,
+`INVENTORY` was reclassified `regulated`. The approval is recorded. The action did not happen.
+No agent was asked to be honest about this — the tag is read again before the write.*
+
+---
+
+![A 24-hour timeline of unattended task runs across both Snowflake tasks, 34 runs and none
+failed](docs/images/web/unattended.png)
+
+*Minimal manual intervention, measured rather than asserted. Two serverless tasks — one triggered
+on the approval stream, one sweeping hourly — ran 34 times in 24 hours with nothing failing and
+nobody present. "Nothing to do" is counted separately from a failure on purpose: a triggered task
+that finds its stream empty and spends nothing is working correctly, and folding those into either
+column would misreport a healthy pipeline.*
+
+### 3.1 · The agent can answer for itself
 
 Two questions governed automation usually cannot answer, both computed by the **same resolver the
 executor uses** and both callable from SQL:
@@ -419,7 +417,10 @@ The replay's headline count is deliberately narrow: **executed work that today's
 would no longer permit unsupervised**. That is the only category which cannot be corrected going
 forward, and it is the question an auditor actually asks.
 
-### The corpus is untrusted input
+### 3.2 · The corpus is untrusted input
+
+![The planted hostile runbook beside the six scored reasoning cases](docs/images/web/tested.png)
+
 
 Step ② interpolates retrieved documents into a prompt, so a document is an attack surface.
 `corpus/adversarial/` contains one that claims to supersede RB-003, grants itself release
@@ -435,6 +436,89 @@ footprint come from the registry, the sensitivity tag is read from the object ra
 reply, and the executor re-resolves authority before it binds anything. "The model refused" is a
 property of a model that changes under you; "the model's compliance changed nothing" is a property
 of the architecture.
+
+---
+
+## 4 · Driven from the CLI: six skills, thirteen tools
+
+Defined in [`.cortex/skills/`](.cortex/skills/). The first five describe how each phase is built;
+the sixth is how to *operate* the agent from a terminal:
+
+| Skill | Responsibility |
+|---|---|
+| `detect-anomaly` | Baseline + statistical/ML exception detection |
+| `investigate-root-cause` | Grounded reasoning over structured + unstructured evidence |
+| `classify-authority` | Resolve the authority tier from object tags |
+| `propose-action` | Produce a concrete, reversible, typed action |
+| `orchestrate-loop` | Run the five phases end to end |
+| `operate-warrant` | Drive the agent from the CLI through its MCP server |
+
+![The MCP tool surface: thirteen tools split eleven read and two act, five resources, six skills,
+and the test asserting no tool accepts an authority tier](docs/images/web/coco-cli.png)
+
+*The whole agent is an MCP server. The load-bearing property is not the tool count — it is that
+no tool accepts a `tier`, so there is no parameter for a prompt to aim at, and that is asserted
+by walking every registered tool's live schema.*
+
+---
+
+## 5 · Three surfaces, and only one of them can act
+
+| Surface | Can it act? |
+|---|---|
+| **Streamlit console**, inside Snowflake | **Yes**, through the governed path: approve → re-resolve authority → execute. It runs on the reviewer's own Snowflake identity, so an approval is attributable to a person. |
+| **[Public web viewer](https://snowflake-coco-cli-hackathon-2026.vercel.app/)**, Next.js on Vercel | **No — and it lets you prove that yourself.** The approve, reject and defer buttons are live and send the real statements. Snowflake refuses them in front of you. |
+| **Cortex Agent** in CoWork | **No.** Two read-only tools, and nothing bound to the executor. |
+
+That asymmetry is the design, not a limitation. Approving is a governed act, so it belongs only to
+the surface that has an identity.
+
+![The public viewer's approve control, with the refusal already returned and reported as a passing
+check](docs/images/web/evidence.png)
+
+*Press **Approve and execute** on the public page and this is what comes back. The panel is green
+because being refused is the pass condition; Snowflake's own words are inside it, labelled verbatim.
+The two refusals differ, and the difference is worth reading:*
+
+| Press | What Snowflake answers | Why |
+|---|---|---|
+| Reject / Defer | `SQL access control error: Insufficient privileges to operate on table 'PENDING_ACTIONS'` | the role can see the queue, and is told no |
+| Approve | `SQL compilation error: Unknown user-defined function WARRANT.CORE.EXECUTE_ACTION` | without `USAGE`, Snowflake will not concede the executor exists |
+
+Denial by non-disclosure is the stronger of the two: **the role cannot be talked into calling
+something it cannot name.** Both statements bind an `action_id` that cannot exist, so neither would
+do anything even if a grant were one day mis-applied — the demonstration cannot become the incident
+it describes. `web/scripts/probe.mjs` asserts both write paths on every run.
+
+### 5.1 · The conversational surface cannot act, on purpose
+
+`WARRANT_ANALYST` is a Cortex Agent with two read-only tools: Cortex Search over the parsed
+procedures, and Cortex Analyst over the semantic view. It is **not** given a `generic` tool
+bound to `RUN_LOOP` or `EXECUTE_ACTION`, and that is the point. A chat box that can invoke the
+executor routes around the console, the approval queue and the human — it puts the most
+persuadable surface in the system on the far side of the gate.
+
+So it may look and speak, and it may not touch. Asked to release a hold, it declines and cites
+the clause:
+
+```
+I cannot release QH-0034. Per RB-003, quality holds are regulated records:
+"No automated system may alter a hold's disposition, release a lot, or close an
+investigation." … I also cannot provide the lot reference. RB-003 states that lot
+identifiers are need-to-know, and that automation is not granted visibility of them.
+```
+
+Verify it yourself without a browser:
+
+```bash
+snow sql -c <conn> -q "SELECT SNOWFLAKE.CORTEX.DATA_AGENT_RUN(
+  'WARRANT.CORE.WARRANT_ANALYST',
+  '{\"messages\":[{\"role\":\"user\",\"content\":[{\"type\":\"text\",
+     \"text\":\"What does RB-003 permit automation to do with an aging hold?\"}]}],
+    \"stream\":false}');"
+```
+
+---
 
 ## Snowflake services used
 
@@ -469,57 +553,6 @@ which is more defensible than a black box and leaves a documented seam where the
 would plug in); Snowflake Marketplace (no third-party dataset would be synthetic, and the
 clean-room rule matters more than the extra line item); and a `generic` agent tool wired to the
 executor — see below, that one is a governance decision rather than an omission.
-
-### The conversational surface cannot act, on purpose
-
-`WARRANT_ANALYST` is a Cortex Agent with two read-only tools: Cortex Search over the parsed
-procedures, and Cortex Analyst over the semantic view. It is **not** given a `generic` tool
-bound to `RUN_LOOP` or `EXECUTE_ACTION`, and that is the point. A chat box that can invoke the
-executor routes around the console, the approval queue and the human — it puts the most
-persuadable surface in the system on the far side of the gate.
-
-So it may look and speak, and it may not touch. Asked to release a hold, it declines and cites
-the clause:
-
-```
-I cannot release QH-0034. Per RB-003, quality holds are regulated records:
-"No automated system may alter a hold's disposition, release a lot, or close an
-investigation." … I also cannot provide the lot reference. RB-003 states that lot
-identifiers are need-to-know, and that automation is not granted visibility of them.
-```
-
-Verify it yourself without a browser:
-
-```bash
-snow sql -c <conn> -q "SELECT SNOWFLAKE.CORTEX.DATA_AGENT_RUN(
-  'WARRANT.CORE.WARRANT_ANALYST',
-  '{\"messages\":[{\"role\":\"user\",\"content\":[{\"type\":\"text\",
-     \"text\":\"What does RB-003 permit automation to do with an aging hold?\"}]}],
-    \"stream\":false}');"
-```
-
-## Custom CoCo Agent Skills
-
-Defined in [`.cortex/skills/`](.cortex/skills/). The first five describe how each phase is built;
-the sixth is how to *operate* the agent from a terminal:
-
-| Skill | Responsibility |
-|---|---|
-| `detect-anomaly` | Baseline + statistical/ML exception detection |
-| `investigate-root-cause` | Grounded reasoning over structured + unstructured evidence |
-| `classify-authority` | Resolve the authority tier from object tags |
-| `propose-action` | Produce a concrete, reversible, typed action |
-| `orchestrate-loop` | Run the five phases end to end |
-| `operate-warrant` | Drive the agent from the CLI through its MCP server |
-
-![The MCP tool surface: thirteen tools split eleven read and two act, five resources, six skills,
-and the test asserting no tool accepts an authority tier](docs/images/web/coco-cli.png)
-
-*The whole agent is an MCP server. The load-bearing property is not the tool count — it is that
-no tool accepts a `tier`, so there is no parameter for a prompt to aim at, and that is asserted
-by walking every registered tool's live schema.*
-
----
 
 ## Quick start
 
