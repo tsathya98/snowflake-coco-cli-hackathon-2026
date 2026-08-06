@@ -30,6 +30,7 @@ was granted under.
 | [Architecture](#architecture) | the loop, and the two reads that matter |
 | [The agent can answer for itself](#the-agent-can-answer-for-itself) | capability manifest, policy what-if, decision replay |
 | [The corpus is untrusted input](#the-corpus-is-untrusted-input) | a planted attack, and why the tests assume it worked |
+| [The data](docs/the_data.md) | the domain in plain terms, and what was planted |
 | [Snowflake services used](#snowflake-services-used) | 19, each cited to a file |
 | [Quick start](#quick-start) · [Development](#development) | five commands, and the gates CI runs |
 
@@ -304,7 +305,7 @@ A service does not appear here until it is actually wired up.
 | **Snowpark (Python)** | `RUN_LOOP`, `EXECUTE_ACTION`, `EXECUTE_APPROVED` stored procedures | `sql/40_orchestration.sql` |
 | **Dynamic Tables** | Rolling supplier and inventory baselines | `sql/20_pipeline.sql` |
 | **Streams** | Change detection on exceptions and approvals | `sql/20_pipeline.sql` |
-| **Tasks** | Serverless cron sweep + a triggered task on the approval stream | `sql/40_orchestration.sql` |
+| **Tasks** | Serverless cron sweep + a triggered task on the approval stream, both running unattended — `TASK_ACTIVITY()` reports what they did | `sql/40_orchestration.sql`, `sql/46_schedule.sql` |
 | **Cortex Agents** | `CREATE AGENT` — a conversational surface with **no authority to act**, deliberately | `sql/35_agent.sql` |
 | **Cortex Analyst** | The agent's `cortex_analyst_text_to_sql` tool over the semantic view | `sql/35_agent.sql` |
 | **Snowflake CoWork** | Where that agent is used — `ai.snowflake.com`, zero extra build | `sql/35_agent.sql` |
@@ -454,8 +455,20 @@ Two of them need explaining, because they gate on committed artifacts rather tha
 All data is **synthetic**, generated in-warehouse by `sql/10_synthetic_data.sql`. No proprietary,
 personal or customer data is used, and **no Snowflake Marketplace listing is used** — deliberately,
 because a third-party dataset would not be synthetic and provenance matters more here than one
-more line in the services table. Provenance is recorded in
+more line in the services table. Provenance is in
 [`docs/data_licences.md`](docs/data_licences.md).
+
+**[`docs/the_data.md`](docs/the_data.md) explains the domain for a reader who does not work in
+supply chain** — a five-term glossary, why this domain was chosen (it is the cleanest case of one
+workload spanning three governance levels at once), and how the generator works.
+
+It also says plainly that **we planted the anomalies the agent then detects**, because that sounds
+like cheating until you see the alternative. A testbed with no known-bad data cannot demonstrate
+detection, and one seeded from a real operation would fail the clean-room rule. What matters is
+whether the detector had to do real work: every threshold is quoted from a runbook clause written
+before the data, the planted supplier scores a robust *z* of **−3.63** against **−0.46** for the
+next-worst, and the reasoning eval includes a case where the correct answer is to do *nothing* —
+which a detector tuned to find what was planted would fail.
 
 The five operating procedures in `corpus/` were written for this project. They are realistic in
 form and deliberately not derived from any real organisation's documents.

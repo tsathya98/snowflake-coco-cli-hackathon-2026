@@ -71,7 +71,7 @@ snow sql --connection "$CONNECTION" \
              AUTO_COMPRESS = FALSE OVERWRITE = TRUE" >/dev/null
 
 # 40 and 45 both import the packaged python, so they run after the upload above.
-for step in sql/40_orchestration.sql sql/45_review.sql; do
+for step in sql/40_orchestration.sql sql/45_review.sql sql/46_schedule.sql; do
   echo "==> ${step}"
   snow sql --connection "$CONNECTION" --filename "$step" >/dev/null
 done

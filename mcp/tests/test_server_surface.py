@@ -29,6 +29,7 @@ READ_ONLY = {
     "search_runbooks",
     "detect_exceptions",
     "read_runbook",
+    "task_activity",
 }
 
 ACTING = {"run_agent_loop", "execute_approved_action"}

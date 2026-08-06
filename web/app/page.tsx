@@ -25,10 +25,12 @@ import {
   REFUSALS,
   REPLAY,
   SEVERITY_TONE,
+  TASK_ACTIVITY,
   TIER_NAMES,
   TIER_TONE,
   type ManifestPayload,
   type ReplayPayload,
+  type TaskActivity,
 } from "@/lib/queries";
 import { PointerGlow } from "@/components/pointer";
 import { Card, Chip, ModelText, Note, Reveal, Section, Tag, Tiles } from "@/components/ui";
@@ -54,6 +56,7 @@ const NAV = [
   ["replay", "Replay"],
   ["refusals", "Refusals"],
   ["governance", "Governance"],
+  ["unattended", "Unattended"],
 ] as const;
 
 const str = (v: unknown) => String(v ?? "");
@@ -69,9 +72,10 @@ export default async function Page() {
     query(METRICS),
     query(AUDIT),
   ]);
-  const [manifest, replay] = await Promise.all([
+  const [manifest, replay, schedule] = await Promise.all([
     callJson<ManifestPayload>(MANIFEST),
     callJson<ReplayPayload>(REPLAY),
+    callJson<TaskActivity>(TASK_ACTIVITY, [24]),
   ]);
 
   const escalated = decisions.find((d) => str(d.DECISION) === "pending") ?? decisions[0];
@@ -455,6 +459,55 @@ export default async function Page() {
               />
             </Reveal>
           </div>
+        </Section>
+
+        <Section
+          id="unattended"
+          eyebrow="Minimal manual intervention"
+          title="What ran without anybody present"
+          lede={
+            <>
+              Two Snowflake tasks operate this pipeline unattended:{" "}
+              <code className="font-mono text-[0.88em]">EXECUTE_ON_APPROVAL</code>, triggered on the
+              approval stream, and <code className="font-mono text-[0.88em]">SCAN_FOR_EXCEPTIONS</code>,
+              an hourly sweep. Both serverless, so an idle schedule costs nothing.
+            </>
+          }
+        >
+          <Tiles
+            figures={[
+              ["Runs in 24h", schedule.summary.runs, "info"],
+              ["Succeeded", schedule.summary.succeeded, "good"],
+              ["Nothing to do", schedule.summary.skipped_nothing_to_do, "muted"],
+              ["Failed", schedule.summary.failed, schedule.summary.failed ? "bad" : "good"],
+            ]}
+          />
+          <div className="mt-4 space-y-2.5">
+            {schedule.tasks.map((task) => (
+              <Reveal key={task.name}>
+                <Card tone={task.state === "started" ? "good" : "muted"}>
+                  <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                    <span className="font-mono text-[0.9rem] font-bold">{task.name}</span>
+                    <span
+                      className="text-[0.66rem] font-extrabold uppercase tracking-[0.11em]"
+                      style={{ color: `var(--${task.state === "started" ? "good" : "muted"})` }}
+                    >
+                      {task.state}
+                    </span>
+                  </div>
+                  <div className="mt-1.5 text-[0.82rem] text-[var(--text-muted)]">{task.role}</div>
+                </Card>
+              </Reveal>
+            ))}
+          </div>
+          <p className="mt-3 max-w-[80ch] text-[0.8rem] leading-relaxed text-[var(--text-muted)]">
+            <strong>&ldquo;Nothing to do&rdquo; is counted separately from a failure, on purpose.</strong>{" "}
+            A triggered task that finds its stream empty and spends nothing is working correctly —
+            folding those into either column would misreport a healthy pipeline. The failures shown,
+            if any, are real: they predate an <code className="font-mono">EXECUTE MANAGED TASK</code>{" "}
+            grant that serverless tasks require, and the task auto-suspended itself after three of
+            them rather than failing quietly.
+          </p>
         </Section>
 
         <Section

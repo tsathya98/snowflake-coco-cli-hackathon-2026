@@ -161,6 +161,7 @@ SELECT TO_VARCHAR(ts, 'YYYY-MM-DD HH24:MI:SS') AS at,
 export const MANIFEST = "CALL WARRANT.CORE.AUTHORITY_MANIFEST(NULL)";
 export const MANIFEST_WHATIF = "CALL WARRANT.CORE.AUTHORITY_MANIFEST(PARSE_JSON(?))";
 export const REPLAY = "CALL WARRANT.CORE.REPLAY_DECISIONS(NULL)";
+export const TASK_ACTIVITY = "CALL WARRANT.CORE.TASK_ACTIVITY(?)";
 
 export type Capability = {
   action: string;
@@ -173,6 +174,19 @@ export type Capability = {
 export type ManifestPayload = {
   capabilities: Capability[];
   changes?: { action: string; from_outcome: string; to_outcome: string; revocation: boolean }[];
+};
+
+export type TaskActivity = {
+  window_hours: number;
+  tasks: { name: string; state: string; role: string }[];
+  runs: { NAME: string; STATE: string; SCHEDULED_TIME: string; COMPLETED_TIME: string }[];
+  summary: {
+    runs: number;
+    succeeded: number;
+    skipped_nothing_to_do: number;
+    failed: number;
+    pending: number;
+  };
 };
 
 export type ReplayPayload = {

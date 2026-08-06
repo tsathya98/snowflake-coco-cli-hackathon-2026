@@ -104,6 +104,7 @@ SELECT TO_VARCHAR(ts, 'YYYY-MM-DD HH24:MI:SS') AS at,
 RUNBOOK = "SELECT doc_id, title, body FROM WARRANT.DATA.RUNBOOKS WHERE doc_id = ?"
 RUNBOOK_INDEX = "SELECT doc_id, title FROM WARRANT.DATA.RUNBOOKS ORDER BY doc_id"
 DISPATCH = "CALL WARRANT.CORE.EXECUTE_ACTION(?)"
+TASK_ACTIVITY = "CALL WARRANT.CORE.TASK_ACTIVITY(?)"
 
 INSTRUCTIONS = """
 Warrant is an operations agent on Snowflake whose authority is derived from the governance
@@ -498,6 +499,29 @@ def detect_exceptions() -> list[dict[str, Any]]:
         }
         for e in detect(session())
     ]
+
+
+@mcp.tool(
+    annotations={"title": "Unattended task activity", "readOnlyHint": True},
+    tags={"orchestrate", "read"},
+)
+def task_activity(
+    hours: Annotated[int, Field(ge=1, le=168, description="Look-back window")] = 24,
+) -> dict[str, Any]:
+    """Report what the scheduled and triggered tasks did without a human present.
+
+    Args:
+        hours: How far back to look, 1–168.
+
+    Returns:
+        Each task's current state and its recent runs, bucketed by state.
+
+    Two tasks run this pipeline unattended: `EXECUTE_ON_APPROVAL`, triggered on the
+    approval stream, and `SCAN_FOR_EXCEPTIONS`, an hourly sweep. Note that a *skipped*
+    run is reported separately from a failure — for a triggered task, finding the stream
+    empty and spending nothing is the common case and the correct one.
+    """
+    return json.loads(session().sql(TASK_ACTIVITY, params=[hours]).collect()[0][0])
 
 
 # --------------------------------------------------------------------------------- acting
