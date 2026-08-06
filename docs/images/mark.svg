@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32" fill="none">
+  <!-- Standalone copy of components/mark.tsx. A favicon is fetched outside the page, so it
+       cannot use currentColor or the theme variables and has to carry its own colour. The
+       accent is picked to hold up on both a dark and a light browser chrome. -->
+  <rect width="24" height="24" rx="5" fill="#131211"/>
+  <path d="M 20.4 7.2 A 9.6 9.6 0 1 0 21.6 12" stroke="#a5b4fc" stroke-width="1.9" stroke-linecap="round" transform="translate(12 12) scale(0.86) translate(-12 -12)"/>
+  <path d="M 12.2 6.4 h 5.4 v 5.4 l -5.9 5.9 a 1.2 1.2 0 0 1 -1.7 0 l -3.7 -3.7 a 1.2 1.2 0 0 1 0 -1.7 z" stroke="#c4b5fd" stroke-width="1.6" stroke-linejoin="round" transform="translate(12 12) scale(0.86) translate(-12 -12)"/>
+  <circle cx="15.1" cy="8.9" r="1.15" fill="#c4b5fd" transform="translate(12 12) scale(0.86) translate(-12 -12)"/>
+</svg>

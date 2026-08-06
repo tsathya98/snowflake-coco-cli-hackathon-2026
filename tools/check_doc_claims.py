@@ -33,7 +33,6 @@ DOCUMENTS = (
     "README.md",
     "docs/rubric_alignment.md",
     "docs/judges_walkthrough.md",
-    "docs/deck_content.md",
     # Not a document, but it states a count about the repository in front of the public, which is
     # the same failure mode. It claimed nine adversarial tests while pytest collects ten, because
     # the count was taken by grepping `def test_` and the file parametrises.
@@ -136,6 +135,16 @@ def adversarial_tests() -> int:
     )
 
 
+def mcp_tools() -> int:
+    """Count the tools the MCP server registers.
+
+    Returns:
+        One per ``@mcp.tool`` decorator, so the README badge and the server cannot disagree.
+    """
+    server = (ROOT / "mcp" / "warrant_mcp" / "server.py").read_text(encoding="utf-8")
+    return len(re.findall(r"@mcp\.tool\(", server))
+
+
 def declared_services() -> int:
     """Count the rows in the README's Snowflake-services table.
 
@@ -162,12 +171,23 @@ def declared_services() -> int:
 # Every literal space is `\s+`, because these figures are quoted inside prose that Markdown wraps
 # at 100 columns. A pattern that assumes a single space silently stops matching the moment a
 # sentence is reflowed, and a rule that matches nothing reports success.
+# Which phrasings mean "the injection suite" rather than "the whole suite". Both rules below
+# reference this, so a sentence can only ever be claimed by one of them — the alternative is two
+# patterns matching one figure, where the stricter rule loses and a correct number is reported as
+# wrong. Add a phrasing here, in one place, rather than to each pattern.
+INJECTION_SUITE = r"(?:,\s+each\s+naming|\s+that\s+\*\*assume)"
+
 RULES: tuple[tuple[str, Callable[[], int], str], ...] = (
-    # The lookahead hands "N tests, each naming …" to the injection-suite rule below. Without it
-    # both rules match that one sentence, the whole-suite rule loses, and a correct figure gets
-    # reported as wrong.
-    ("tests in the suite", collected_tests, r"\*?\*?(\d+)\s+tests\b(?!,\s+each\s+naming)"),
-    ("tests that pass", passing_tests, r"(\d+)\s+passed"),
+    # `(?![A-Za-z])` rather than `\b` after "tests". Underscore is a word character, so `\b` does
+    # not match between "tests" and the "_" a shields.io badge uses as a space — which meant the
+    # README's own test-count badge silently matched nothing and was never checked. Still rejects
+    # "testsuite", which is all `\b` was there for.
+    (
+        "tests in the suite",
+        collected_tests,
+        rf"\*?\*?(\d+)[\s_]+tests(?![A-Za-z])(?!{INJECTION_SUITE})",
+    ),
+    ("tests that pass", passing_tests, r"(\d+)[\s_]+passed"),
     ("modules mypy checks", typed_modules, r"(\d+)\s+source\s+files"),
     (
         "modules the SQL boundary covers",
@@ -175,8 +195,9 @@ RULES: tuple[tuple[str, Callable[[], int], str], ...] = (
         r"boundary\s+holds\s+across\s+(\d+)\s+module",
     ),
     ("documents in the corpus", corpus_documents, r"(\d+)\s+document\(s\)\s+verified"),
-    ("Snowflake services claimed", declared_services, r"\*\*(\d+)\s+services"),
-    ("tests in the injection suite", adversarial_tests, r"(\d+)\s+tests,\s+each\s+naming"),
+    ("Snowflake services claimed", declared_services, r"\*?\*?(\d+)[\s_]+services"),
+    ("tests in the injection suite", adversarial_tests, rf"(\d+)[\s_]+tests(?={INJECTION_SUITE})"),
+    ("tools the MCP server exposes", mcp_tools, r"(\d+)[\s_]+governed[\s_]+tools"),
 )
 
 

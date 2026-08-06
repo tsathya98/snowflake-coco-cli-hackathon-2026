@@ -1,40 +1,88 @@
+<div align="center">
+
+<img src="docs/images/mark.svg" alt="" width="76" height="76">
+
 # Warrant
 
-**A governed autonomous operations agent on Snowflake.**
-*No action without a warrant.*
+### No action without a warrant.
 
-Submission for the **Snowflake CoCo CLI Hackathon 2026** — Problem Statement 1,
-*Intelligent Workflow Automation Agent*.
-Team **Argmax** (solo).
+**An autonomous operations agent whose permission to act is read from the Snowflake governance
+tags on the data it touches — live, and again at execution time, so a human's approval cannot
+outlive the policy it was granted under.**
+
+[![CoCo CLI Hackathon 2026](https://img.shields.io/badge/Snowflake_CoCo_CLI_Hackathon_2026-Problem_Statement_1-29B5E8?style=for-the-badge&logo=snowflake&logoColor=white)](#the-problem)
+[![Live demo](https://img.shields.io/badge/Live_demo-reads_Snowflake_on_every_request-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://snowflake-coco-cli-hackathon-2026.vercel.app/)
+[![Team Argmax](https://img.shields.io/badge/Team-Argmax_·_solo-D4AF37?style=for-the-badge)](#)
+
+[![Tests](https://img.shields.io/badge/pytest-251_tests_·_100%25_branch-6E9F18?style=for-the-badge&logo=pytest&logoColor=white)](#development)
+[![mypy](https://img.shields.io/badge/mypy-strict,_0_errors-1F5082?style=for-the-badge&logo=python&logoColor=white)](#development)
+[![MCP](https://img.shields.io/badge/MCP-13_governed_tools-7A77FF?style=for-the-badge)](#custom-coco-agent-skills)
+[![Snowflake services](https://img.shields.io/badge/Snowflake-19_services_wired-29B5E8?style=for-the-badge&logo=snowflake&logoColor=white)](#snowflake-services-used)
 
 ### ▸ [**Try it live — snowflake-coco-cli-hackathon-2026.vercel.app**](https://snowflake-coco-cli-hackathon-2026.vercel.app/)
 
-Reads this Snowflake account on every request, with no cache anywhere. The approve, reject and
-defer buttons are live and send the real statements; what comes back is Snowflake refusing them.
+**The approve, reject and defer buttons on that page are real.** They send the statements the
+governed console sends, and what comes back is Snowflake refusing them — not a disabled control.
+
+</div>
 
 ![The Warrant viewer: the headline claim beside three tables resolved live to L4, L3 and L2
 authority](docs/images/web/hero.png)
 
-*The idea in one picture, and it is not an illustration — those three rows come from the same
-`SYSTEM$GET_TAG` read that drives the agent. Retag a table and the hero changes.*
+<div align="center"><em>The idea in one picture, and it is not an illustration — those three rows
+come from the same <code>SYSTEM$GET_TAG</code> read that drives the agent. Retag a table and the
+hero changes.</em></div>
 
-**In one sentence:** an operations agent that closes the loop from detection to action, whose
-permission to take each action is read from the Snowflake object tags on the data that action
-touches — live, and again at execution time, so a human's approval cannot outlive the policy it
-was granted under.
+---
+
+<table>
+<tr>
+<td width="33%" valign="top">
+
+#### 🎯 The idea
+
+Authority is **not** a rules list in application code. It is derived from the
+`SENSITIVITY` tag already on the table, read with `SYSTEM$GET_TAG` on every
+decision. Governance policy and agent behaviour stay in sync because they are
+the same artifact.
+
+</td>
+<td width="33%" valign="top">
+
+#### 🛑 The differentiator
+
+The tag is read **again at execution time**. Approve an action, reclassify the
+table it touches, run the executor — it refuses, and both facts are in the
+append-only log: that you approved, and that it was refused.
+
+</td>
+<td width="33%" valign="top">
+
+#### 🔍 The evidence
+
+A planted attack in the grounding corpus, and 10 tests that **assume the model
+complied with it** and assert the outcome anyway. *"The model resisted"* is a
+property of a model. This is a property of the architecture.
+
+</td>
+</tr>
+</table>
+
+---
 
 ![The Warrant console: six exceptions detected, five handled by the agent, one awaiting a human,
 two refused](docs/images/console-headline.png)
 
-*Where a human actually decides: Streamlit in Snowflake, inside the governed perimeter. One
-command ran the whole loop — five exceptions handled alone, one escalated, two refused — and the
-count it leads with is the refusals, not the throughput.*
+<div align="center"><em>Where a human actually decides: Streamlit in Snowflake, inside the governed
+perimeter. One command ran the whole loop — five exceptions handled alone, one escalated, two
+refused — and the count it leads with is the refusals, not the throughput.</em></div>
 
+> [!TIP]
 > **Reviewing this?** [`docs/rubric_alignment.md`](docs/rubric_alignment.md) maps every claim to
 > the command that settles it, and [`docs/judges_walkthrough.md`](docs/judges_walkthrough.md) is a
 > reproduction with expected output. Most of both needs no Snowflake account.
 
-| | |
+| Where to go | What you get |
 |---|---|
 | [The problem](#the-problem) · [What Warrant does](#what-warrant-does) | why an agent that *can* act still doesn't get deployed |
 | [Authority tiers](#authority-tiers) · [What one pass does](#what-one-pass-actually-does) | the model, and one measured run through it |
@@ -42,7 +90,7 @@ count it leads with is the refusals, not the throughput.*
 | [The agent can answer for itself](#the-agent-can-answer-for-itself) | capability manifest, policy what-if, decision replay |
 | [The corpus is untrusted input](#the-corpus-is-untrusted-input) | a planted attack, and why the tests assume it worked |
 | [The data](docs/the_data.md) | the domain in plain terms, and what was planted |
-| [Snowflake services used](#snowflake-services-used) | 19, each cited to a file |
+| [Snowflake services used](#snowflake-services-used) | 19 services, each cited to a file |
 | [Quick start](#quick-start) · [Development](#development) | five commands, and the gates CI runs |
 
 ---
