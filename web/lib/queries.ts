@@ -221,3 +221,35 @@ export type ReplayPayload = {
     needs_attention: boolean;
   }[];
 };
+
+/**
+ * The signal the detector fired on, weekly, for every supplier.
+ *
+ * The Semantic View is deliberately not the source here. It aggregates the whole history, and
+ * over the whole history all six suppliers sit between 85% and 92% — a chart of it would show
+ * six near-identical bars and quietly contradict the collapse the agent detected. The
+ * detection was a rolling window, so the chart has to be one too.
+ *
+ * Partial buckets at both ends are real and are labelled rather than trimmed: dropping the
+ * current week would make the most recent, most relevant point disappear.
+ */
+export const OTD_TREND = `
+SELECT supplier_id                                                        AS supplier,
+       TO_VARCHAR(DATE_TRUNC('week', promised_date), 'MM-DD')             AS week,
+       ROUND(AVG(IFF(COALESCE(days_late, 0) <= 0, 1, 0)) * 100, 1)::FLOAT AS on_time_pct,
+       COUNT(*)::INT                                                      AS shipments
+  FROM WARRANT.DATA.SHIPMENTS
+ WHERE status = 'delivered'
+   AND promised_date >= DATEADD('day', -91, CURRENT_DATE())
+ GROUP BY 1, 2
+ ORDER BY 1, 2`;
+
+/**
+ * RB-001 §1 fires at 20 percentage points below a supplier's 90-day baseline. SUP-002's
+ * recorded baseline is 90.8%, so its threshold is 70.8 — the number the dashed line marks.
+ * Stated here rather than recomputed because it is the figure the *detector* used, and a
+ * chart that redrew the threshold from today's data would stop matching the decision it
+ * is illustrating.
+ */
+export const OTD_THRESHOLD = 70.8;
+export const OTD_SUBJECT = "SUP-002";

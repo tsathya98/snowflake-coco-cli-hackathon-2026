@@ -21,6 +21,7 @@ import {
   MANIFEST,
   MASKED_HOLDS,
   METRICS,
+  OTD_TREND,
   OUTCOME_TONE,
   REFUSALS,
   REPLAY,
@@ -41,6 +42,7 @@ import { Decide } from "@/components/decide";
 import { Wordmark } from "@/components/mark";
 import { Resolution } from "@/components/resolution";
 import { Coco } from "@/components/coco";
+import { OnTimeTrend, TaskTimeline } from "@/components/charts";
 import { Tested } from "@/components/tested";
 import { ConsoleGallery } from "@/components/console";
 
@@ -73,13 +75,14 @@ const num = (v: unknown) => Number(v ?? 0);
 
 export default async function Page() {
   const [headline] = await query(HEADLINE);
-  const [decisions, refusals, governance, holds, metrics, audit] = await Promise.all([
+  const [decisions, refusals, governance, holds, metrics, audit, otd] = await Promise.all([
     query(DECISIONS),
     query(REFUSALS),
     query(GOVERNANCE),
     query(MASKED_HOLDS),
     query(METRICS),
     query(AUDIT),
+    query(OTD_TREND),
   ]);
   const [manifest, replay, schedule] = await Promise.all([
     callJson<ManifestPayload>(MANIFEST),
@@ -222,6 +225,11 @@ export default async function Page() {
           }
         >
           <Reveal>
+            <OnTimeTrend rows={otd} />
+          </Reveal>
+
+          <Reveal delay={90}>
+            <div className="mt-5">
             <DataTable
               columns={[
                 ["ENTITY", "Entity"],
@@ -238,6 +246,7 @@ export default async function Page() {
                   str(d.DECISION) === "pending" ? "awaiting a human" : str(d.EXECUTION_RESULT),
               }))}
             />
+            </div>
           </Reveal>
         </Section>
 
@@ -540,6 +549,9 @@ export default async function Page() {
               ["Failed", schedule.summary.failed, schedule.summary.failed ? "bad" : "good"],
             ]}
           />
+          <Reveal>
+            <TaskTimeline runs={schedule.runs} tasks={schedule.tasks} totalRuns={schedule.summary.runs} />
+          </Reveal>
           <div className="mt-4 space-y-2.5">
             {schedule.tasks.map((task) => (
               <Reveal key={task.name}>
