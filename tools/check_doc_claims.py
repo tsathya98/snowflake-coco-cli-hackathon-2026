@@ -218,6 +218,50 @@ COCO = "web/components/coco.tsx"
 TESTED = "web/components/tested.tsx"
 
 
+def dead_config_failures() -> list[str]:
+    """Check that every variable in ``.env.example`` is read by something.
+
+    ``.env.example`` is documentation that looks like configuration, which is the worst kind to
+    let rot: a reviewer grepping it finds a capability, goes looking for the code, and finds
+    none. This found three — two that named a database and warehouse spelled literally into the
+    SQL, and one advertising a Slack webhook secret for a notification path that was never built.
+
+    This module excludes *itself* from the search. Naming a dead variable in the message that
+    reports it would make the variable look used, and the check would go quiet the moment it had
+    something to say — which is the failure mode the module docstring warns about, reached by a
+    different route.
+
+    Returns:
+        One message per variable that nothing in the repository reads.
+    """
+    example = (ROOT / ".env.example").read_text(encoding="utf-8")
+    declared = re.findall(r"^([A-Z][A-Z0-9_]*)=", example, re.M)
+    this_file = Path(__file__).resolve()
+
+    searchable = "\n".join(
+        path.read_text(encoding="utf-8", errors="replace")
+        for directory in (
+            "src",
+            "sql",
+            "tools",
+            "scripts",
+            "streamlit",
+            "mcp",
+            "web/lib",
+            "web/app",
+        )
+        for path in (ROOT / directory).rglob("*")
+        if path.is_file()
+        and path.suffix in {".py", ".sql", ".sh", ".ts", ".tsx", ".toml"}
+        and path.resolve() != this_file
+    )
+    return [
+        f".env.example: {name} is declared but nothing in the repository reads it"
+        for name in declared
+        if name not in searchable
+    ]
+
+
 def mcp_readme_failures() -> list[str]:
     """Check that ``mcp/README.md`` documents exactly the tools and resources the server has.
 
@@ -333,6 +377,7 @@ def main() -> int:
         print(f"  {actual:>4}  {label:<34} {status}")
 
     for label, derive_failures in (
+        (".env.example vs the code", dead_config_failures),
         ("mcp/README vs the MCP server", mcp_readme_failures),
         ("deployed page vs the MCP server", mcp_surface_failures),
         ("deployed page vs eval and images", recorded_claims_failures),
