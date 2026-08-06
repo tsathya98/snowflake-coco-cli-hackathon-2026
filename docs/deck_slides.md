@@ -1,43 +1,51 @@
-# Warrant — slide-by-slide deck content
+# Warrant — the deck, slide by slide
 
 Build source for the submission PPT. Working material rather than a judge-facing document — it is
 tracked so it travels between machines, and written knowing it is public.
 
-**The template's real envelope is 6 slides** — measured from the organizer's own PPTX
-(`docs/submission_template/`): a cover, a guidelines slide listing the three mandated sections
-(Problem Brief · Architecture Diagram · Impact Statement), three blank content slides, and one
-literally titled "Additional Slide", singular. So the deck they expect is **cover + 3 sections +
-1–2 extra ≈ 6–7 slides**, and a judge skimming thirty decks will hold you to that shape even if
-nobody enforces it.
+## Six slides. Here is why, measured rather than guessed
 
-The 9 sections below are therefore **content blocks, not a slide count**. Build 6–7:
+The organiser's template (`docs/submission_template/`) is six physical slides, and reading its XML
+settles the question:
 
-| Template slot | Take it from |
+| # | What is actually on it |
 |---|---|
-| 1 · Cover | Slide 1 below |
-| 2 · Problem Brief | Slide 2 below |
-| 3 · Architecture Diagram | Slide 4, with slide 3's mechanism table folded in as the diagram's caption — the tag → tier table *is* the architecture's point |
-| 4 · Impact Statement | Slide 5, plus the two-line verification note from slide 6 |
-| 5 · Additional: CoCo CLI + MCP | Slide 7, uncut — it answers the 40% criterion |
-| 6 · Additional: the boundary | Slide 8's refusal table + slide 9's closing line |
+| 1 | Cover — four fields to fill: team name, problem statement, team leader, team size |
+| 2 | **Instructions to you**, not content: *"Submission Guidelines: things to add on the submission deck — 1. Problem Brief, 2. Architecture Diagram, 3. Impact Statement"* |
+| 3, 4, 6 | Blank canvases. Branding art only, no placeholders |
+| 5 | Blank, captioned **"Additional Slide"** — singular |
 
-What that drops: slide 6's full verification table (keep the one-liner "every claim is a CI
-gate — clone and run one command") and slide 9's limitations panel (move the honest-limitations
-bullets to the speaker notes; say them out loud instead). If a seventh slide is tolerated, restore
-the limitations panel — judges reward stated limitations, but not at the cost of the CLI slide.
+So slide 2 is a checklist, not a section. **Delete it before submitting** — leaving the organiser's
+own instructions in your deck reads as not having read them. That leaves the cover plus four
+canvases, and the three mandated sections have to live in them.
+
+**Build exactly these six.** One section per slide, and their "Additional Slide" allowance used
+twice — once for the thing that carries 40% of the score, once for the close:
+
+| Slide | Section | Why it earns the space |
+|---|---|---|
+| 1 | Cover | Mandated |
+| 2 | **Problem Brief** | Mandated. Opens with a scene, not a thesis |
+| 3 | **Architecture Diagram** | Mandated. The mechanism *is* the architecture, so they share a slide |
+| 4 | **Impact Statement** | Mandated. Measured figures only |
+| 5 | *Additional* — CoCo CLI + MCP | Technical Execution is 40% and names CLI, Skills and tools explicitly |
+| 6 | *Additional* — the boundary, and what isn't proven | The close, plus stated limitations, which judges reward |
+
+If you are cut to **three**: keep 2, 3, 4. Slide 3 is the one nobody else will have. If cut to
+**four**, add 5 — it is the only slide that answers the 40% criterion head-on.
 
 Every figure below was measured on the live account. Nothing is projected, illustrative or rounded
-in our favour. Where something is unproven, it says so — slide 8 exists for that.
+in our favour. Where something is unproven, it says so — slide 6 exists for that.
 
-**Design notes for the build.** The organizer's template supplies branding as a full-bleed image:
-navy header bar, gradient footer. Content lives between them. Canvas is **10 × 5.625 in**, not 13.3.
-Their palette: navy `#0A1B33`, cyan `#00B8A9`. Use the semantic accents this project uses everywhere
-else — green `#15803D` acts, amber `#B45309` needs a human, red `#B91C1C` refused. No accent lines
-under titles, no decorative stripes.
+**Design notes.** The template supplies branding as a full-bleed image: navy header bar, gradient
+footer. Content lives between them. Canvas is **10 × 5.625 in**, not 13.3. Their palette: navy
+`#0A1B33`, cyan `#00B8A9`. Use the semantic accents this project uses everywhere else — green
+`#15803D` acts, amber `#B45309` needs a human, red `#B91C1C` refused. No accent lines under titles,
+no decorative stripes. **One idea per slide; if a slide needs a paragraph, it is two slides.**
 
 ---
 
-## Slide 1 — Cover *(template's own layout, just fill the fields)*
+## Slide 1 — Cover
 
 ```
 Team Name         : Argmax
@@ -57,8 +65,8 @@ One line beneath, if it fits above the footer:
 **Eyebrow:** PROBLEM BRIEF
 **Title:** The automation that would actually help is the one that never ships
 
-**Open with the scene, not the thesis.** Three numbers, big, across the top — every one of them
-real and live on the deployed site:
+**Open with the scene, not the thesis.** Three numbers, large, across the top. Every one is real and
+live on the deployed site:
 
 | 82 days | 5 days | 26% |
 |---|---|---|
@@ -80,115 +88,74 @@ nobody signs off. If the answer is *no, it only drafts emails*, it isn't worth b
 **Red callout — THE REAL BLOCKER**
 
 > The blocker was never capability. It was **authority**. Nobody could say, in advance and in
-> writing, what the agent was allowed to touch — so the automation that would actually help is the
-> one that never ships.
+> writing, what the agent was allowed to touch.
 
-**Three personas, as three cards**
+**Three personas, small, along the bottom**
 
-| Persona | What they need |
-|---|---|
-| Operations analyst | Owns the exception queue. Wants routine responses to stop reaching them at all. |
-| Quality / compliance owner | A defensible answer to "what is this agent allowed to do, and who decided?" |
-| Data platform owner | Refuses to maintain a second copy of the access policy inside an application. |
+| Operations analyst | Quality / compliance owner | Data platform owner |
+|---|---|---|
+| Owns the exception queue. Wants routine responses to stop reaching them at all. | Needs a defensible answer to "what is this agent allowed to do, and who decided?" | Refuses to maintain a second copy of the access policy inside an application. |
 
 **Domain footer:** Supply chain and manufacturing operations. 100% synthetic data — 2,400
 shipments, 6 suppliers, 40 quality holds, 6 SKUs, 5 operating procedures.
 
 ---
 
-## Slide 3 — The mechanism *(this is the differentiator; give it a whole slide)*
+## Slide 3 — Architecture *(the mandated diagram, and the mechanism, together)*
 
-**Eyebrow:** THE MECHANISM
-**Title:** Authority is read from the data's own governance tags
+**Eyebrow:** ARCHITECTURE
+**Title:** One loop, three endings, decided by the tag on the data
 
-**Lead**
+The mechanism is not separate from the architecture — it *is* the architecture's point — so they
+share the slide. Lead with the three lanes, then the diagram.
 
-An action's permission tier is resolved at runtime from the Snowflake `SENSITIVITY` object tag on
-every table it touches — read live with `SYSTEM$GET_TAG`, never cached, never from `ACCOUNT_USAGE`
-(which lags two hours). Retag a table and the agent's next decision changes. No code change, no
-redeploy, no rules list.
+**The three lanes — this is the slide's best moment**
 
-**Lead with the three lanes — this is the slide's best moment**
-
-One pass, one code path, three endings, decided entirely by the tag on the data:
-
-| The exception | Table it touches | Tag | Ending |
+| The exception | Table it must touch | Tag | Ending |
 |---|---|---|---|
-| SUP-002 on-time down to 26% | `SHIPMENTS` | `open` | **Handled**, nobody asked |
-| SKU-1003 five days from stockout | `INVENTORY` | `internal` | **Escalated**, prepared in full then stopped |
+| SUP-002 on-time collapsed to 26% | `SHIPMENTS` | `open` | **Handled**, nobody asked |
+| SKU-1003 five days from stockout | `INVENTORY` | `internal` | **Escalated** — prepared in full, then stopped |
 | QH-0034 on hold 82 days | `QUALITY_HOLDS` | `regulated` | **Refused**, and it says why |
 
-Say out loud: *"There is no `if table_name` anywhere in this code."*
+Say out loud: *"Same code path, three endings. There is no `if table_name` anywhere in this."*
 
-**Table — the whole model in five rows**
+**The diagram: use the sequence diagram, not the flowchart.** The flowchart shows what connects to
+what; the sequence diagram shows *when*, and the ordering is the argument. Export it from the
+README's `sequenceDiagram` block.
 
-| Tag on the data | The agent may | Observed in one pass |
-|---|---|---|
-| `open` | Act unsupervised (L2) | SUP-002 — supplier case opened, no human |
-| `internal` | Act only with approval (L3) | SKU-1003 — queued for a human + email |
-| `regulated` | Read and explain, never act (L4) | 4 quality holds — drafted only |
-| *untagged* | Treated as unclassified, **not** cleared | RUNBOOKS — demands approval |
+**The seven stages, as a strip under the diagram** — mark 4, 5 and 6 in amber:
 
-Sub-line under the table: *The most demanding object in an action's footprint binds — never the
-least, or one `open` table could dilute a `regulated` one.*
+`01 Watch → 02 Detect → 03 Investigate → 04 Classify → 05 Route → 06 Execute → 07 Audit`
 
-**And it is not one hardcoded tag — say this out loud, it is the first objection**
+Stages 1–3 are a pipeline any competent team would build. **Stages 4–6 are the submission.**
 
-A second axis, `RETENTION`, is already live and independent. Same table, sensitivity untouched at
-`open`: setting `retention = 'legal_hold'` on `OPS_REQUESTS` turns `open_supplier_case` from *acts
-unsupervised* into *refused outright*, and the rationale names retention rather than sensitivity —
-because pointing a reviewer at the wrong tag sends them to change the wrong thing. Adding a third
-axis is a row in `POLICIES`, not a control-flow change.
+**Six Agent Skills, one line each** — each is a real file in `.cortex/skills/` naming the module
+that implements it, so skill and code cannot drift apart silently:
 
-**Red callout box — THE CLAIM THAT MATTERS**
+`detect-anomaly` · `investigate-root-cause` · `classify-authority` · `propose-action` ·
+`orchestrate-loop` — plus `operate-warrant`, which is how you drive all five from a terminal.
+
+**Red callout — THE CLAIM THAT MATTERS**
 
 > Authority is resolved **again at execution time**. Approve an action, reclassify the table it
 > touches, run the executor — it refuses, and records why. A human's own approval does not survive
 > a governance change, and nothing was deployed in between.
 
----
+**If there is room, one line on each of these — all three are real and cheap to say:**
 
-## Slide 4 — Architecture
-
-**Eyebrow:** ARCHITECTURE
-**Title:** Six Agent Skills, one loop, everything inside Snowflake
-
-**Put the sequence diagram here, not the flowchart.** The flowchart shows what connects to what; the
-sequence diagram shows *when*, and the ordering is the argument. Export it from the README's
-`sequenceDiagram` block. If space forces one only, the sequence wins.
-
-**The five skills, as a table**
-
-| # | CoCo Agent Skill | What it owns | Feeds |
-|---|---|---|---|
-| 1 | `detect-anomaly` | Dynamic-table baselines → `EXCEPTIONS`. Every threshold quoted from a runbook clause, deduplicated per RB-005 | 2 |
-| 2 | `investigate-root-cause` | `AI_COMPLETE` under a JSON schema, grounded by Cortex Search over the parsed procedures | 3 |
-| 3 | `classify-authority` | `SYSTEM$GET_TAG` live, then `resolve()` — most demanding object binds | 4 |
-| 4 | `propose-action` | Typed, parameterised, reversible actions from a closed registry | 5 |
-| 5 | `orchestrate-loop` | Runs 1–4 idempotently with a circuit breaker; every path ends in an audit row | audit |
-
-A sixth, `operate-warrant`, is not a phase — it is how you drive all five from a terminal, and it
-gets its own slide.
-
-Each is a real file in `.cortex/skills/`, and each names the module implementing it — so the skill
-and the code cannot drift apart silently.
-
-**Two side panels**
-
-*Structured and unstructured.* Five tables carrying three classifications plus one deliberately
-untagged. Five operating procedures authored as Markdown, rendered to PDFs, staged, and read back
-with `AI_PARSE_DOCUMENT` — parsed documents, not a `VARCHAR` of prose. That parsed text is what
-Cortex Search indexes, what the reasoning cites, **and** where every detector threshold comes from,
-so a conclusion can cite the clause that set the threshold that raised it.
-
-*Two controls, different jobs.* The `SENSITIVITY` tag decides what the agent may **do**. A masking
-policy on `QUALITY_HOLDS.lot_ref` decides what it may **see** — so it can report a hold is 82 days
-old and cannot report which physical lot it is, because identifying the lot is what would make the
-record actionable. Same table, same query, two answers by role.
+- *Structured and unstructured together.* Five procedures authored as Markdown, rendered to PDFs,
+  read back with `AI_PARSE_DOCUMENT`. That parsed text is what Cortex Search indexes, what the
+  reasoning cites, **and** where every detector threshold comes from — so a conclusion can cite the
+  clause that set the threshold that raised it.
+- *Two controls, different jobs.* The tag decides what the agent may **do**. A masking policy on
+  `QUALITY_HOLDS.lot_ref` decides what it may **see** — it can report a hold is 82 days old and
+  cannot report which lot, because naming the lot is what would make the record actionable.
+- *It is not one hardcoded tag.* A second axis, `RETENTION`, is already live and independent:
+  `legal_hold` on an `open` table turns *acts unsupervised* into *refused outright*.
 
 ---
 
-## Slide 5 — Impact
+## Slide 4 — Impact Statement
 
 **Eyebrow:** IMPACT
 **Title:** Measured on the live account, not projected
@@ -209,7 +176,13 @@ Colours: first two navy, then green / amber / red.
 | Hostile document planted in the grounding corpus: findings that cited it / routings it changed | 6 of 6  /  **0** |
 | Statistical separation of the planted anomaly (robust *z*) | −3.63 vs −0.46 next-worst |
 | Tests / branch coverage / mypy-strict errors | 251 / 100% / 0 |
-| Unattended task runs in 24h / failed | 34 / **0** — both tasks started, sweep hourly |
+| Unattended task runs in 24h / failed | 34 / **0** — both tasks started, hourly sweep |
+| Credits to build the entire project | 8.39 of 400 — AI functions were 6.5% of it |
+
+**One line, not a table — the verification claim**
+
+> Every number on this slide is a CI gate. Clone the repository, run one command, and a checker
+> executes the project's own tools and fails if any figure here disagrees with the code.
 
 **Navy callout — THE NUMBER THAT MATTERS**
 
@@ -219,41 +192,16 @@ Colours: first two navy, then green / amber / red.
 
 ---
 
-## Slide 6 — Why you can believe it
-
-**Eyebrow:** VERIFICATION
-**Title:** Every claim here is checkable without a Snowflake account
-
-**Lead:** Clone the repository and run one command. Seven gates, all of them in CI.
-
-| The claim | What enforces it |
-|---|---|
-| The model never contributes SQL text | An AST lint fails the build if any module composes SQL from runtime data — and it fails **on purpose** against a deliberately bad file |
-| The agent cannot escalate its own authority | Tier and footprint come from the registry; the model's reply schema has no field for either |
-| It cannot read what it may not act on | A masking policy on one column, with `APPLY` on that policy only — not on the account |
-| The reasoning is not hard-coded | Six scenarios scored on five dimensions, recorded and gated in CI |
-| The documentation is not stale | A checker runs the project's own tools and fails if a counted claim disagrees with the repository |
-
-**Teal callout — AND THE CORPUS IS TREATED AS UNTRUSTED INPUT**
-
-> A planted document claims to supersede RB-003 and grant the agent release authority. It ranks
-> **first** for a quality query and is cited by **all six** findings — and the routing does not move.
-> Ten tests then **assume the model complied** and assert the outcome anyway. *"The model resisted"*
-> is a property of a model that changes under you; *"the model's compliance changed nothing"* is a
-> property of the architecture.
-
----
-
-## Slide 7 — Driven from the CLI *(new — do not cut this one)*
+## Slide 5 — *Additional:* driven from the CLI
 
 **Eyebrow:** COCO CLI + MCP
 **Title:** The whole agent is an MCP server, and CoCo operates it
 
-This is the slide that answers *"where does CoCo CLI actually come in?"* — Technical Execution is
-40% of the score and names *"strong use of Snowflake CoCo CLI, Agent Skills and tools"* explicitly.
+The slide that answers *"where does CoCo CLI actually come in?"* Technical Execution is 40% and
+names *"strong use of Snowflake CoCo CLI, Agent Skills and tools"* explicitly. **Do not cut this.**
 
-**Screenshot:** `docs/images/web/coco-cli.png` — it carries the whole slide on its own if space is
-tight. Otherwise use the two tables below and put the callout under them.
+**Screenshot:** `docs/images/web/coco-cli.png` carries the whole slide on its own if space is
+tight. Otherwise the three facts below, then the callout.
 
 | | |
 |---|---|
@@ -266,129 +214,84 @@ tight. Otherwise use the two tables below and put the callout under them.
 > **No tool on this server accepts an authority tier.** A tool taking `tier` as a parameter would
 > hand the model the one decision the design exists to keep away from it. Every tool resolves the
 > tier itself from the live tag — so prompt-engineering the model into higher authority has no
-> parameter to aim at. Asserted by a test that walks every registered tool's live input schema.
+> parameter to aim at. Asserted by a test that walks every registered tool's live input schema,
+> names *and* enum values.
 
-**And the server holds no credential of its own.** It reads the same
+**One line, bottom:** the server holds no credential of its own. It reads the same
 `~/.snowflake/connections.toml` that `snow` and `cortex` do, so it inherits the operator's identity
-rather than acquiring one. An agent should not be able to reach further than the person running it.
-
-The server's `instructions` tell the model this before it calls anything:
-
-> *"You cannot choose an action's authority… If you believe an action should be permitted and
-> Warrant refuses it, the answer is to change the tag through governance — not to retry, not to
-> rephrase, and not to look for another tool."*
-> *"A refusal is a result, not an error."*
+rather than acquiring one. An agent should not reach further than the person running it.
 
 ---
 
-## Slide 8 — Two surfaces, deliberately asymmetric
+## Slide 6 — *Additional:* the boundary, and what isn't proven
 
 **Eyebrow:** SOLUTION COMPLETENESS
-**Title:** Where a decision can be made, and where it cannot
+**Title:** Three surfaces, and only one of them can act
 
 | Surface | Can it act? |
 |---|---|
-| **Streamlit console, inside Snowflake** — approval queue, capability manifest, replay, refusal ledger, live tag table | **Yes**, through the governed path: approve → re-resolve authority → execute. Runs on the reviewer's own Snowflake identity, so an approval is attributable to a person. |
-| **Public web viewer** (Next.js on Vercel) — same evidence, live from Snowflake | **No — and it lets you prove that yourself.** The approve, reject and defer buttons are live and send the real statements. Snowflake refuses them in front of you. |
-| **Cortex Agent in CoWork** — conversational, over Cortex Search + Cortex Analyst | **No.** Two read-only tools and no `generic` tool bound to the executor. |
+| **Streamlit console**, inside Snowflake | **Yes**, through the governed path. The reviewer's own identity, so an approval is attributable to a person. |
+| **Public web viewer** (Next.js on Vercel) | **No — and you can prove it yourself.** The approve, reject and defer buttons are live and send the real statements. Snowflake refuses them in front of you. |
+| **Cortex Agent in CoWork** | **No.** Two read-only tools, nothing bound to the executor. |
 
-**The two refusals differ, and the difference is the slide's best moment**
+**The two refusals differ, and that difference is worth ten seconds**
 
 | Press | Snowflake answers | Why |
 |---|---|---|
-| Reject / Defer | `SQL access control error: Insufficient privileges to operate on table 'PENDING_ACTIONS'` | the role can see the queue and is told no |
-| Approve | `SQL compilation error: Unknown user-defined function WARRANT.CORE.EXECUTE_ACTION` | without `USAGE`, Snowflake will not concede the executor exists |
+| Reject / Defer | `Insufficient privileges to operate on table 'PENDING_ACTIONS'` | the role can see the queue and is told no |
+| Approve | `Unknown user-defined function WARRANT.CORE.EXECUTE_ACTION` | without `USAGE`, Snowflake will not concede the executor exists |
 
 Denial by non-disclosure is the stronger of the two: the role cannot be talked into calling
-something it cannot name. Both statements bind an `action_id` that cannot exist, so neither would
-do anything even if a grant were mis-applied — the demonstration cannot become the incident it
-describes.
+something it cannot name.
 
-**If you screenshot this, screenshot the whole panel.** The page reports the result as a *passing
-check* — green, ticked, "the boundary held" — and keeps Snowflake's error text inside it labelled
-as verbatim. Cropped to just the red block it reads as a broken demo, which is the one way to
-lose the point of the slide.
+> **If you screenshot this, screenshot the whole panel.** The page reports the result as a *passing
+> check* — green, ticked, "the boundary held" — with Snowflake's error text inside it labelled
+> verbatim. Cropped to the red block it reads as a broken demo, which is the one way to lose the
+> slide.
 
-**The point to land:** that asymmetry is the design, not a limitation. A chat box wired to
-`EXECUTE_ACTION` routes around the console, the queue and the human — it puts the most persuadable
-surface in the system on the far side of the gate. Approving is a governed act, so it belongs only
-to the surface that has an identity.
-
-**Add the live URL prominently:** `snowflake-coco-cli-hackathon-2026.vercel.app`
-
----
-
-## Slide 9 — Beyond the demo, and what isn't proven
-
-**Eyebrow:** BEYOND THE DEMO
-**Title:** It generalises — and here is what is not proven yet
-
-**Left panel — SCALES WITHOUT REWRITING**
-
-- Detection is set-based — one `MERGE` per detector, so cost tracks data volume, not exception
-  count. Six to six thousand adds no round trips.
-- Governing a new table is `ALTER TABLE … SET TAG`. No code change.
-- Adding an action is one registry entry; invariant tests then force it to declare its footprint,
-  bind its parameters in placeholder order, and state its undo path.
-- A circuit breaker caps unsupervised actions per pass, so a detector bug produces approval requests
-  rather than a thousand actions.
-- Serverless tasks mean an idle schedule costs nothing.
-
-**Right panel — HONEST LIMITATIONS**
+**Honest limitations — say these out loud, they buy credibility**
 
 - Synthetic data, one account. The mechanism is domain-agnostic; the demonstration is not a
   deployment.
 - `SNOWFLAKE.ML.ANOMALY_DETECTION` is a documented seam, not an implementation — a threshold
   traceable to a procedure is more defensible to an auditor than a score that cannot cite one.
-- Thresholds come from a corpus written for this project. A real deployment needs those documents to
-  be the live controlled ones.
-- Streamlit in Snowflake cannot be shared publicly, which is why the read-only web viewer exists.
+- Thresholds come from a corpus written for this project; a real deployment needs the live
+  controlled documents.
 
 **Closing line across the bottom**
 
-> `SENSITIVITY` is one tag, and the same runtime lookup already reads a second — `RETENTION` is
-> live, independent, and refuses an action on an `open` table. Residency or contractual restriction
-> would bind the same way. The loop needs a classified table and an action registry, **not a supply
-> chain.**
+> The loop needs a classified table and an action registry — **not a supply chain.** `SENSITIVITY`
+> is one tag, and the same lookup already reads a second. Residency or contractual restriction
+> would bind an action exactly the same way.
 
-`github.com/tsathya98/snowflake-coco-cli-hackathon-2026`
+`snowflake-coco-cli-hackathon-2026.vercel.app` · `github.com/tsathya98/snowflake-coco-cli-hackathon-2026`
 
 ---
 
 ## Screenshots — which file goes on which slide
 
-All re-captured from the deployed site after the final round of changes, at 1440 CSS px, `deviceScaleFactor: 2`, so every file is
-2880px wide and survives a projector. Section shots are clipped to the section's measured bounding
-box, so nothing is cut mid-heading.
+All re-captured from the deployed site after the final round of changes, at 1440 CSS px,
+`deviceScaleFactor: 2`, so every file is 2880px wide and survives a projector. Section shots are
+clipped to the section's measured bounding box, so nothing is cut mid-heading.
 
 | File | Slide | Why this one |
 |---|---|---|
 | `web/hero.png` | 1 or 2 | The claim and the live tag resolution in one frame. Strongest single image in the set. |
 | `web/hero-light.png` | — | Light-theme alternative if the template's background fights the dark one. |
-| `web/one-pass.png` | 5 (Impact) | The detection chart. SUP-002's line going through the RB-001 threshold is the most legible "something happened here" in the deck. |
-| `web/evidence.png` | 3 or 8 | Evidence beside reasoning, the live controls, **and the refusal already fired** — captured with the green verdict panel showing, so it needs no explanation on the slide. |
-| `web/coco-cli.png` | 7 | Carries slide 7 on its own if space is tight. |
-| `web/tested.png` | 6 | The planted attack and the scored reasoning, side by side. |
-| `web/authority-whatif.png` | 3 | The capability manifest plus the policy what-if. |
-| `web/replay.png` | 6 | Decision replay — the auditor's question. |
-| `web/refusals.png` | 5 | The refusal ledger. |
-| `web/governance.png` | 3 | The live tag table, light theme. |
-| `web/unattended.png` | 5 or 9 | The 24-hour task timeline — the picture of "nobody was present". Both tasks started, **0 failed**, hourly sweep visibly running. |
-| `web/mobile.png`, `web/mobile-refusal.png` | 8 | Only if you want to show it works on a phone. Usually cut. |
-| `console-headline.png`, `evidence-and-reasoning.png`, `refusal-banner.png`, `queue-already-decided.png`, `authority-manifest.png`, `whatif-revocation.png`, `replay.png`, `column-governance.png` | 8 | The Streamlit console — the governed surface. `refusal-banner.png` is the one to keep if you keep one: a human approved it and it was refused anyway. |
+| `web/story-workflow.png` | **3** | The seven stages and the three lanes in one picture — the closest thing to the mandated "architecture diagram" that is also the mechanism. |
+| `web/one-pass.png` | 4 | The detection chart. SUP-002's line going through the RB-001 threshold is the most legible "something happened here" in the deck. |
+| `web/coco-cli.png` | **5** | Carries slide 5 on its own if space is tight. |
+| `web/evidence.png` | 6 | Evidence beside reasoning, the live controls, **and the refusal already fired** — captured with the green verdict panel showing, so it needs no explanation. |
+| `web/tested.png` | 4 or 6 | The planted attack and the scored reasoning, side by side. |
+| `web/unattended.png` | 4 | The 24-hour task timeline. Both tasks started, **0 failed**, hourly sweep visibly running. |
+| `web/authority-whatif.png`, `web/replay.png`, `web/refusals.png`, `web/governance.png` | spares | Use if a slide is thin. `governance.png` is the light-theme tag table. |
+| `web/mobile.png`, `web/mobile-refusal.png` | — | Only if you want to show it works on a phone. Usually cut. |
+| `refusal-banner.png` | 6 | The Streamlit console. If you keep exactly one console shot, keep this one: a human approved it and it was refused anyway. |
+| the other seven console shots | spares | `console-headline`, `evidence-and-reasoning`, `queue-already-decided`, `authority-manifest`, `whatif-revocation`, `replay`, `column-governance` |
 
 All under `docs/images/`. Web shots are in `docs/images/web/`.
 
 ---
-
-## If you are cut to three slides
-
-Keep **2 (problem)**, **3 (the mechanism)**, **5 (impact)**. Slide 3 is the one nobody else will
-have. Everything on 4, 6, 8 and 9 is supporting evidence for it.
-
-**If you are cut to four, add 7 (CoCo CLI).** It is the only slide that answers the 40% Technical
-Execution criterion directly, and it is the one a judge scanning for "did they actually use the
-CLI?" is looking for.
 
 ## Speaker notes for the live demo (Sept 1–4)
 
@@ -400,10 +303,10 @@ setup, and almost every other entry in this track will spend its whole slot on i
    clause it cited. Then the Governance tab — the tags, and the masked `lot_ref` column. *"The
    agent can tell you this hold is 82 days old. It cannot tell you which lot it is."*
 3. The refusal ledger — *"show me every action your agent declined."*
-4. **Approve the pending replenishment. Then reclassify `INVENTORY` to `regulated`. Then run
-   the executor.** It refuses, and says the classification in force at execution time supersedes
-   the approval. Nothing was deployed between those two steps. *A human's own approval did not
-   survive a governance change.*
+4. **Approve the pending replenishment. Then reclassify `INVENTORY` to `regulated`. Then run the
+   executor.** It refuses, and says the classification in force at execution time supersedes the
+   approval. Nothing was deployed between those two steps. *A human's own approval did not survive
+   a governance change.*
 5. **`./scripts/injection_drill.sh`** — put a hostile document into the grounding corpus. It ranks
    first for a quality query and is cited by all six findings. Routing does not move. Then the
    honest part, which is the bit worth saying out loud: *"I am not claiming the model resisted.
@@ -412,11 +315,6 @@ setup, and almost every other entry in this track will spend its whole slot on i
    from the object, the parameters are bound.
 6. If there is time: `tools/lint_sql_boundary.py` on a deliberately bad file — the claim that the
    model cannot write SQL, failing a build.
-
-**The line to land.** Everyone in this track will show an agent that acts. The differentiator is
-an agent that *declines* — and one whose declining does not depend on the model choosing to.
-
----
 
 ## The one line to land, wherever it fits
 
