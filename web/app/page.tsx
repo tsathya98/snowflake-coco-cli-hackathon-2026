@@ -574,11 +574,21 @@ export default async function Page() {
           <p className="mt-3 max-w-[80ch] text-[0.8rem] leading-relaxed text-[var(--text-muted)]">
             <strong>&ldquo;Nothing to do&rdquo; is counted separately from a failure, on purpose.</strong>{" "}
             A triggered task that finds its stream empty and spends nothing is working correctly —
-            folding those into either column would misreport a healthy pipeline. The failures shown,
-            if any, are real: they predate an <code className="font-mono">EXECUTE MANAGED TASK</code>{" "}
-            grant that serverless tasks require, and the task auto-suspended itself after three of
-            them rather than failing quietly.
+            folding those into either column would misreport a healthy pipeline.
           </p>
+          {/* Only when there is something to explain.
+           *
+           * This paragraph was unconditional and hedged with "if any", which meant that once the
+           * failures aged out of the window it sat under a zero explaining an absence. A note
+           * about failures is worth reading beside failures and is noise beside none. */}
+          {schedule.summary.failed > 0 ? (
+            <p className="mt-2 max-w-[80ch] text-[0.8rem] leading-relaxed text-[var(--text-muted)]">
+              The failures above are real, and left visible rather than reset away: they predate an{" "}
+              <code className="font-mono">EXECUTE MANAGED TASK</code> grant that serverless tasks
+              require, and the task auto-suspended itself after three of them rather than failing
+              quietly.
+            </p>
+          ) : null}
         </Section>
 
         <Section
