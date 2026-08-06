@@ -10,14 +10,15 @@
 tags on the data it touches — live, and again at execution time, so a human's approval cannot
 outlive the policy it was granted under.**
 
-[![CoCo CLI Hackathon 2026](https://img.shields.io/badge/Snowflake_CoCo_CLI_Hackathon_2026-Problem_Statement_1-29B5E8?style=for-the-badge&logo=snowflake&logoColor=white)](#the-problem)
-[![Live demo](https://img.shields.io/badge/Live_demo-reads_Snowflake_on_every_request-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://snowflake-coco-cli-hackathon-2026.vercel.app/)
-[![Team Argmax](https://img.shields.io/badge/Team-Argmax_·_solo-D4AF37?style=for-the-badge)](#)
+[![CoCo CLI Hackathon 2026](https://img.shields.io/badge/CoCo_CLI_Hackathon_2026-Problem_Statement_1-29B5E8?style=for-the-badge&labelColor=555555&logo=snowflake&logoColor=white)](#the-problem)
+[![Live demo](https://img.shields.io/badge/Live_demo-Vercel-000000?style=for-the-badge&labelColor=555555&logo=vercel&logoColor=white)](https://snowflake-coco-cli-hackathon-2026.vercel.app/)
+[![Team](https://img.shields.io/badge/Team-Argmax_·_solo-D4AF37?style=for-the-badge&labelColor=555555)](#)
 
-[![Tests](https://img.shields.io/badge/pytest-251_tests_·_100%25_branch-6E9F18?style=for-the-badge&logo=pytest&logoColor=white)](#development)
-[![mypy](https://img.shields.io/badge/mypy-strict,_0_errors-1F5082?style=for-the-badge&logo=python&logoColor=white)](#development)
-[![MCP](https://img.shields.io/badge/MCP-13_governed_tools-7A77FF?style=for-the-badge)](#custom-coco-agent-skills)
-[![Snowflake services](https://img.shields.io/badge/Snowflake-19_services_wired-29B5E8?style=for-the-badge&logo=snowflake&logoColor=white)](#snowflake-services-used)
+[![pytest](https://img.shields.io/badge/pytest-251_tests_·_100%25_branch-6E9F18?style=for-the-badge&labelColor=555555&logo=pytest&logoColor=white)](#development)
+[![mypy](https://img.shields.io/badge/mypy-strict_·_0_errors-1F5082?style=for-the-badge&labelColor=555555&logo=python&logoColor=white)](#development)
+[![MCP](https://img.shields.io/badge/MCP-13_governed_tools-7A77FF?style=for-the-badge&labelColor=555555)](#custom-coco-agent-skills)
+[![Snowflake](https://img.shields.io/badge/Snowflake-19_services-29B5E8?style=for-the-badge&labelColor=555555&logo=snowflake&logoColor=white)](#snowflake-services-used)
+[![Authority](https://img.shields.io/badge/Authority-from_object_tags-B91C1C?style=for-the-badge&labelColor=555555)](#what-warrant-does)
 
 ### ▸ [**Try it live — snowflake-coco-cli-hackathon-2026.vercel.app**](https://snowflake-coco-cli-hackathon-2026.vercel.app/)
 
