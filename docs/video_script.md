@@ -1,290 +1,281 @@
-# Demo video — 4 minutes, shot by shot
+# Warrant demo video — natural 4½-minute script
 
-Build source for the recording. Working material rather than a judge-facing document — tracked so
-it travels between machines, and written knowing it is public.
+This is the recording script, not submission copy. The portal asks for a 3–5 minute screen
+recording of an end-to-end workflow executed through Cortex Code CLI, including input, processing,
+output, and two or three modular skills. This version targets **4:30–4:45** and leaves room for
+natural pauses.
 
-## What the portal actually asks for
+The script is intentionally conversational. Do not memorise every word. Learn the point of each
+beat, then say it in your own voice. The lines in quotation blocks are a strong first take, not a
+teleprompter contract.
 
-> "Video size should not be more than 3-5 minutes. **End-to-end workflow executed via Cortex Code
-> CLI** — Screen recording showing: Input → Processing → Output. **At least one fully working
-> workflow, 2-3 modular skills/capabilities demonstrated.**"
+## The story in one sentence
 
-Read that literally, because it decides the shape of the video. It is not "show me your app". It is
-**show the workflow being executed through the CLI**, and show two or three skills doing distinct
-things. Technical Execution (40%) separately scores *"strong use of Snowflake CoCo CLI, Agent
-Skills and tools."* So CoCo drives; the console and the web viewer are where the result is
-inspected. They are the Output, not the demo.
+An operations lead starts Monday with three urgent exceptions; one governed workflow handles the
+safe work, asks about the consequential work, and refuses the regulated work—even after approval.
 
-**Target 4:30–4:45.** Inside the 3–5 window with room to breathe. Do not rush to 3:00.
+## What the judge should remember
 
-**Budget the words, not the minutes.** Everything in a `SAY` block below adds up to **670 words**.
+1. The hard problem is not detection; it is authority.
+2. CoCo CLI drives a real end-to-end run through modular Agent Skills and MCP tools.
+3. The model proposes, but live Snowflake tags decide.
+4. Authority is checked again at execution, so stale approval cannot override new policy.
+5. The hostile-document tests assume the model was fooled and prove the boundary still holds.
 
-| Your reading pace | Speech alone | Plus ~45s of typing, model time and two pauses |
-|---|---|---|
-| 165 wpm — brisk, presenting | 4:04 | **≈ 4:49, fits** |
-| 150 wpm — conversational | 4:28 | ≈ 5:13, **over the limit** |
+## Recording setup — MacBook (QuickTime plan)
 
-So this only fits if you read at a **presenting pace, not a chatting pace**. Time yourself against
-the script before you record; if your read lands over 4:55, cut before you shoot, not after.
+- Use **QuickTime Player**. It is the best choice here: a clean 1080p screen recording, no
+  meeting UI, no cloud upload, and no recording bot to distract from the proof. In QuickTime,
+  choose **File → New Screen Recording**, Options → Microphone, then record the whole display.
+  Record camera separately only if the portal explicitly requires a face camera; this demo is
+  strongest as a calm narrated screen recording.
+- Set the display to 1920×1080 before recording. Enable Do Not Disturb, hide the Dock, close
+  Messages/Mail/Calendar, and turn off desktop notification previews. Keep one browser profile
+  with no personal bookmarks or account tabs visible.
+- Terminal: dark theme, 17–19 pt, already in the repository root.
+- Keep four destinations ready:
+  1. terminal with `cortex` and the repository;
+  2. Streamlit in Snowflake, opened once so every tab is warm;
+  3. Snowsight worksheet with the `ALTER TABLE` statement already typed;
+  4. the public viewer: `https://snowflake-coco-cli-hackathon-2026.vercel.app/`.
+- Export slide 1 of the final deck as a clean 16:9 still. Insert it for only 2–4 seconds at the
+  product reveal; do not show PowerPoint, Canva, or the rest of the deck.
+- Hide or crop the Snowsight address bar because it contains the account locator. The Vercel URL
+  is safe and useful to show.
+- Switch with Cmd+Tab. Clean jump cuts are fine.
+- The reasoning calls take roughly two minutes. Start the run, explain what it is doing, then cut
+  to the completed result. Do not pretend the cut is real time.
 
-This is measured, not estimated, and it is the constraint that actually bites. An earlier draft of
-this script ran to 916 words. That is over six minutes of talking, and no amount of tight editing
-recovers it. **If you add a sentence, cut one.**
+### Exact window order — arrange this before pressing Record
 
-**Cut in this order if you need to:** prompt 1's narration, then the "Left is what the detector
-measured" paragraph, then the second half of the injection section. **Never cut the turn at 2:55**
-— it is the only thirty seconds a judge will still remember tomorrow.
+Keep these windows open, in this exact Cmd+Tab order. This prevents hunting for tabs while the
+recording is running.
 
-## The story you are telling
+| Order | Window | What must already be on screen | Why the judge sees it |
+|---|---|---|---|
+| 1 | Browser — Vercel viewer | Hero section with the three exceptions; later, the public refusal shortcut | Establishes the Monday scenario, then gives independent public proof. |
+| 2 | Browser — Streamlit console | Overview / pending-action screen, already signed in | Shows the human review surface inside Snowflake. |
+| 3 | Snowsight worksheet | Only the one-line `ALTER TABLE ... INVENTORY ... regulated` statement | Makes the live policy change legible without exposing the account locator. |
+| 4 | Terminal | Repository root; no prior command output containing secrets | Shows Cortex Code CLI input, processing, output, and adversarial proof. |
+| 5 | Finder / Preview | `docs/submission/warrant-video-title-card-1920x1080.png`, full-screen-ready | A 3–4 second product reveal only; never show the full deck. |
 
-A demo that is a tour of features is forgettable. A demo that is a story is not. There is one
-story here and every section is a beat in it. If you only remember one thing while recording,
-remember which beat you are on.
+### What must be visible versus what can be cut
 
-| Beat | The question in the viewer's head | Your answer |
-|---|---|---|
-| **Purpose** | Why should I care? | Three real problems are sitting on a dashboard, unfixed, because a dashboard waits for a person. |
-| **Story** | Who is hurt by that? | The person who opens six tabs on Monday and does it all by hand. An agent could do her job. It never gets switched on. |
-| **The blocker** | So why hasn't someone built it? | Nobody can say in advance what the agent is allowed to touch. The blocker was never capability. It was **authority**. |
-| **Solution** | What is your idea? | Take the answer from the data. Every action's authority is read from the Snowflake governance tag on the tables it touches. |
-| **Functionality** | Does it actually work? | One pass, six exceptions, three different endings, all from one code path, driven from the CLI. |
-| **Proof** | Why should I believe you? | Approve something, reclassify the table underneath it, and watch your own approval fail to survive. Then watch tests that assume the model was fooled. |
-| **The close** | What do I remember? | Everyone else will show you an agent that acts. This one declines. |
+Visible proof is more important than continuous footage. Record these full moments: the CoCo
+prompt, enough live processing to show it began, the completed CoCo answer, the tag-change SQL,
+the reviewer approval, the refusal, the adversarial test pass, and the public refusal result.
+Cut only waiting time, window switching, and long model processing. A hard cut is honest if the
+spoken line says that the model calls take a couple of minutes.
 
-**The turn is at 2:15.** Everything before it earns the right to it; everything after it is
-supporting evidence. If you are running long, cut from the sections *around* the turn, never from
-the turn itself.
-
-**One thread to keep pulling:** the word *authority*. Say it in the opening, say it when you
-explain the tags, say it at the refusal, say it at the close. A single repeated word is what makes
-four minutes feel like one argument instead of six demos.
-
-## Yes, share your screen — here is the exact setup
-
-It must be a **screen recording with voiceover**. No webcam needed; nobody scores your face, and a
-face bubble costs screen space the terminal needs.
-
-**Record the full screen at 1920×1080.** Have exactly these ready before you hit record, each
-already opened once so nothing renders cold on camera:
-
-| Window | What it is for |
-|---|---|
-| WSL terminal, font ~16pt, dark theme, maximised | The whole CLI section. This is most of the video. |
-| Browser tab 1: the Streamlit console in Snowsight, all tabs clicked once | The Output section and the approval moment |
-| Browser tab 2: a Snowsight worksheet with the ALTER TABLE statement already typed | The reclassification |
-| Browser tab 3: the public viewer (vercel.app) | The close |
-
-- **Crop or hide the browser address bar while on Snowsight** — it contains the account locator.
-  The vercel.app tab is fine to show fully.
-- Notifications off, one monitor, no other tabs visible.
-- Use OBS or the built-in Xbox Game Bar (Win+Alt+R); anything that captures steady 1080p is fine.
-  Record the voiceover in the same take — syncing a separate track costs an evening.
-- Alt+Tab between windows rather than dragging them. Cuts are fine; say when you cut.
-
-**The constraint that shapes everything:** the full loop takes 2–3 minutes of model calls. You
-cannot wait for it on camera. Start it, talk over the first seconds, cut, and resume on the
-completed result. An honest jump cut costs nothing. A faked real-time run costs everything if a
-judge notices the clock.
-
----
-
-## Before you hit record
+## Pre-flight — do this before recording
 
 ```bash
-# 1. Canonical state. ~4 min — do this first, it is the long pole.
+# Return the workflow to a genuine pre-run state. Do not run the loop yet;
+# the CoCo prompt in the recording must be the run that creates the output.
 snow sql -c warrant -f sql/90_reset.sql
-snow sql -c warrant -q "CALL WARRANT.CORE.RUN_LOOP('AUTO');"
 
-# 2. Assert the state the script assumes.
+# Check the assumptions used in the video.
 snow sql -c warrant -q "
 SELECT (SELECT COUNT(*) FROM WARRANT.CORE.PENDING_ACTIONS WHERE decision='pending') AS pending,
+       (SELECT COUNT(*) FROM WARRANT.CORE.FINDINGS)                                 AS findings,
        (SELECT COUNT(*) FROM WARRANT.DATA.RUNBOOKS WHERE doc_id='RB-666')           AS attack_left,
        SYSTEM\$GET_TAG('WARRANT.CORE.SENSITIVITY','WARRANT.DATA.INVENTORY','TABLE')  AS inventory_tag;"
 
-# 3. Both unattended tasks must be started.
-snow sql -c warrant -q "SHOW TASKS IN SCHEMA WARRANT.CORE;" | grep -E "started|suspended"
-# if either is suspended:  ALTER TASK WARRANT.CORE.<name> RESUME;
+# Confirm that the MCP server is registered and both tasks are started.
+cortex mcp list
+snow sql -c warrant -q "SHOW TASKS IN SCHEMA WARRANT.CORE;"
 ```
 
-**Required: `pending = 1`, `attack_left = 0`, `inventory_tag = internal`, both tasks `started`.**
+Required state:
 
-`SCAN_FOR_EXCEPTIONS` sweeps hourly, so resume it a few hours before recording, not minutes —
-otherwise the Unattended section of the viewer shows one lonely mark instead of a filled timeline.
+- `pending = 0`
+- `findings = 0`
+- `attack_left = 0`
+- `inventory_tag = internal`
+- `warrant` appears in `cortex mcp list`
+- both Snowflake tasks show `started`
+
+Start `SCAN_FOR_EXCEPTIONS` a few hours before recording if you want the public viewer's rolling
+timeline to contain several marks. Do not quote its exact 24-hour run count; it changes naturally.
 
 ---
 
-**How to read the script:** `DO` is what happens on screen. `SAY` is what comes out of your mouth,
-written the way you would actually say it. Read it out loud twice before recording; anywhere you
-stumble, change the words to yours. Short sentences survive nerves.
+## 0:00–0:34 — Introduce the human problem
 
-## 0:00–0:50 · Purpose, story, and the blocker
+**DO:** Start on the public viewer hero, zoomed so the three operational examples are visible but
+the counters below are outside the frame. The pipeline is intentionally reset; the CoCo run will
+create those counts. Keep the cursor still.
 
-**DO:** The public viewer's hero on screen, or just the terminal. Nothing moving yet. Do not
-narrate what is on screen; let the words do the work.
+**SAY:**
 
-**SAY:** *(slow right down on the three numbers. A full beat of silence before "All three".)*
-
-> A quality hold, open eighty-two days. A SKU five days from running out. A supplier's on-time
-> delivery down to twenty-six percent.
+> Hi, I'm Sathya from Team Argmax. I'm a solo developer, and before I show you what I built,
+> here's the Monday morning it was built for.
 >
-> All three are on a dashboard right now. None of them is fixed. Because a dashboard tells you
-> something, and then it waits for a person.
+> Monday morning. An operations lead opens the exception queue.
 >
-> That person works out, by hand, which of forty open holds actually matters. Analytics stopped at
-> the insight. Her work starts after it.
+> A quality hold has been open for eighty-two days. A critical SKU has five days of stock left.
+> And a reliable supplier has fallen to twenty-six percent on-time delivery.
 >
-> An agent could do all of it today, and it still doesn't get switched on. Because the first
-> question in a regulated operation is always "so it can change a quality record?" Say yes, nobody
-> signs off. Say no, and it wasn't worth building.
->
-> That was never a capability problem. It's an authority problem. So I built Warrant, and Warrant
-> takes that answer from the data itself.
+> The dashboard found them. It didn't chase the supplier, prepare replenishment, or decide who may
+> touch the hold.
 
-## 0:50–2:25 · FUNCTIONALITY — CoCo CLI drives the workflow
+**DELIVERY:** Do not open with “Hello everyone, today I am going to present.” Say the introduction
+as though one judge has just sat beside you. Pause after “built for” and after each exception.
 
-**DO:** Terminal, repo root.
+## 0:34–0:50 — The real problem
+
+**DO:** Stay on the same screen. Let the three cases remain visible.
+
+**SAY:**
+
+> Those aren't the same decision. Contacting a supplier is reversible. Replenishment commits
+> spend. Changing a quality record is regulated.
+>
+> Blanket autonomy is reckless. An agent that stops everywhere is useless. The real problem is
+> authority: who decides what it may do?
+
+## 0:50–0:54 — Reveal Warrant
+
+**DO:** Cut to the exported slide-1 title card. Show only the wordmark and tagline for 2–4 seconds.
+Do not show PowerPoint or advance through the deck.
+
+**SAY:**
+
+> That's why I built Warrant: no action without a warrant.
+
+## 0:54–1:12 — The promise
+
+**DO:** Return to the public viewer and point once across the three tag rows: `SHIPMENTS`,
+`INVENTORY`, `QUALITY_HOLDS`.
+
+**SAY:**
+
+> Warrant runs one workflow, but it doesn't write its own permissions. It reads the governance
+> already attached to the Snowflake data.
+>
+> Open can run. Internal asks a person. Regulated is refused. And Warrant checks again at the
+> moment of execution.
+
+## 1:12–2:35 — CoCo CLI takes the Monday queue
+
+**DO:** Switch to the terminal and run:
 
 ```bash
 cortex mcp list
-```
-
-**SAY:**
-
-> This is Cortex Code CLI. The whole agent is exposed to it as an MCP server. Thirteen tools,
-> eleven of them read-only, two that act.
->
-> And on authority: not one of them accepts a tier. There's no parameter to pass, so there's
-> nothing for a prompt to aim at.
-
-**DO:**
-
-```bash
 cortex
 ```
 
-Then type prompt 1:
+**SAY:**
 
-```
-Use the governance_posture and authority_manifest tools. What is the agent allowed to do right now, and what would change if INVENTORY were reclassified as regulated?
-```
+> This is Cortex Code CLI, with Warrant as its MCP server. Before touching the queue: what may it
+> do right now?
 
-**SAY (while it works):**
+**DO:** Enter this first prompt:
 
-> What is it allowed to do right now, and what would a policy change cost. The what-if runs on the
-> same resolver the executor does, so it can't disagree with reality.
-
-**DO:** Prompt 2, the end-to-end run:
-
-```
-Using the orchestrate-loop skill, run one full pass of the Warrant agent against the live account, then summarise what each phase did and how each action was routed.
+```text
+Use the operate-warrant skill. Call governance_posture and authority_manifest, then tell me what Warrant may do right now and which Snowflake tags make that true.
 ```
 
-**SAY (over the first seconds, then cut):**
+**SAY while it responds:**
 
-> Now the full pass. Detection is set-based, and every threshold is quoted from a runbook clause,
-> not invented. Then reasoning, grounded by Cortex Search over five procedures we parsed out of
-> PDFs.
+> This uses the executor's own resolver. And no tool accepts an authority tier, so the model can't
+> grant itself more access.
+
+**DO:** Enter the end-to-end prompt:
+
+```text
+Using the orchestrate-loop skill, run one full AUTO pass against the live account. Summarise what detection, investigation, authority classification, routing, execution and audit did for each exception.
+```
+
+**SAY over the first few seconds:**
+
+> Now it takes the queue. Detection finds the exceptions. Cortex Search grounds the investigation.
+> Then Warrant routes each response and records the outcome.
 >
-> This takes about two minutes, so I'm cutting to the result.
+> The model calls take a couple of minutes, so this is an honest cut to the result.
 
-**DO:** Resume on the completed summary.
+**DO:** Make an honest jump cut to the completed response. Keep the three outcomes visible. At
+this point the same run has also created the pending SKU-1003 action used in the console section.
 
 **SAY:**
 
-> Six exceptions, three different endings. The supplier case it handled alone, because shipments
-> are tagged open. The stockout it prepared in full and then stopped, because inventory is tagged
-> internal. The quality hold it explained and would not touch, because that table is regulated.
+> Six exceptions. The three we started with now have different boundaries.
 >
-> Same code path, all three. There is no "if table name" anywhere in this.
+> The supplier case ran because `SHIPMENTS` is open. Replenishment stopped because `INVENTORY` is
+> internal. The aging hold was surfaced, but Warrant didn't alter it; releasing a regulated hold
+> is outside the action registry.
+>
+> One Python workflow. The tags changed the ending.
 
-**DO:** Prompt 3, the differentiator:
+**DO:** Enter the third, short prompt:
 
-```
-Using the classify-authority skill, explain why raise_replenishment needed a human but open_supplier_case did not.
+```text
+Use the classify-authority skill to compare raise_replenishment with open_supplier_case. Show the touched object, live tag, and final tier for each.
 ```
 
 **SAY:**
 
-> So why did one stop and the other not? That's the entire model. The tier came from the tag on
-> the data, read live. Not from a rules file in the code.
+> The model recommends. Snowflake governance decides.
 
-*That is three skills and two MCP tools demonstrated, and the workflow executed through the CLI.
-Spec satisfied.*
+This section visibly demonstrates `operate-warrant`, `orchestrate-loop`, and
+`classify-authority`, plus multiple MCP tools and the full CLI-driven workflow.
 
-## 2:25–2:55 · OUTPUT — where the human actually sees it
+## 2:35–3:00 — The decision that comes back to a person
 
-**DO:** Switch to the Streamlit console tab. Point with the cursor as you speak: tiles first, then
-the pending card, left column, right column.
+**DO:** Switch to the Streamlit console. Show the headline tiles, then the SKU-1003 pending card.
+Point first to the detector evidence, then the model-generated reasoning and citation.
 
 **SAY:**
 
-> Now the person's side, because one of those six came back to a human. Same run, from the approval
-> console. Streamlit, inside Snowflake.
+> The stockout came back to the operations lead. Here's the reviewer's view inside Snowflake.
 >
-> Six detected, five handled, one waiting on me. Notice which count it leads with. The refusals,
-> not the throughput.
->
-> Left is what the detector measured. Right is what the model concluded, marked model generated,
-> citing the clause it reasoned from.
+> Measurement on the left; model reasoning on the right, tied to the procedure. The action is
+> ready—but it hasn't happened.
 
-## 2:55–3:45 · THE TURN — an approval that doesn't survive
+## 3:00–3:50 — Change the policy underneath the decision
 
-*This is the beat the whole video exists for. Slow down. Do not talk over the pause.*
-
-**DO:** Switch to the worksheet tab. The statement is already typed. Run it.
+**DO:** Switch to the prepared Snowsight worksheet and run:
 
 ```sql
-ALTER TABLE WARRANT.DATA.INVENTORY SET TAG WARRANT.CORE.SENSITIVITY = 'regulated';
+ALTER TABLE WARRANT.DATA.INVENTORY
+  SET TAG WARRANT.CORE.SENSITIVITY = 'regulated';
 ```
 
 **SAY:**
 
-> Now watch this. Governance just reclassified that table. One tag. Nothing deployed.
+> Now the situation changes. Before the reviewer decides, governance reclassifies `INVENTORY` as
+> regulated. One tag changed. No redeploy.
 
-**DO:** Back to the console. Governance tab shows `regulated`. Then the pending card. Type the
-reviewer note:
+**DO:** Return to the console, briefly show the regulated tag, then open the pending action. Use
+this reviewer note:
 
-```
+```text
 Checked in-transit is zero and SKU-1003 is not on quality hold. Quantity restores to safety-stock minimum.
 ```
 
 Click **Approve and execute**.
 
-**SAY:**
+**SAY immediately before clicking:**
 
-> And I approve the action anyway.
+> This action was queued under the old policy. The reviewer approves it under the new one.
 
-**DO:** The refusal banner appears. **Say nothing for two full seconds.**
-
-**SAY:**
-
-> I approved this. It still didn't happen.
->
-> Authority is resolved again at execution time, so my approval couldn't outlive the policy it was
-> granted under. And both facts are in the audit log. That I approved it, and that it was refused.
-> A trail that only keeps outcomes can't tell you who tried.
-
-**DO (off camera, right after this section):** put the tag back.
-
-```bash
-snow sql -c warrant -q "ALTER TABLE WARRANT.DATA.INVENTORY SET TAG WARRANT.CORE.SENSITIVITY = 'internal';"
-```
-
-## 3:45–4:15 · PROOF — it survives a hostile document
-
-**DO:** Terminal.
+**DO:** When the refusal appears, stop speaking for two full seconds.
 
 **SAY:**
 
-> One fair objection to all of that: it depends on the model behaving.
+> Approved. And it still didn't happen.
 >
-> The runbooks this agent reads are untrusted input. So we planted an attack in the corpus, a fake
-> procedure claiming to supersede the real one and grant the agent release authority. It ranks
-> first in retrieval, all six findings cite it, and the routing doesn't move.
+> The executor read the tag again and refused. The audit keeps both truths: a human approved, and
+> the action did not execute.
 >
-> But don't take "the model resisted" from me. Watch.
+> Approval is a decision. It isn't a permanent permission slip.
 
-**DO:**
+**IMPORTANT:** The order is queue while `internal` → reclassify to `regulated` → approve →
+execution-time tag read → refuse. Never describe it as approve first and reclassify afterwards.
+
+## 3:50–4:16 — What if the model is manipulated?
+
+**DO:** Switch to the terminal and run:
 
 ```bash
 uv run pytest tests/test_adversarial.py -q
@@ -292,57 +283,103 @@ uv run pytest tests/test_adversarial.py -q
 
 **SAY:**
 
-> These ten tests assume the model fell for it completely, and assert the outcome is governed
-> anyway.
+> There's one harder question. What if a document manipulates the model itself?
 >
-> "The model resisted" is a property of a model, and models change under you. "The model's
-> compliance changed nothing" is a property of the architecture.
+> We planted a fake runbook that claims it can override policy. These tests assume the model obeyed
+> it completely, then check that the architecture still contains it.
+>
+> The model resisting is encouraging. The model complying and changing nothing is a boundary.
 
-## 4:15–4:40 · THE CLOSE
+## 4:16–4:45 — Resolve the Monday morning
 
-**DO:** Switch to the public viewer tab, at the top. Pause one beat so the three live tag rows on
-the right are readable, then **click the second shortcut card, "The refusal that held"** — it jumps
-straight to Evidence. Clicking beats scrolling here: it is one motion instead of ten, and it shows
-the page was built for someone in a hurry.
+**DO:** Switch to the public viewer. Keep the Vercel URL visible. Click the shortcut **The refusal
+that held**, then click **Approve and execute**. Wait until the green “THE BOUNDARY HELD” result is
+fully visible.
 
 **SAY:**
 
-> All of this is live at a public link, read only. And on the authority question, I'd rather prove
-> it than claim it.
+> Monday's queue now has an answer. Supplier handled. Replenishment returned with evidence.
+> Regulated action protected.
+>
+> You can test the boundary here. These buttons send real statements using a role that cannot act.
 
-**DO:** Click **Approve and execute**. Let the green panel render fully before speaking.
+**DO:** Click. Pause while the response loads.
 
 **SAY:**
 
-> Same buttons the console has, wired to the same statements. It comes back green, because being
-> refused is the pass condition. That's Snowflake's answer, not the page's.
+> Green means Snowflake refused it. That's the pass condition.
 >
-> Everyone in this track will show you an agent that acts. This is one that declines. And its
-> declining doesn't depend on the model choosing to.
+> Warrant knows which work was never its decision to make.
+>
+> No action without a warrant.
 
-**DO:** Hold on the green panel for the last two seconds. Stop recording.
+**DO:** Hold on the green refusal panel and visible URL for two seconds, then stop recording.
 
 ---
 
-## After recording
+## Delivery notes that make it sound human
 
-1. **Reset**, or the next take starts from a consumed queue:
-   ```bash
-   snow sql -c warrant -f sql/90_reset.sql && snow sql -c warrant -q "CALL WARRANT.CORE.RUN_LOOP('AUTO');"
-   ```
-2. Watch it once at 1× with sound. The two things that must survive compression are the
-   **terminal text** and the **refusal panel**.
-3. Upload **unlisted, not private** — a private link 404s for a judge. Confirm in an incognito
-   window before submitting.
+- Speak to one judge, not “the audience.” Imagine you are showing the project to a technical
+  colleague sitting beside you.
+- Use contractions. “It doesn't” sounds natural; “it does not” sounds like documentation.
+- Do not narrate every click. Say what the result means.
+- Let the refusal breathe. The two-second silence after approval is part of the story.
+- Look away from the script during the three key lines:
+  - “Blanket autonomy is reckless. An agent that stops everywhere is useless.”
+  - “Approved. And it still didn't happen.”
+  - “The model complying and changing nothing is a boundary.”
+- If a sentence does not sound like you after two read-throughs, rewrite it in your own words while
+  keeping the fact and meaning intact.
+- Aim for calm confidence, not trailer voice. The product is interesting enough without hype.
 
-## Recovery, if something fails live
+## Cut list if the first take runs long
+
+Cut in this order:
+
+1. “This uses the executor's own resolver…” after the first CLI prompt.
+2. “Measurement on the left…” in the reviewer section.
+3. “These tests assume the model obeyed it completely…” in the adversarial section.
+4. “You can test the boundary here…” in the close; keep the Monday resolution and final lines.
+
+Never cut:
+
+- the visible end-to-end CoCo prompt and result;
+- the three routed outcomes;
+- queue → reclassify → approve → re-read → refuse;
+- the two-second pause after the refusal;
+- the final public boundary proof.
+
+## Immediately after recording
+
+Restore `INVENTORY` and reset the demo state:
+
+```bash
+snow sql -c warrant -q \
+  "ALTER TABLE WARRANT.DATA.INVENTORY SET TAG WARRANT.CORE.SENSITIVITY = 'internal';"
+
+snow sql -c warrant -f sql/90_reset.sql
+snow sql -c warrant -q "CALL WARRANT.CORE.RUN_LOOP('AUTO');"
+```
+
+Then:
+
+1. Watch the video once at 1× with sound.
+2. Confirm terminal text, the governance change, and both refusal panels remain readable after
+   compression.
+3. Confirm no Snowflake account locator, credentials, notification, or personal information is
+   visible.
+4. Upload the video as **unlisted**, not private.
+5. Open the submitted URL in a signed-out/incognito window.
+
+## Recovery table
 
 | If | Do |
 |---|---|
-| CoCo is slow or wanders | You have the transcript. Cut to the result and narrate — the spec asks for the workflow executed via the CLI, not for it to be fast |
-| CoCo asks for a permission | Approve it on camera. It is a fair thing for a judge to see |
-| The refusal doesn't fire | `INVENTORY` was already `regulated`. Check pre-flight and re-record that section only |
-| No pending card | A prior take consumed it. Full reset, ~4 min |
-| A console panel shows a red error box | Keep going and say "each panel is isolated so one failure can't take the app down" — which is true, and is a design point |
-| The web viewer's approve button says "could not reach Snowflake" | The refusal did not match the expected shape. Check `npm run probe` — it asserts both write paths — and fall back to narrating the read-only note above the buttons |
-| `cortex mcp list` shows nothing | The server is registered per-machine. `cortex mcp add warrant "$PWD/.venv-wsl/bin/python -m warrant_mcp.server" -t stdio` |
+| CoCo takes too long | Keep the start and completed result, then make an honest jump cut. |
+| CoCo starts wandering | Stop it, use the exact prompt again, and re-record only that terminal section. |
+| CoCo requests permission | Approve it on camera; the operator boundary is relevant evidence. |
+| No pending action appears | A prior take consumed it. Run the full pre-flight again. |
+| The execution is not refused | Stop. Check that `INVENTORY` is `regulated`; do not narrate around a failed control. |
+| A Streamlit panel fails | Re-record after checking query history. Do not turn an unrelated error into a design claim. |
+| The public button cannot reach Snowflake | Run `npm run probe` from `web/`. Use a previous verified take only if the probe is green. |
+| `warrant` is absent from `cortex mcp list` | Run `cortex mcp add warrant "$PWD/.venv-mcp/bin/python -m warrant_mcp.server" -t stdio`. |

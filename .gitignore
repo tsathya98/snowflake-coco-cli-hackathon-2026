@@ -77,4 +77,8 @@ web/next-env.d.ts
 # WSL virtualenv for the MCP server (CoCo and connections.toml live in the distro)
 .venv-wsl/
 docs/coco_sessions_planned.md
+
+# Personal rehearsal material. It explains the submission to its author and is
+# intentionally not judge-facing submission content.
+docs/private/
 *.tar.gz
