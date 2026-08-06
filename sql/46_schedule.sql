@@ -71,12 +71,15 @@ def main(session, hours):
     window = -abs(int(hours or 24))
     runs = [row.as_dict() for row in session.sql(HISTORY, params=[window]).collect()]
 
-    session.sql(STATE).collect()
+    # SHOW returns rows directly through Snowpark, so read them.
+    #
+    # The obvious-looking SHOW + RESULT_SCAN(LAST_QUERY_ID()) pattern does not work
+    # reliably here: inside a stored procedure LAST_QUERY_ID() can come back NULL, and
+    # the failure is "000709: Statement NULL not found" — intermittent, which is worse
+    # than broken. It passed a direct probe and failed the moment the page called it.
     states = {
         row["name"]: row["state"]
-        for row in session.sql(
-            "SELECT \"name\", \"state\" FROM TABLE(RESULT_SCAN(LAST_QUERY_ID()))"
-        ).collect()
+        for row in session.sql(STATE).collect()
         if row["name"] in ("SCAN_FOR_EXCEPTIONS", "EXECUTE_ON_APPROVAL")
     }
 
