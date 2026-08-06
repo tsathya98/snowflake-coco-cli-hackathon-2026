@@ -106,7 +106,7 @@ export function Tested() {
           ))}
         </ul>
         <p className="mt-3 text-[0.78rem] text-[var(--text-muted)]">
-          <code className="font-mono">tests/test_adversarial.py</code> — nine tests, each naming
+          <code className="font-mono">tests/test_adversarial.py</code> &mdash; 10 tests, each naming
           the control that stops the attack. The attack text is read from the corpus file rather
           than restated, so the document and the tests cannot drift apart.{" "}
           <code className="font-mono">scripts/injection_drill.sh</code> runs it against a live

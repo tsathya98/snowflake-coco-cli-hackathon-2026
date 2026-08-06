@@ -34,6 +34,10 @@ DOCUMENTS = (
     "docs/rubric_alignment.md",
     "docs/judges_walkthrough.md",
     "docs/deck_content.md",
+    # Not a document, but it states a count about the repository in front of the public, which is
+    # the same failure mode. It claimed nine adversarial tests while pytest collects ten, because
+    # the count was taken by grepping `def test_` and the file parametrises.
+    "web/components/tested.tsx",
 )
 
 
@@ -119,6 +123,19 @@ def corpus_documents() -> int:
     return measure(["tools/build_corpus.py", "--check"], r"(\d+) document\(s\) verified")
 
 
+def adversarial_tests() -> int:
+    """Count the tests in the injection suite, as pytest collects them.
+
+    Returns:
+        The collected total, which is larger than the number of ``def test_`` lines because the
+        module parametrises. Derived rather than counted by eye for exactly that reason.
+    """
+    return measure(
+        ["-m", "pytest", "tests/test_adversarial.py", "--collect-only", "-q", "-m", ""],
+        r"(\d+) tests? collected",
+    )
+
+
 def declared_services() -> int:
     """Count the rows in the README's Snowflake-services table.
 
@@ -146,7 +163,10 @@ def declared_services() -> int:
 # at 100 columns. A pattern that assumes a single space silently stops matching the moment a
 # sentence is reflowed, and a rule that matches nothing reports success.
 RULES: tuple[tuple[str, Callable[[], int], str], ...] = (
-    ("tests in the suite", collected_tests, r"\*?\*?(\d+)\s+tests\b"),
+    # The lookahead hands "N tests, each naming …" to the injection-suite rule below. Without it
+    # both rules match that one sentence, the whole-suite rule loses, and a correct figure gets
+    # reported as wrong.
+    ("tests in the suite", collected_tests, r"\*?\*?(\d+)\s+tests\b(?!,\s+each\s+naming)"),
     ("tests that pass", passing_tests, r"(\d+)\s+passed"),
     ("modules mypy checks", typed_modules, r"(\d+)\s+source\s+files"),
     (
@@ -156,6 +176,7 @@ RULES: tuple[tuple[str, Callable[[], int], str], ...] = (
     ),
     ("documents in the corpus", corpus_documents, r"(\d+)\s+document\(s\)\s+verified"),
     ("Snowflake services claimed", declared_services, r"\*\*(\d+)\s+services"),
+    ("tests in the injection suite", adversarial_tests, r"(\d+)\s+tests,\s+each\s+naming"),
 )
 
 

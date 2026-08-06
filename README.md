@@ -7,17 +7,28 @@ Submission for the **Snowflake CoCo CLI Hackathon 2026** — Problem Statement 1
 *Intelligent Workflow Automation Agent*.
 Team **Argmax** (solo).
 
-![The Warrant console: six exceptions detected, five handled by the agent, one awaiting a human,
-two refused](docs/images/console-headline.png)
+### ▸ [**Try it live — snowflake-coco-cli-hackathon-2026.vercel.app**](https://snowflake-coco-cli-hackathon-2026.vercel.app/)
 
-*One command ran the whole loop. It handled five exceptions on its own, escalated one, and refused
-two — and the count it leads with is the refusals, not the throughput. Streamlit in Snowflake,
-inside the governed perimeter.*
+Reads this Snowflake account on every request, with no cache anywhere. The approve, reject and
+defer buttons are live and send the real statements; what comes back is Snowflake refusing them.
+
+![The Warrant viewer: the headline claim beside three tables resolved live to L4, L3 and L2
+authority](docs/images/web/hero.png)
+
+*The idea in one picture, and it is not an illustration — those three rows come from the same
+`SYSTEM$GET_TAG` read that drives the agent. Retag a table and the hero changes.*
 
 **In one sentence:** an operations agent that closes the loop from detection to action, whose
 permission to take each action is read from the Snowflake object tags on the data that action
 touches — live, and again at execution time, so a human's approval cannot outlive the policy it
 was granted under.
+
+![The Warrant console: six exceptions detected, five handled by the agent, one awaiting a human,
+two refused](docs/images/console-headline.png)
+
+*Where a human actually decides: Streamlit in Snowflake, inside the governed perimeter. One
+command ran the whole loop — five exceptions handled alone, one escalated, two refused — and the
+count it leads with is the refusals, not the throughput.*
 
 > **Reviewing this?** [`docs/rubric_alignment.md`](docs/rubric_alignment.md) maps every claim to
 > the command that settles it, and [`docs/judges_walkthrough.md`](docs/judges_walkthrough.md) is a
@@ -103,6 +114,13 @@ is a row in `POLICIES` plus a field on `TouchedObject` — no control flow chang
 
 Measured on the live account, from `CALL WARRANT.CORE.RUN_LOOP('AUTO')` over 2,400 shipments,
 40 quality holds and 6 SKUs. One loop, no branching on table names:
+
+![Weekly on-time delivery for six suppliers; five hold their baseline while SUP-002 falls through
+the RB-001 detection threshold](docs/images/web/one-pass.png)
+
+*The signal, drawn from the raw shipments rather than the aggregate. Over all history every
+supplier sits between 85% and 92% — the collapse only exists in a rolling window, which is why
+the detector uses one and why this chart does too.*
 
 | Exception | Action proposed | Tag on the data | Outcome |
 |---|---|---|---|
@@ -320,7 +338,7 @@ A service does not appear here until it is actually wired up.
 
 | Service | Used for | Where |
 |---|---|---|
-| **CoCo CLI** | Built with it — 6 custom Agent Skills — **and drivable by it**, via an MCP server exposing 12 governed tools | [`.cortex/skills/`](.cortex/skills/), [`mcp/`](mcp/) |
+| **CoCo CLI** | Built with it — 6 custom Agent Skills — **and drivable by it**, via an MCP server exposing 13 governed tools | [`.cortex/skills/`](.cortex/skills/), [`mcp/`](mcp/) |
 | **Object Tagging / Horizon** | The authority model — `SENSITIVITY` read live with `SYSTEM$GET_TAG` | `sql/00_setup.sql`, `src/warrant/authority/tags.py` |
 | **Masking Policies** | Column-level governance — the agent cannot read the lot identifier it may not act on | `sql/00_setup.sql`, `sql/10_synthetic_data.sql` |
 | **Cortex AI** (`AI_COMPLETE`) | Structured reasoning, `response_format` + `return_error_details` | `src/warrant/reason/investigate.py` |
@@ -388,6 +406,13 @@ the sixth is how to *operate* the agent from a terminal:
 | `propose-action` | Produce a concrete, reversible, typed action |
 | `orchestrate-loop` | Run the five phases end to end |
 | `operate-warrant` | Drive the agent from the CLI through its MCP server |
+
+![The MCP tool surface: thirteen tools split eleven read and two act, five resources, six skills,
+and the test asserting no tool accepts an authority tier](docs/images/web/coco-cli.png)
+
+*The whole agent is an MCP server. The load-bearing property is not the tool count — it is that
+no tool accepts a `tier`, so there is no parameter for a prompt to aim at, and that is asserted
+by walking every registered tool's live schema.*
 
 ---
 
