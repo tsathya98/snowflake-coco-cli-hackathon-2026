@@ -87,3 +87,12 @@ docs/private/
 *.mp4
 *.mov
 recordings/
+
+# Backstage working documents. Kept locally, never published: they are recording
+# aids and background research, not part of what a reviewer is asked to judge.
+docs/paste-buffer.txt
+docs/video_script.md
+docs/deck_prompt.md
+docs/deck_slides.md
+docs/research/
+docs/submission_template/
