@@ -62,6 +62,8 @@ jobs:
       - name: Documentation claims match the repository
         run: uv run python tools/check_doc_claims.py
 
+      # The MCP surface is exercised by an in-process client in mcp/tests, which pytest
+      # collects via testpaths. It needs the `mcp` extra, hence --all-extras at install.
       # Integration tests are excluded by addopts; they need a warehouse.
       - name: Test
         run: uv run pytest --cov --cov-report=term-missing

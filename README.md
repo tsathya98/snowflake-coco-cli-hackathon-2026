@@ -293,7 +293,7 @@ A service does not appear here until it is actually wired up.
 
 | Service | Used for | Where |
 |---|---|---|
-| **CoCo CLI** | Built with it — 5 custom Agent Skills | [`.cortex/skills/`](.cortex/skills/) |
+| **CoCo CLI** | Built with it — 6 custom Agent Skills — **and drivable by it**, via an MCP server exposing 12 governed tools | [`.cortex/skills/`](.cortex/skills/), [`mcp/`](mcp/) |
 | **Object Tagging / Horizon** | The authority model — `SENSITIVITY` read live with `SYSTEM$GET_TAG` | `sql/00_setup.sql`, `src/warrant/authority/tags.py` |
 | **Masking Policies** | Column-level governance — the agent cannot read the lot identifier it may not act on | `sql/00_setup.sql`, `sql/10_synthetic_data.sql` |
 | **Cortex AI** (`AI_COMPLETE`) | Structured reasoning, `response_format` + `return_error_details` | `src/warrant/reason/investigate.py` |
@@ -350,7 +350,8 @@ snow sql -c <conn> -q "SELECT SNOWFLAKE.CORTEX.DATA_AGENT_RUN(
 
 ## Custom CoCo Agent Skills
 
-Defined in [`.cortex/skills/`](.cortex/skills/):
+Defined in [`.cortex/skills/`](.cortex/skills/). The first five describe how each phase is built;
+the sixth is how to *operate* the agent from a terminal:
 
 | Skill | Responsibility |
 |---|---|
@@ -359,6 +360,7 @@ Defined in [`.cortex/skills/`](.cortex/skills/):
 | `classify-authority` | Resolve the authority tier from object tags |
 | `propose-action` | Produce a concrete, reversible, typed action |
 | `orchestrate-loop` | Run the five phases end to end |
+| `operate-warrant` | Drive the agent from the CLI through its MCP server |
 
 ---
 
@@ -399,6 +401,9 @@ eval/               cases.json — six reasoning scenarios; scorecard.json — t
 src/warrant/        Python package — detect / reason / authority / act / orchestrate / common
 sql/                Idempotent DDL, run in filename order (00 → 45); 90 resets for a re-run
 streamlit/          Approval console (Streamlit in Snowflake)
+mcp/                MCP server — Warrant's governed tools, drivable by CoCo CLI or any
+                      MCP client. Ten read-only tools, two that act, none that take a tier.
+web/                Public read-only viewer (Next.js on Vercel), reading live from Snowflake
 tests/              pytest suite, 100% branch coverage, one file per source module
 tools/              Repo governance: the SQL-construction boundary lint, the corpus builder,
                       the reasoning evaluator, and the documentation claims checker

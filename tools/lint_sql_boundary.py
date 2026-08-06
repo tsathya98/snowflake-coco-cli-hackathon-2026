@@ -28,7 +28,7 @@ import ast
 import pathlib
 import sys
 
-ROOTS = ("src", "streamlit", "tools")
+ROOTS = ("src", "streamlit", "tools", "mcp")
 
 SQL_KEYWORDS = (
     "SELECT ",

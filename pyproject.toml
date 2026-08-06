@@ -19,6 +19,10 @@ dev = [
     # provisioning uses the committed output rather than re-rendering.
     "fpdf2>=2.8.0",
 ]
+mcp = [
+    "fastmcp>=3.0",
+    "pytest-asyncio>=0.24",
+]
 
 [build-system]
 requires = ["hatchling"]
@@ -61,7 +65,12 @@ max-complexity = 10
 known-third-party = ["streamlit"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+# mcp/tests exercises the MCP surface through a real in-process client. It needs the `mcp`
+# extra (`uv sync --all-extras`), and `pythonpath` because mcp/ is an entry point rather
+# than an installed package — the same reason streamlit/ is not importable either.
+testpaths = ["tests", "mcp/tests"]
+pythonpath = ["mcp"]
+asyncio_mode = "auto"
 markers = [
     "integration: requires a live Snowflake connection",
 ]

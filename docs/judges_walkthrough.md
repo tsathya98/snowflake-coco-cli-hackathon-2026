@@ -16,7 +16,7 @@ uv run mypy                                   # strict, 19 modules, zero errors
 uv run python tools/lint_sql_boundary.py      # the prompt-injection boundary, enforced
 uv run python tools/build_corpus.py --check   # committed PDFs still match corpus/*.md
 uv run python tools/evaluate_reasoning.py --check   # recorded reasoning scorecard
-uv run pytest --cov --cov-report=term-missing # 234 tests, 100% branch coverage, gated
+uv run pytest --cov --cov-report=term-missing # 242 tests, 100% branch coverage, gated
 ```
 
 The two most load-bearing tests, if you only read two:

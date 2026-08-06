@@ -23,9 +23,9 @@ uv run python tools/check_doc_claims.py
 uv run pytest --cov --cov-report=term-missing
 ```
 
-Expected: clean, clean, `no issues found in 19 source files`, `SQL boundary holds across 24
+Expected: clean, clean, `no issues found in 19 source files`, `SQL boundary holds across 27
 module(s)`, `6 document(s) verified`, `6 case(s) evaluated`, `Every counted claim matches the
-repository`, `230 passed … 100.00%` with the coverage gate satisfied.
+repository`, `238 passed … 100.00%` with the coverage gate satisfied.
 
 Every figure in that sentence is checked by the run above it. `tools/check_doc_claims.py` executes
 the project's own tools and compares what they print against what this document, the README and
@@ -36,9 +36,10 @@ has found a CI failure, not a discrepancy.
 
 ## T&C §9(1) — use of Cortex Code CLI
 
-**Mandatory.** Five custom Agent Skills in [`.cortex/skills/`](../.cortex/skills/), one per phase
-of the loop, each naming the module that implements it so the skill and the code cannot drift
-apart silently:
+**Mandatory, and answered twice.**
+
+*Built with it.* Six custom Agent Skills in [`.cortex/skills/`](../.cortex/skills/), each naming
+the module that implements it so the skill and the code cannot drift apart silently:
 
 | Skill | Phase | Implemented by |
 |---|---|---|
@@ -47,6 +48,18 @@ apart silently:
 | `classify-authority` | ③ classify | `warrant/authority/tags.py` + `tiers.py` |
 | `propose-action` | ④ route | `warrant/act/registry.py` |
 | `orchestrate-loop` | ①–⑤ | `warrant/orchestrate/loop.py` |
+| `operate-warrant` | driving it | `mcp/warrant_mcp/server.py` |
+
+*Drivable by it.* Cortex Code CLI is a full MCP client, and [`mcp/`](../mcp/) exposes Warrant as
+an MCP server: twelve tools, ten annotated `readOnlyHint`, one `destructiveHint`. Register it with
+`cortex mcp add warrant …` and the governed capabilities appear as `mcp__warrant__*`.
+
+The load-bearing detail is what the tools *do not* accept. Not one takes a tier, a role or a force
+flag — authority is resolved from the object tags inside every call, and
+`mcp/tests/test_server_surface.py::test_no_tool_accepts_a_tier` asserts that against the generated
+JSON schema. So the guarantee holds against a persuaded model, not only a well-behaved one. Asking
+Warrant to release a regulated hold over MCP produces the same refusal, in the same append-only
+log, as asking through the console.
 
 `AGENTS.md` is the project context loaded at session start. It carries the hard constraints, the
 conventions, and — deliberately — the reasons behind them, because a rule without a reason is a
@@ -186,7 +199,7 @@ you, "the model's compliance changed nothing" is a property of the architecture.
 uv run pytest --cov --cov-report=term-missing
 ```
 
-**234 tests, 100% branch coverage of `src/warrant`, gated** (545 statements, 96 branches, zero
+**242 tests, 100% branch coverage of `src/warrant`, gated** (545 statements, 96 branches, zero
 missed; 230 pass, 3 are skipped for a missing optional dependency and 1 is the opt-in integration
 test). `mypy --strict` clean across 19 modules. Ruff clean against 21 rule families, including
 complexity, `BLE`, and `RUF100` — which fails on a `noqa` that no longer suppresses anything, so
@@ -235,7 +248,7 @@ Measured on the live account, not projected:
 | Human approvals that did **not** survive a reclassification | **1, refused** |
 | Reasoning eval — cases × dimensions passed | **6 × 5** |
 | Hostile-document findings where routing changed | **0 of 6** |
-| Tests / branch coverage / mypy-strict errors | **234 / 100% / 0** |
+| Tests / branch coverage / mypy-strict errors | **242 / 100% / 0** |
 
 **The number that matters** is not agent-versus-human on speed. It is *deployable versus not*. The
 same loop safely spans open, internal and regulated data in one pass, and the boundary is
