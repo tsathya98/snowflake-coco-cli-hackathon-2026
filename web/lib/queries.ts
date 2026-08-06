@@ -157,11 +157,31 @@ SELECT TO_VARCHAR(ts, 'YYYY-MM-DD HH24:MI:SS') AS at,
  ORDER BY ts DESC
  LIMIT 40`;
 
-/** The two procedures WARRANT_PUBLIC may call. Both only compute. */
+/** The procedures WARRANT_PUBLIC may call. Every one of them only computes. */
 export const MANIFEST = "CALL WARRANT.CORE.AUTHORITY_MANIFEST(NULL)";
 export const MANIFEST_WHATIF = "CALL WARRANT.CORE.AUTHORITY_MANIFEST(PARSE_JSON(?))";
 export const REPLAY = "CALL WARRANT.CORE.REPLAY_DECISIONS(NULL)";
 export const TASK_ACTIVITY = "CALL WARRANT.CORE.TASK_ACTIVITY(?)";
+
+/*
+ * The three statements a visitor is invited to *try*, and which Snowflake refuses.
+ *
+ * These are the real statements the governed console runs — not lookalikes written to
+ * fail. A demo that proves a boundary has to cross it, or it proves nothing; a disabled
+ * button only shows that this page chose not to ask.
+ *
+ * They are safe to fire at a live production account because they are inert twice over.
+ * First, WARRANT_PUBLIC holds no grant on EXECUTE_ACTION and no INSERT/UPDATE anywhere,
+ * so authorisation fails before execution. Second — for the case where that grant is one
+ * day mis-applied — the caller binds an action_id that cannot exist, so EXECUTE_ACTION
+ * finds nothing to run and the UPDATE matches no row. The demo cannot become the incident
+ * it is describing.
+ */
+export const ATTEMPT_APPROVE = "CALL WARRANT.CORE.EXECUTE_ACTION(?)";
+export const ATTEMPT_DECIDE = `
+  UPDATE WARRANT.CORE.PENDING_ACTIONS
+     SET decision = ?, decided_by = CURRENT_USER(), decided_at = CURRENT_TIMESTAMP()
+   WHERE action_id = ?`;
 
 export type Capability = {
   action: string;

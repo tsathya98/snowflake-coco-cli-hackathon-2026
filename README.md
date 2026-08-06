@@ -430,7 +430,9 @@ sql/                Idempotent DDL, run in filename order (00 → 45); 90 resets
 streamlit/          Approval console (Streamlit in Snowflake)
 mcp/                MCP server — Warrant's governed tools, drivable by CoCo CLI or any
                       MCP client. Ten read-only tools, two that act, none that take a tier.
-web/                Public read-only viewer (Next.js on Vercel), reading live from Snowflake
+web/                Public read-only viewer (Next.js on Vercel), reading live from Snowflake.
+                      Its approve/reject/defer buttons are live and send the real statements —
+                      what you get back is Snowflake's refusal, not a disabled control.
 tests/              pytest suite, 100% branch coverage, one file per source module
 tools/              Repo governance: the SQL-construction boundary lint, the corpus builder,
                       the reasoning evaluator, and the documentation claims checker

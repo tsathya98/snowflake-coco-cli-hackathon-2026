@@ -36,6 +36,11 @@
 
 :root,
 :root[data-theme="dark"] {
+  /* Which palette the browser paints the parts of the UI CSS cannot reach: scrollbars,
+   * the native <option> popup, form controls. The inline script in app/layout.tsx sets
+   * this on the element too, before first paint, so the two never disagree; this is the
+   * fallback for the case where that script does not run. */
+  color-scheme: dark;
   --page: #131211;
   --page-deep: #0c0b0a;
   --surface: rgba(240, 235, 228, 0.045);
@@ -59,6 +64,7 @@
 }
 
 :root[data-theme="light"] {
+  color-scheme: light;
   --page: #f1ece1;
   --page-deep: #e6dfce;
   --surface: #ffffff;
@@ -107,6 +113,19 @@ body {
 
 ::selection {
   background: color-mix(in srgb, var(--info) 35%, transparent);
+}
+
+/* The dropdown list is drawn from the <select>'s own computed colours, not from the page
+ * or from `color-scheme`. The select is styled `bg-[var(--surface)]`, and --surface in
+ * dark mode is `rgba(240,235,228,0.045)` — a translucent wash that reads correctly over
+ * the page but composites to near-white in a popup with a light base. Options then
+ * inherit --text, also near-white, and the whole menu is white on white.
+ *
+ * So the options need an opaque background of their own. --page-deep is opaque in both
+ * themes, which is the whole reason to reach for it here rather than --surface. */
+option {
+  background: var(--page-deep);
+  color: var(--text);
 }
 
 /* -------------------------------------------------------------------- nav state

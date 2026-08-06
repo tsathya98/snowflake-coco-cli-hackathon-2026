@@ -14,6 +14,22 @@ decision a bug can undo; a missing grant is Snowflake refusing the statement.
 Approving is a governed act, so it belongs to the surface that has an identity. This is the same
 reason the Cortex Agent is given no tool bound to the executor.
 
+So the page keeps the buttons and lets you watch them fail. **Approve**, **Reject** and **Defer**
+are wired to the statements the console really runs, and pressing one prints Snowflake's own
+refusal with its error code. Leaving them out would have been easier and would have proved
+nothing: an absent control is indistinguishable from a hidden one. The two refusals differ, and
+the difference is worth reading —
+
+| Control | What Snowflake says | Why |
+|---|---|---|
+| Reject / Defer | `SQL access control error: Insufficient privileges to operate on table 'PENDING_ACTIONS'` | the role can see the queue and is told no |
+| Approve | `SQL compilation error: Unknown user-defined function WARRANT.CORE.EXECUTE_ACTION` | without `USAGE`, Snowflake will not concede the executor exists |
+
+Both statements bind an `action_id` that cannot exist, so neither would do anything even if a
+grant were one day mis-applied — the demonstration cannot become the incident it describes. If
+one ever *is* permitted, the page says so as an alarm rather than a success, and `npm run probe`
+fails.
+
 [sharing]: https://docs.snowflake.com/en/developer-guide/streamlit/features/sharing-streamlit-apps
 
 ## Running it locally
@@ -27,8 +43,10 @@ npm run dev
 
 `npm run probe` is worth running first and worth reading. It proves four things cheapest-first, so
 a failure names its own cause: the key is accepted, the session is the role and warehouse
-intended, a real query returns rows, and **`EXECUTE_ACTION` is refused**. That last assertion is
-the point — a regression in the grants shows up here rather than as an action nobody authorised.
+intended, every object and procedure the page touches is readable, and **both write paths are
+refused**. That last assertion is the point — a regression in the grants shows up here rather than
+as an action nobody authorised, and now that the page invites visitors to test the boundary
+themselves, a silent regression would turn a governance claim into a false one on a public URL.
 
 ## Configuration
 

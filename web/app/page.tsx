@@ -37,6 +37,7 @@ import { Card, Chip, ModelText, Note, Reveal, Section, Tag, Tiles } from "@/comp
 import { DataTable } from "@/components/table";
 import { ScrollSpy, ThemeToggle } from "@/components/theme";
 import { WhatIf } from "@/components/whatif";
+import { Decide } from "@/components/decide";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -178,12 +179,16 @@ export default async function Page() {
             <strong>This page is read-only, and not by convention.</strong> It authenticates as{" "}
             <code className="font-mono text-[0.85em]">WARRANT_PUBLIC</code>, a role holding{" "}
             <code className="font-mono text-[0.85em]">SELECT</code> on a handful of objects and{" "}
-            <code className="font-mono text-[0.85em]">USAGE</code> on the two procedures that only
+            <code className="font-mono text-[0.85em]">USAGE</code> on the procedures that only
             compute. It has no grant on{" "}
             <code className="font-mono text-[0.85em]">EXECUTE_ACTION</code>. Approving is a
             governed act and belongs to the console inside Snowflake, where the reviewer has an
             identity of their own — the same reason the conversational agent is given no tool bound
-            to the executor.
+            to the executor. Don&apos;t take that on trust:{" "}
+            <a href="#evidence" className="font-semibold underline underline-offset-2">
+              the approve, reject and defer buttons below are live
+            </a>
+            , they send the real statements, and Snowflake refuses them in front of you.
           </Note>
         </div>
 
@@ -280,6 +285,10 @@ export default async function Page() {
                 </div>
               </Reveal>
             </div>
+
+            <Reveal delay={140}>
+              <Decide actionType={str(escalated.ACTION_TYPE)} />
+            </Reveal>
           </Section>
         ) : null}
 

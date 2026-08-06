@@ -31,10 +31,11 @@ const connection = snowflake.createConnection({
   schema: "CORE",
 });
 
-const run = (sql) =>
+const run = (sql, binds = []) =>
   new Promise((resolve, reject) => {
     connection.execute({
       sqlText: sql,
+      binds,
       complete: (error, _s, rows) => (error ? reject(error) : resolve(rows ?? [])),
     });
   });
@@ -93,13 +94,25 @@ connection.connect(async (error) => {
     const payload = JSON.parse(String(Object.values(manifest[0])[0]));
     console.log(`   PROC     manifest returned ${payload.capabilities.length} capabilities`);
 
-    // The boundary. This MUST fail.
-    try {
-      await run("CALL WARRANT.CORE.EXECUTE_ACTION('probe-should-never-run')");
-      console.error("4. BOUNDARY  *** FAILED *** EXECUTE_ACTION was permitted to this role");
-      process.exit(1);
-    } catch (refused) {
-      console.log(`4. BOUNDARY ok — EXECUTE_ACTION refused: ${refused.message.slice(0, 72)}`);
+    // The boundary. These MUST fail — and the page invites visitors to prove it, so a
+    // regression here turns a governance demo into a false claim on a public URL.
+    // Both bind an action_id that cannot exist, so neither does anything even if the
+    // privilege check were one day to pass.
+    for (const [label, sql, binds] of [
+      ["EXECUTE_ACTION", "CALL WARRANT.CORE.EXECUTE_ACTION(?)", ["probe-should-never-run"]],
+      [
+        "UPDATE queue",
+        "UPDATE WARRANT.CORE.PENDING_ACTIONS SET decision = ? WHERE action_id = ?",
+        ["rejected", "probe-should-never-run"],
+      ],
+    ]) {
+      try {
+        await run(sql, binds);
+        console.error(`4. BOUNDARY  *** FAILED *** ${label} was permitted to this role`);
+        process.exit(1);
+      } catch (refused) {
+        console.log(`4. BOUNDARY ok — ${label} refused: ${refused.message.split("\n")[1] ?? ""}`);
+      }
     }
 
     console.log(`\nprobe green in ${Date.now() - started} ms`);
