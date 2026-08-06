@@ -2,12 +2,12 @@
 
 This is the recording script, not submission copy. The portal asks for a 3–5 minute screen
 recording of an end-to-end workflow executed through Cortex Code CLI, including input, processing,
-output, and two or three modular skills. This version targets **4:30–4:45** and leaves room for
+output, and two or three modular skills. This version targets **4:45–4:55** and leaves room for
 natural pauses.
 
-The script is intentionally conversational. Do not memorise every word. Learn the point of each
-beat, then say it in your own voice. The lines in quotation blocks are a strong first take, not a
-teleprompter contract.
+The SAY blocks are written to be read **word for word, aloud** — contractions, pauses, and all.
+Read from your phone, but look up during the three key lines listed in the delivery notes. If a
+sentence trips your tongue twice, change the words, keep the fact.
 
 ## The story in one sentence
 
@@ -23,10 +23,13 @@ public refusal proof.
 
 ## Spoken length
 
-547 spoken words. At 155 words per minute that is **3:32 of speech**. The section timings below sum
-to **4:45**, so they budget about seventy seconds of typing, model waiting and the deliberate pause.
-Expect a clean take around **4:45–4:55** against the portal's five-minute ceiling: margin, but not
-much. If a take runs long, use the cut list at the end rather than speaking faster.
+642 spoken words. Read straight through that is **4:08 at 155 wpm** — but a full minute of it is
+spoken *over* typing and the model wait (the CLI section alone is 166 words across 73 seconds), so
+speech and screen time overlap rather than add. The section timings below sum to **4:50**, which is
+the real budget against the portal's five-minute ceiling.
+
+Do one timed read-through before recording. If your voice alone passes **4:15**, apply the cut
+list now — do not try to win the time back by speaking faster on camera.
 
 ## What the judge should remember
 
@@ -35,6 +38,8 @@ much. If a take runs long, use the cut list at the end rather than speaking fast
 3. The model proposes, but live Snowflake tags decide.
 4. Authority is checked again at execution, so stale approval cannot override new policy.
 5. The hostile-document tests assume the model was fooled and prove the boundary still holds.
+6. Two surfaces, one boundary: the Streamlit console runs **inside Snowflake** and is the only
+   surface that can act; the public Vercel viewer is outside and proves it cannot.
 
 ## Recording setup — MacBook (QuickTime plan)
 
@@ -114,7 +119,7 @@ timeline to contain several marks. Do not quote its exact 24-hour run count; it 
 
 ---
 
-## 0:00–0:34 — Introduce the human problem
+## 0:00–0:35 — Introduce the human problem
 
 **DO:** Start on the public viewer hero, zoomed so the three operational examples are visible but
 the counters below are outside the frame. The pipeline is intentionally reset; the CoCo run will
@@ -122,55 +127,58 @@ create those counts. Keep the cursor still.
 
 **SAY:**
 
-> Hi, I'm Sathya from Team Argmax. I'm a solo developer, and before I show you what I built,
-> here's the Monday morning it was built for.
+> Hi, I'm Sathya from Team Argmax — solo developer. Let me show you the Monday morning I built
+> this for.
 >
-> Monday morning. An operations lead opens the exception queue.
+> An operations lead opens the exception queue — three things waiting.
 >
-> A quality hold has been open for eighty-two days. A critical SKU has five days of stock left.
-> And a reliable supplier has fallen to twenty-six percent on-time delivery.
+> A quality hold, sitting open for eighty-two days. A critical part with five days of stock left.
+> And a reliable supplier who's suddenly down to twenty-six percent on-time delivery.
 >
-> The dashboard knows something is wrong. It doesn't know what it's allowed to do about it.
+> The dashboard already knows all of this. What it doesn't know… is what it's allowed to do
+> about it.
 
 **DELIVERY:** Do not open with “Hello everyone, today I am going to present.” Say the introduction
-as though one judge has just sat beside you. Pause after “built for” and after each exception.
+as though one judge has just sat beside you. Pause after “built this for” and after each
+exception. On the last line, let the ellipsis breathe — that pause is the thesis landing.
 
-## 0:34–0:50 — The real problem
+## 0:35–0:57 — The real problem
 
 **DO:** Stay on the same screen. Let the three cases remain visible.
 
 **SAY:**
 
-> Those aren't the same decision. Contacting a supplier is reversible. Replenishment commits
-> spend. Changing a quality record is regulated.
+> Those are three very different decisions. Calling a supplier? Reversible. Ordering stock? Real
+> money. Changing a quality record? Regulated — nobody lets software touch that.
 >
-> Blanket autonomy is reckless. An agent that stops everywhere is useless. The real problem is
-> authority: who decides what it may do?
+> So blanket autonomy is reckless — but an agent that always stops and asks is useless. The real
+> problem isn't detection — it's authority. Who decides what this thing may do?
 
-## 0:50–0:54 — Reveal Warrant
+## 0:57–1:01 — Reveal Warrant
 
 **DO:** Cut to the exported slide-1 title card. Show only the wordmark and tagline for 2–4 seconds.
 Do not show PowerPoint or advance through the deck.
 
 **SAY:**
 
-> That's why I built Warrant: no action without a warrant.
+> That's why I built Warrant. No action without a warrant.
 
-## 0:54–1:12 — The promise
+## 1:01–1:22 — The promise
 
 **DO:** Return to the public viewer and point once across the three tag rows: `SHIPMENTS`,
 `INVENTORY`, `QUALITY_HOLDS`.
 
 **SAY:**
 
-> Warrant runs one workflow, but it doesn't write its own permissions. It reads the governance
-> already on the data.
+> Warrant runs one workflow — but it never writes its own permissions. It reads the governance
+> tags already on the data.
 >
-> Open can run. Internal asks a person. Regulated is refused. Unclear goes down, never up.
+> Open data? It just acts. Internal? It asks a person first. Regulated? Refused — full stop. And
+> anything unclear defaults down, never up.
 >
-> And it checks again at the moment of execution.
+> And it re-reads those tags at the moment of execution. Remember that — it matters in a minute.
 
-## 1:12–2:35 — CoCo CLI takes the Monday queue
+## 1:22–2:35 — CoCo CLI takes the Monday queue
 
 **DO:** Switch to the terminal and run:
 
@@ -181,8 +189,8 @@ cortex
 
 **SAY:**
 
-> This is Cortex Code CLI, with Warrant as its MCP server. Before touching the queue: what may it
-> do right now?
+> This is Cortex Code CLI — CoCo — with Warrant as an MCP server. First question: what is it
+> allowed to do right now?
 
 **DO:** Enter this first prompt:
 
@@ -192,7 +200,8 @@ Use the operate-warrant skill. Call governance_posture and authority_manifest, t
 
 **SAY while it responds:**
 
-> No tool here accepts an authority tier, so the model can't grant itself access.
+> And notice — no tool here takes an authority level as input. There's no parameter the model
+> could use to give itself more power.
 
 **DO:** Enter the end-to-end prompt:
 
@@ -202,25 +211,25 @@ Using the orchestrate-loop skill, run one full AUTO pass against the live accoun
 
 **SAY over the first few seconds:**
 
-> Now it takes the queue. Detection finds the exceptions; Cortex Search grounds the investigation.
+> Now the real thing — one prompt takes the whole Monday queue.
 >
-> The AI does the messy part — what this evidence means, and which procedure applies. It never
-> decides its own permission.
+> The AI does the messy part: reading the evidence, pulling the right procedure through Cortex
+> Search. It never decides its own permission.
 >
-> The model calls take a couple of minutes, so this is an honest cut to the result.
+> These calls take a couple of minutes, so here's an honest cut to the result.
 
 **DO:** Make an honest jump cut to the completed response. Keep the three outcomes visible. At
 this point the same run has also created the pending SKU-1003 action used in the console section.
 
 **SAY:**
 
-> Six exceptions. The three we started with now have different boundaries.
+> And there it is — our three from Monday.
 >
-> The supplier case ran because `SHIPMENTS` is open. Replenishment stopped because `INVENTORY` is
-> internal. The aging hold was surfaced, but Warrant didn't alter it; releasing a regulated hold
-> is outside the action registry.
+> The supplier case? Handled. `SHIPMENTS` is open, so Warrant just did it. The replenishment?
+> Prepared, but held — `INVENTORY` is internal, so a person gets the final say. And the quality
+> hold? Flagged and escalated — but releasing it isn't even in Warrant's vocabulary.
 >
-> One Python workflow. The tags changed the ending.
+> Same code ran all three. The tags wrote the endings.
 
 **DO:** Enter the third, short prompt:
 
@@ -242,10 +251,10 @@ Point first to the detector evidence, then the model-generated reasoning and cit
 
 **SAY:**
 
-> The stockout came back to the operations lead. Here's the reviewer's view inside Snowflake.
+> The stockout came back to a person. This is where they decide — a Streamlit console inside
+> Snowflake, right next to the data. The only surface that can act.
 >
-> Measurement on the left; model reasoning on the right, tied to the procedure. The action is
-> ready—but it hasn't happened.
+> Evidence on the left, the model's reasoning on the right. Ready… but it hasn't happened.
 
 ## 3:00–3:50 — Change the policy underneath the decision
 
@@ -258,8 +267,8 @@ ALTER TABLE WARRANT.DATA.INVENTORY
 
 **SAY:**
 
-> Before the reviewer decides, governance reclassifies `INVENTORY` as regulated. One tag. No
-> redeploy.
+> Now — before the reviewer gets to decide, the world changes. Governance reclassifies
+> `INVENTORY` as regulated. One tag. Nothing redeployed.
 
 **DO:** Return to the console, briefly show the regulated tag, then open the pending action. Use
 this reviewer note:
@@ -272,19 +281,19 @@ Click **Approve and execute**.
 
 **SAY immediately before clicking:**
 
-> A reviewer can decide at ten o'clock, and governance can legitimately change at one past. This
-> was queued under the old policy. It's approved under the new one.
+> This action was queued under the old policy — and it's about to be approved under the new one.
+> Watch.
 
 **DO:** When the refusal appears, stop speaking for two full seconds.
 
 **SAY:**
 
-> Approved. And it still didn't happen.
+> Approved… and it still didn't happen.
 >
-> The executor read today's governance, not yesterday's approval. The audit keeps both truths: a
-> human approved, and the action did not execute.
+> The executor read today's governance — not yesterday's approval. And the audit keeps both
+> truths: a human said yes, and the action never ran.
 >
-> Approval is a decision. It isn't a permanent permission slip.
+> Because approval is a decision. It's not a permanent permission slip.
 
 **IMPORTANT:** The order is queue while `internal` → reclassify to `regulated` → approve →
 execution-time tag read → refuse. Never describe it as approve first and reclassify afterwards.
@@ -299,14 +308,15 @@ uv run pytest tests/test_adversarial.py -q
 
 **SAY:**
 
-> There's one harder question. What if a document manipulates the model itself?
+> One harder question. What if a document attacks the model itself?
 >
-> We planted a fake runbook that claims it can override policy. These tests assume the model obeyed
-> it completely, then check that the architecture still contains it.
+> We planted one — a fake runbook claiming it can override policy. These tests assume the model
+> believed every word, then check that nothing could happen anyway.
 >
-> The model resisting is encouraging. The model complying and changing nothing is a boundary.
+> A model refusing an attack is encouraging. A model falling for it, and nothing changing —
+> that's a boundary.
 
-## 4:16–4:45 — Resolve the Monday morning
+## 4:16–4:50 — Resolve the Monday morning
 
 **DO:** Switch to the public viewer. Keep the Vercel URL visible. Click the shortcut **The refusal
 that held**, then click **Approve and execute**. Wait until the green “THE BOUNDARY HELD” result is
@@ -314,17 +324,18 @@ fully visible.
 
 **SAY:**
 
-> Monday's queue now has an answer. Supplier handled. Replenishment returned with evidence.
-> Regulated action protected.
+> So Monday's queue has its answer. Supplier — handled. Replenishment — back with a person,
+> evidence attached. Regulated record — protected.
 >
-> These buttons send real statements using a role that cannot act. A missing button would prove
-> nothing; a visible refusal proves the boundary.
+> And this page is public — Vercel, outside Snowflake — but the buttons are real. They send the
+> actual statements, with a role that cannot act. A missing button proves nothing. A refusal you
+> can watch — that's the boundary.
 
 **DO:** Click. Pause while the response loads.
 
 **SAY:**
 
-> Green means Snowflake refused it. That's the pass condition.
+> Green. Snowflake itself refused it — and that's the pass condition.
 >
 > Warrant knows which work was never its decision to make.
 >
@@ -342,9 +353,9 @@ fully visible.
 - Do not narrate every click. Say what the result means.
 - Let the refusal breathe. The two-second silence after approval is part of the story.
 - Look away from the script during the three key lines:
-  - “Blanket autonomy is reckless. An agent that stops everywhere is useless.”
-  - “Approved. And it still didn't happen.”
-  - “The model complying and changing nothing is a boundary.”
+  - “So blanket autonomy is reckless — but an agent that always stops and asks is useless.”
+  - “Approved… and it still didn't happen.”
+  - “A model falling for it, and nothing changing — that's a boundary.”
 - If a sentence does not sound like you after two read-throughs, rewrite it in your own words while
   keeping the fact and meaning intact.
 - Aim for calm confidence, not trailer voice. The product is interesting enough without hype.
@@ -363,17 +374,17 @@ Not spoken in the video, but have it ready for the description field and for any
 
 Cut in this order:
 
-1. “Detection finds the exceptions; Cortex Search grounds the investigation.” The prompt on screen
-   already names both.
-2. “Measurement on the left…” in the reviewer section.
-3. “A reviewer can decide at ten o'clock, and governance can legitimately change at one past.”
-   before the approval click; keep “This was queued under the old policy. It's approved under the
-   new one.”
-4. “These tests assume the model obeyed it completely…” in the adversarial section.
-5. “A missing button would prove nothing…” in the close; keep the Monday resolution and final lines.
+1. “Remember that — it matters in a minute.” in the promise. The climax still lands without the
+   setup; it just loses a little foreshadowing.
+2. “Evidence on the left, the model's reasoning on the right.” in the reviewer section — you are
+   pointing at it anyway.
+3. “These tests assume the model believed every word, then check that nothing could happen
+   anyway.” in the adversarial section.
+4. “A missing button proves nothing. A refusal you can watch — that's the boundary.” in the
+   close; keep the Monday resolution and final lines.
 
-Do not cut “No tool here accepts an authority tier” to save four seconds. It is the only spoken
-statement of the invariant the deck gives a whole panel to.
+Do not cut “no tool here takes an authority level as input” to save four seconds. It is the only
+spoken statement of the invariant the deck gives a whole panel to.
 
 Never cut:
 
