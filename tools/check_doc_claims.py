@@ -37,6 +37,10 @@ DOCUMENTS = (
     # the same failure mode. It claimed nine adversarial tests while pytest collects ten, because
     # the count was taken by grepping `def test_` and the file parametrises.
     "web/components/tested.tsx",
+    # Working docs, but tracked and public since 3fbf510 — so their figures are held to the same
+    # standard as the judge-facing ones.
+    "docs/deck_slides.md",
+    "docs/video_script.md",
 )
 
 

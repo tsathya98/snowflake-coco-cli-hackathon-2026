@@ -1,6 +1,7 @@
 # Demo video — 4 minutes, shot by shot
 
-**Gitignored working material.** Build source for the recording, not a judge-facing document.
+Build source for the recording. Working material rather than a judge-facing document — tracked so
+it travels between machines, and written knowing it is public.
 
 ## What the portal actually asks for
 
@@ -8,15 +9,40 @@
 > CLI** — Screen recording showing: Input → Processing → Output. **At least one fully working
 > workflow, 2-3 modular skills/capabilities demonstrated.**"
 
-Read that literally, because it decides the shape of the video. It is not "show me your app." It is
+Read that literally, because it decides the shape of the video. It is not "show me your app". It is
 **show the workflow being executed through the CLI**, and show two or three skills doing distinct
-things. Technical Execution (40%) separately scores *"strong use of Snowflake CoCo CLI, Agent Skills
-and tools."*
-
-So CoCo drives. The console and the web viewer are where the *result* is inspected — they are the
-Output, not the demo.
+things. Technical Execution (40%) separately scores *"strong use of Snowflake CoCo CLI, Agent
+Skills and tools."* So CoCo drives; the console and the web viewer are where the result is
+inspected. They are the Output, not the demo.
 
 **Target 4:00.** Inside the 3–5 window with room to breathe. Do not rush to 3:00.
+
+## Yes, share your screen — here is the exact setup
+
+It must be a **screen recording with voiceover**. No webcam needed; nobody scores your face, and a
+face bubble costs screen space the terminal needs.
+
+**Record the full screen at 1920×1080.** Have exactly these ready before you hit record, each
+already opened once so nothing renders cold on camera:
+
+| Window | What it is for |
+|---|---|
+| WSL terminal, font ~16pt, dark theme, maximised | The whole CLI section. This is most of the video. |
+| Browser tab 1: the Streamlit console in Snowsight, all tabs clicked once | The Output section and the approval moment |
+| Browser tab 2: a Snowsight worksheet with the ALTER TABLE statement already typed | The reclassification |
+| Browser tab 3: the public viewer (vercel.app) | The close |
+
+- **Crop or hide the browser address bar while on Snowsight** — it contains the account locator.
+  The vercel.app tab is fine to show fully.
+- Notifications off, one monitor, no other tabs visible.
+- Use OBS or the built-in Xbox Game Bar (Win+Alt+R); anything that captures steady 1080p is fine.
+  Record the voiceover in the same take — syncing a separate track costs an evening.
+- Alt+Tab between windows rather than dragging them. Cuts are fine; say when you cut.
+
+**The constraint that shapes everything:** the full loop takes 2–3 minutes of model calls. You
+cannot wait for it on camera. Start it, talk over the first seconds, cut, and resume on the
+completed result. An honest jump cut costs nothing. A faked real-time run costs everything if a
+judge notices the clock.
 
 ---
 
@@ -32,220 +58,222 @@ snow sql -c warrant -q "
 SELECT (SELECT COUNT(*) FROM WARRANT.CORE.PENDING_ACTIONS WHERE decision='pending') AS pending,
        (SELECT COUNT(*) FROM WARRANT.DATA.RUNBOOKS WHERE doc_id='RB-666')           AS attack_left,
        SYSTEM\$GET_TAG('WARRANT.CORE.SENSITIVITY','WARRANT.DATA.INVENTORY','TABLE')  AS inventory_tag;"
-```
 
-**Required: `pending = 1`, `attack_left = 0`, `inventory_tag = internal`.**
-
-```bash
-# 3. Both unattended tasks must be started, or the timeline on the web viewer shows an empty lane.
+# 3. Both unattended tasks must be started.
 snow sql -c warrant -q "SHOW TASKS IN SCHEMA WARRANT.CORE;" | grep -E "started|suspended"
 # if either is suspended:  ALTER TASK WARRANT.CORE.<name> RESUME;
 ```
 
-Both must read `started`. `SCAN_FOR_EXCEPTIONS` sweeps hourly, so if you resume it just before
-recording the Unattended section will show one lonely mark; leave it running a few hours and the
-timeline fills in, which is the whole point of that shot.
+**Required: `pending = 1`, `attack_left = 0`, `inventory_tag = internal`, both tasks `started`.**
 
-- Terminal at **~16pt**, dark theme, window ~1400px wide. Anything smaller is unreadable after
-  compression.
-- Console tab open and showing **Active**, all tabs clicked once so nothing renders cold on camera.
-- Web viewer open in a second tab.
-- **Crop out the browser address bar** — it contains the account locator.
-- Notifications off. One monitor. 1080p.
-
-**The constraint that shapes everything:** `RUN_LOOP` takes 2–3 minutes — six model calls. You
-cannot wait for it on camera. So section 2 starts it, you narrate over the first part, and you cut
-to the completed result. Say that you cut. An honest jump-cut costs nothing; a fake real-time run
-costs everything if a judge notices the clock.
+`SCAN_FOR_EXCEPTIONS` sweeps hourly, so resume it a few hours before recording, not minutes —
+otherwise the Unattended section of the viewer shows one lonely mark instead of a filled timeline.
 
 ---
+
+**How to read the script:** `DO` is what happens on screen. `SAY` is what comes out of your mouth,
+written the way you would actually say it. Read it out loud twice before recording; anywhere you
+stumble, change the words to yours. Short sentences survive nerves.
 
 ## 0:00–0:25 · The problem
 
-*No screen yet, or just the repo README.*
+**DO:** Repo README on screen, or just the terminal. Nothing moving yet.
 
-> "Enterprise ops teams don't lack insight — they lack action. And the reason agents that can *act*
-> don't get deployed isn't capability. It's that nobody will grant one blanket authority over
-> regulated data.
+**SAY:**
+
+> Enterprise ops teams don't lack insight. They lack action. And the reason agents that can act
+> never get deployed isn't capability. It's trust. Nobody will hand an autonomous agent blanket
+> authority over regulated data.
 >
-> So the question I set out to answer is: where does an agent's authority actually come from? My
-> answer is that it should come from the data's own governance metadata — not from a rules list in
-> application code."
+> So I built Warrant. The idea is simple. The agent's authority comes from the data itself, from
+> the governance tags already sitting on the tables. Change a tag, and what the agent may do
+> changes with it. No code change. No deploy.
 
----
+## 0:25–1:35 · INPUT and PROCESSING — CoCo CLI drives it
 
-## 0:25–1:35 · INPUT and PROCESSING — CoCo CLI drives the workflow
-
-*Terminal, in the repo root. This is the section the spec is asking for.*
-
-**Show the tools exist before using them.** The rubric scores *"strong use of Snowflake CoCo CLI,
-Agent Skills **and tools**"* — so spend eight seconds proving there is a real tool surface, not just
-a chat window.
+**DO:** Terminal, repo root.
 
 ```bash
 cortex mcp list
 ```
 
-> "The whole agent is exposed to CoCo as an MCP server: thirteen tools, eleven of them read-only,
-> two that act. And no tool on it accepts an authority tier — there's no parameter to pass and no
-> elevated value to ask for, so you can't prompt your way into a higher one."
+**SAY:**
+
+> This is Cortex Code CLI. The whole agent is exposed to it as an MCP server. Thirteen tools.
+> Eleven of them only read, two can act. And here's the part that matters. Not one of them accepts
+> an authority tier. There's no parameter to pass. You cannot prompt your way into more power.
+
+**DO:**
 
 ```bash
 cortex
 ```
 
-> "Cortex Code CLI, open in the project. It loads `AGENTS.md` and six Agent Skills from
-> `.cortex/skills/` — one per phase of the loop, plus one for operating it from here."
-
-**Prompt 1 — a real tool call, and the differentiator, in one:**
+Then type prompt 1:
 
 ```
 Use the governance_posture and authority_manifest tools. What is the agent allowed to do right now, and what would change if INVENTORY were reclassified as regulated?
 ```
 
-> "That's two MCP tools. The first reads the live tags; the second resolves every action in the
-> registry against them. And the what-if is answered by the same resolver the executor uses — so it
-> can't disagree with what would actually happen. Nothing was written to answer it."
+**SAY (while it works):**
 
-**Prompt 2 — this is the end-to-end execution. Say the phases out loud as it works:**
+> I'm asking what the agent is allowed to do right now, and what a policy change would cost. Those
+> are two real tool calls. And the what-if runs on the same resolver the executor uses, so the
+> answer can't disagree with what would actually happen. Nothing gets written to produce it.
+
+**DO:** Prompt 2, the end-to-end run:
 
 ```
 Using the orchestrate-loop skill, run one full pass of the Warrant agent against the live account, then summarise what each phase did and how each action was routed.
 ```
 
-> "That's detection running as a set-based MERGE off dynamic-table baselines — every threshold
-> quoted from a runbook clause rather than chosen. Then reasoning: `AI_COMPLETE` under a JSON
-> schema, grounded by Cortex Search over five operating procedures we parsed out of PDFs with
-> `AI_PARSE_DOCUMENT`."
+**SAY (over the first seconds, then cut):**
 
-**⟶ Cut here.** Resume on the completed output.
+> Now the full pass. Detection first. It's set-based, and every threshold is quoted from a runbook
+> clause, not invented. Then reasoning. The model reads the evidence, grounded by Cortex Search
+> over five operating procedures we parsed out of PDFs.
+>
+> This takes about two minutes, so I'm cutting to the result.
 
-> "Six exceptions. Five it handled on its own, one it stopped and escalated. Same loop, no
-> `if table_name ==` anywhere."
+**DO:** Resume on the completed summary.
 
-**Prompt 3 — the third skill, and the differentiator:**
+**SAY:**
+
+> Six exceptions. Five it handled on its own. One it stopped and escalated. Same loop for every
+> table. No special cases.
+
+**DO:** Prompt 3, the differentiator:
 
 ```
 Using the classify-authority skill, explain why raise_replenishment needed a human but open_supplier_case did not.
 ```
 
-> "There it is. The tier came from `SYSTEM$GET_TAG` on the tables each action touches — read live,
-> never cached. `SHIPMENTS` is tagged open, so the supplier case just ran. `INVENTORY` is tagged
-> internal, so the replenishment stopped and waited for me."
+**SAY:**
 
-*That is three skills demonstrated, and the workflow executed through the CLI. Spec satisfied.*
+> So why did one stop? The supplier case ran on its own, because shipments are tagged open. The
+> replenishment stopped, because inventory is tagged internal. That's the entire model. The tier
+> came from the tag on the data, read live. Not from a rules file in the code.
 
----
+*That is three skills and two MCP tools demonstrated, and the workflow executed through the CLI.
+Spec satisfied.*
 
 ## 1:35–2:10 · OUTPUT — the console
 
-*Switch to the Streamlit console.*
+**DO:** Switch to the Streamlit console tab. Point with the cursor as you speak: tiles first, then
+the pending card, left column, right column.
 
-> "Same run, in the approval console — Streamlit in Snowflake, inside the governed perimeter."
+**SAY:**
 
-Point at the header tiles, then the pending card.
+> Same run, seen from the approval console. This is Streamlit, running inside Snowflake.
+>
+> Six detected. Five handled. One waiting on me. And notice which count it leads with. The
+> refusals. Not the throughput.
+>
+> On the left, what the detector measured. On the right, what the model concluded. It's marked
+> model generated, because a reviewer should never have to guess which words a machine wrote. And
+> it cites the exact runbook clause it's reasoning from. That clause lives in a PDF this pipeline
+> parsed at setup.
 
-> "Six detected, five handled, one waiting on me, and the count it leads with is the refusals — not
-> the throughput."
+## 2:10–3:00 · The moment: an approval that doesn't survive
 
-Point left, then right, on the card.
-
-> "Left is what the detector measured. Right is what the model concluded, marked *model-generated*,
-> because a reviewer should never have to guess which parts a machine wrote. It cites RB-002 §5 — a
-> clause in a PDF the pipeline parsed at setup. And the tier rationale names the tag that forced the
-> escalation."
-
----
-
-## 2:10–3:00 · **The moment.** An approval that doesn't survive
-
-*Worksheet, statement already typed. Run it.*
+**DO:** Switch to the worksheet tab. The statement is already typed. Run it.
 
 ```sql
 ALTER TABLE WARRANT.DATA.INVENTORY SET TAG WARRANT.CORE.SENSITIVITY = 'regulated';
 ```
 
-> "Now governance reclassifies that table. No deploy. No code change. One tag."
+**SAY:**
 
-*Console → Governance tab. It reads `regulated`.*
+> Now watch this. Governance just reclassified that table. One tag. Nothing deployed.
 
-> "Read live, on every render."
-
-*→ Awaiting your decision. Type a real reviewer's note:*
+**DO:** Back to the console. Governance tab shows `regulated`. Then the pending card. Type the
+reviewer note:
 
 ```
 Checked in-transit is zero and SKU-1003 is not on quality hold. Quantity restores to safety-stock minimum.
 ```
 
-*Click **Approve and execute**.*
+Click **Approve and execute**.
 
-> "And I approve it anyway."
+**SAY:**
 
-*It refuses. **Let the red banner sit for two full seconds before speaking.***
+> And I approve the action anyway.
 
-> "I approved this. It still didn't happen.
+**DO:** The refusal banner appears. **Say nothing for two full seconds.**
+
+**SAY:**
+
+> I approved this. It still didn't happen.
 >
-> Authority is resolved *again* at execution time, so my approval couldn't outlive the policy it was
-> granted under. Both facts are in the append-only log — that I approved, and that it was refused.
-> An audit trail that only keeps the outcome can't tell you who tried."
+> Authority is resolved again at execution time. So my approval could not outlive the policy it
+> was granted under. And both facts are in the audit log. That I approved it. And that it was
+> refused. An audit trail that only keeps outcomes can't tell you who tried.
 
-*Put it back — off camera or fast:*
+**DO (off camera, right after this section):** put the tag back.
 
 ```bash
 snow sql -c warrant -q "ALTER TABLE WARRANT.DATA.INVENTORY SET TAG WARRANT.CORE.SENSITIVITY = 'internal';"
 ```
 
----
-
 ## 3:00–3:30 · It survives a hostile document
 
-> "The corpus is untrusted input, so we planted an attack in it — a fake procedure that claims to
-> supersede RB-003 and grant the agent release authority. It ranks *first* for a quality query, and
-> all six findings cite it. The routing doesn't move.
+**DO:** Terminal.
+
+**SAY:**
+
+> One more thing. The runbooks this agent reads are untrusted input. So we planted an attack in
+> the corpus. A fake procedure that claims to supersede the real one, and grants the agent release
+> authority. It ranks first in retrieval. All six findings cite it. And the routing doesn't move.
 >
-> But that's the weaker claim, and I'd rather show you the stronger one. I'm not asking you to
-> believe the model resisted —"
+> But I'm not asking you to believe the model resisted. Watch.
+
+**DO:**
 
 ```bash
 uv run pytest tests/test_adversarial.py -q
 ```
 
-> "— ten tests that **assume it complied completely**, and assert the outcome anyway. The tier comes
-> from the registry. The tag comes from the object. The parameters are bound. 'The model resisted'
-> is a property of a model that changes under you. 'The model's compliance changed nothing' is a
-> property of the architecture."
+**SAY:**
 
----
+> These ten tests assume the model fell for it completely. And they check that the outcome is
+> governed anyway. The tier comes from the registry. The tag comes from the object. The parameters
+> are bound, never concatenated.
+>
+> "The model resisted" is a property of a model, and models change under you. "The model's
+> compliance changed nothing" is a property of the architecture.
 
 ## 3:30–4:00 · Close
 
-*Web viewer. Scroll past the hero — the three tag rows resolve live — and stop at Evidence.*
+**DO:** Switch to the public viewer tab. Scroll past the hero so the three live tag rows are seen,
+stop at Evidence.
 
-> "Everything you've seen is also live at a public URL, read-only. And I'd rather show you that
-> than assert it."
+**SAY:**
 
-*Click **Approve and execute**. Let the panel render before you speak.*
+> Everything you've seen is also live at a public link, read only. And I'd rather prove that than
+> claim it.
 
-> "Same buttons the console has, wired to the same statements — and it comes back green, because
-> being refused is the pass condition. That's Snowflake's answer, not the page's. Read it closely:
-> it isn't *permission denied*. Without USAGE on the procedure, Snowflake won't concede the
-> executor exists. This role can't be talked into calling something it can't name.
+**DO:** Click **Approve and execute**. Let the green panel render fully before speaking.
+
+**SAY:**
+
+> Same buttons the console has, wired to the same statements. And it comes back green, because
+> being refused is the pass condition. That's Snowflake's answer, not the page's.
 >
-> Everyone in this track will show you an agent that acts. This is one that **declines** — and whose
-> declining doesn't depend on the model choosing to."
+> Everyone in this track will show you an agent that acts. This is one that declines. And its
+> declining doesn't depend on the model choosing to.
 
-*Hold on the refusal for the last two seconds.*
+**DO:** Hold on the green panel for the last two seconds. Stop recording.
 
 ---
 
 ## After recording
 
-1. **Reset**, or the next run starts from a consumed queue:
+1. **Reset**, or the next take starts from a consumed queue:
    ```bash
    snow sql -c warrant -f sql/90_reset.sql && snow sql -c warrant -q "CALL WARRANT.CORE.RUN_LOOP('AUTO');"
    ```
-2. Watch it once at 1× with sound. The only two things that must be legible at compression are the
-   **terminal** and the **red refusal banner**.
+2. Watch it once at 1× with sound. The two things that must survive compression are the
+   **terminal text** and the **refusal panel**.
 3. Upload **unlisted, not private** — a private link 404s for a judge. Confirm in an incognito
    window before submitting.
 

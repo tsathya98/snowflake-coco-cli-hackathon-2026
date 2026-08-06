@@ -1,7 +1,7 @@
 # Warrant — slide-by-slide deck content
 
-Build source for the submission PPT. **Gitignored** — this is working material, not a judge-facing
-document.
+Build source for the submission PPT. Working material rather than a judge-facing document — it is
+tracked so it travels between machines, and written knowing it is public.
 
 **The template's real envelope is 6 slides** — measured from the organizer's own PPTX
 (`docs/submission_template/`): a cover, a guidelines slide listing the three mandated sections
