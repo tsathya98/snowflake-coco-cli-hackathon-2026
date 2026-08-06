@@ -32,9 +32,14 @@ resource has a tool twin. A resource nobody can reach is documentation, not a ca
 
 Run it::
 
-    uv run --extra mcp python -m warrant_mcp.server           # stdio, for CoCo CLI
-    uv run --extra mcp python -m warrant_mcp.server --http    # streamable HTTP on :8765
-    uv run --extra mcp python -m warrant_mcp.server --surface # print the surface, then exit
+    python -m warrant_mcp.server            # stdio, for CoCo CLI
+    python -m warrant_mcp.server --http     # streamable HTTP on :8765
+    python -m warrant_mcp.server --surface  # print the surface, then exit
+
+Run these against an interpreter with the package installed (``pip install -e ".[mcp]"``),
+not through ``uv run``: on a repository checked out under ``/mnt/c`` in WSL, ``uv run``
+re-syncs its project environment on every invocation and reads the sync-locked ``.venv``
+from that 9p mount, which turns a two-second command into thirty. See ``mcp/README.md``.
 """
 
 from __future__ import annotations

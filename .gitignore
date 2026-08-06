@@ -82,3 +82,8 @@ docs/coco_sessions_planned.md
 # intentionally not judge-facing submission content.
 docs/private/
 *.tar.gz
+
+# Screen recordings: large binaries, and takes are not source.
+*.mp4
+*.mov
+recordings/
