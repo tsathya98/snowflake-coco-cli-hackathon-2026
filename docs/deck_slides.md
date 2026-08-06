@@ -298,7 +298,7 @@ clipped to the section's measured bounding box, so nothing is cut mid-heading.
 | `web/evidence.png` | 6 | Evidence beside reasoning, the live controls, **and the refusal already fired** — captured with the green verdict panel showing, so it needs no explanation. |
 | `web/tested.png` | 4 or 6 | The planted attack and the scored reasoning, side by side. |
 | `web/unattended.png` | 4 | The 24-hour task timeline. Both tasks started, **0 failed**, hourly sweep visibly running. |
-| `web/authority-whatif.png`, `web/replay.png`, `web/refusals.png`, `web/governance.png` | spares | Use if a slide is thin. `governance.png` is the light-theme tag table. |
+| `web/authority-whatif.png`, `web/replay.png`, `web/refusals.png`, `web/governance.png` | spares | Use if a slide is thin. `refusals.png` is the merged **record** section — three refusals, the replay tiles, and the two folded tables. `replay.png` and `governance.png` are the same section with a disclosure opened, so they are tall; crop before using. |
 | `web/mobile.png`, `web/mobile-refusal.png` | — | Only if you want to show it works on a phone. Usually cut. |
 | `refusal-banner.png` | 6 | The Streamlit console. If you keep exactly one console shot, keep this one: a human approved it and it was refused anyway. |
 | the other seven console shots | spares | `console-headline`, `evidence-and-reasoning`, `queue-already-decided`, `authority-manifest`, `whatif-revocation`, `replay`, `column-governance` |
