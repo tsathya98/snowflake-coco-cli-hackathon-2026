@@ -42,23 +42,23 @@ export function Decide({ actionType }: { actionType: string }) {
       </div>
       <p className="mt-1.5 text-[0.84rem] leading-relaxed text-[var(--text-soft)]">
         These are the controls a reviewer sees in the Snowflake console, wired to the same
-        statements. Press one. The refusal you get back is the database&apos;s, not this
-        page&apos;s.
+        statements. <strong>The buttons are live.</strong> Press one — nothing to fill in
+        first — and the refusal you get back is the database&apos;s, not this page&apos;s.
       </p>
 
       <label className="mt-4 block">
         <span className="mb-1.5 block text-[0.62rem] font-bold uppercase tracking-[0.1em] text-[var(--text-muted)]">
-          Your reason (required to reject)
+          Your reason &mdash; optional here, and it goes nowhere
         </span>
         <textarea
           rows={2}
-          placeholder="What did you check? What made this the right call?"
+          placeholder="Type anything, or nothing. The buttons work either way."
           className="w-full resize-y rounded-lg border border-[var(--line)] bg-[var(--page-deep)] px-3 py-2 text-[0.88rem] text-[var(--text)] transition-colors placeholder:text-[var(--text-muted)] hover:border-[var(--line-hi)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--info)]"
         />
         <span className="mt-1 block text-[0.72rem] text-[var(--text-muted)]">
-          Goes nowhere. In the console this lands on the audit row as{" "}
-          <code className="font-mono">decision_note</code>; there is no audit row to write
-          here.
+          The console requires this to reject, and writes it to the audit row as{" "}
+          <code className="font-mono">decision_note</code>. Here it is never sent anywhere,
+          because there is no decision to annotate — so it is reproduced, not enforced.
         </span>
       </label>
 
