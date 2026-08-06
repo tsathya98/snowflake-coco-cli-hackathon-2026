@@ -11,6 +11,7 @@ tags on the data it touches — live, and again at execution time, so a human's 
 outlive the policy it was granted under.**
 
 [![CoCo CLI Hackathon 2026](https://img.shields.io/badge/CoCo_CLI_Hackathon_2026-Problem_Statement_1-29B5E8?style=for-the-badge&labelColor=555555&logo=snowflake&logoColor=white)](#the-problem)
+[![Demo video](https://img.shields.io/badge/Demo_video-Watch-FF0000?style=for-the-badge&labelColor=555555&logo=youtube&logoColor=white)](https://youtu.be/krfdtg2JFNM)
 [![Live demo](https://img.shields.io/badge/Live_demo-Vercel-000000?style=for-the-badge&labelColor=555555&logo=vercel&logoColor=white)](https://snowflake-coco-cli-hackathon-2026.vercel.app/)
 [![Team](https://img.shields.io/badge/Team-Argmax_·_solo-D4AF37?style=for-the-badge&labelColor=555555)](#)
 
@@ -19,6 +20,12 @@ outlive the policy it was granted under.**
 [![MCP](https://img.shields.io/badge/MCP-13_governed_tools-7A77FF?style=for-the-badge&labelColor=555555)](#custom-coco-agent-skills)
 [![Snowflake](https://img.shields.io/badge/Snowflake-19_services-29B5E8?style=for-the-badge&labelColor=555555&logo=snowflake&logoColor=white)](#snowflake-services-used)
 [![Authority](https://img.shields.io/badge/Authority-from_object_tags-B91C1C?style=for-the-badge&labelColor=555555)](#what-warrant-does)
+
+### ▸ [**Watch the demo — youtu.be/krfdtg2JFNM**](https://youtu.be/krfdtg2JFNM)
+
+An end-to-end run driven from Cortex Code CLI, then the moment the whole project exists for: a
+human approves a queued action, the table underneath it is reclassified, and the execution refuses
+anyway.
 
 ### ▸ [**Try it live — snowflake-coco-cli-hackathon-2026.vercel.app**](https://snowflake-coco-cli-hackathon-2026.vercel.app/)
 
