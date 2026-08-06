@@ -14,6 +14,20 @@ teleprompter contract.
 An operations lead starts Monday with three urgent exceptions; one governed workflow handles the
 safe work, asks about the consequential work, and refuses the regulated work—even after approval.
 
+**The mental model, if you only keep one line:** the agent can notice and recommend; the data's
+live governance tag decides whether it may execute.
+
+**The running order, so you never have to think about it mid-take:** public story → title card →
+CoCo runs the loop → Streamlit reviewer view → tag change and refusal → adversarial tests →
+public refusal proof.
+
+## Spoken length
+
+547 spoken words. At 155 words per minute that is **3:32 of speech**. The section timings below sum
+to **4:45**, so they budget about seventy seconds of typing, model waiting and the deliberate pause.
+Expect a clean take around **4:45–4:55** against the portal's five-minute ceiling: margin, but not
+much. If a take runs long, use the cut list at the end rather than speaking faster.
+
 ## What the judge should remember
 
 1. The hard problem is not detection; it is authority.
@@ -116,8 +130,7 @@ create those counts. Keep the cursor still.
 > A quality hold has been open for eighty-two days. A critical SKU has five days of stock left.
 > And a reliable supplier has fallen to twenty-six percent on-time delivery.
 >
-> The dashboard found them. It didn't chase the supplier, prepare replenishment, or decide who may
-> touch the hold.
+> The dashboard knows something is wrong. It doesn't know what it's allowed to do about it.
 
 **DELIVERY:** Do not open with “Hello everyone, today I am going to present.” Say the introduction
 as though one judge has just sat beside you. Pause after “built for” and after each exception.
@@ -151,10 +164,11 @@ Do not show PowerPoint or advance through the deck.
 **SAY:**
 
 > Warrant runs one workflow, but it doesn't write its own permissions. It reads the governance
-> already attached to the Snowflake data.
+> already on the data.
 >
-> Open can run. Internal asks a person. Regulated is refused. And Warrant checks again at the
-> moment of execution.
+> Open can run. Internal asks a person. Regulated is refused. Unclear goes down, never up.
+>
+> And it checks again at the moment of execution.
 
 ## 1:12–2:35 — CoCo CLI takes the Monday queue
 
@@ -178,8 +192,7 @@ Use the operate-warrant skill. Call governance_posture and authority_manifest, t
 
 **SAY while it responds:**
 
-> This uses the executor's own resolver. And no tool accepts an authority tier, so the model can't
-> grant itself more access.
+> No tool here accepts an authority tier, so the model can't grant itself access.
 
 **DO:** Enter the end-to-end prompt:
 
@@ -189,8 +202,10 @@ Using the orchestrate-loop skill, run one full AUTO pass against the live accoun
 
 **SAY over the first few seconds:**
 
-> Now it takes the queue. Detection finds the exceptions. Cortex Search grounds the investigation.
-> Then Warrant routes each response and records the outcome.
+> Now it takes the queue. Detection finds the exceptions; Cortex Search grounds the investigation.
+>
+> The AI does the messy part — what this evidence means, and which procedure applies. It never
+> decides its own permission.
 >
 > The model calls take a couple of minutes, so this is an honest cut to the result.
 
@@ -243,8 +258,8 @@ ALTER TABLE WARRANT.DATA.INVENTORY
 
 **SAY:**
 
-> Now the situation changes. Before the reviewer decides, governance reclassifies `INVENTORY` as
-> regulated. One tag changed. No redeploy.
+> Before the reviewer decides, governance reclassifies `INVENTORY` as regulated. One tag. No
+> redeploy.
 
 **DO:** Return to the console, briefly show the regulated tag, then open the pending action. Use
 this reviewer note:
@@ -257,7 +272,8 @@ Click **Approve and execute**.
 
 **SAY immediately before clicking:**
 
-> This action was queued under the old policy. The reviewer approves it under the new one.
+> A reviewer can decide at ten o'clock, and governance can legitimately change at one past. This
+> was queued under the old policy. It's approved under the new one.
 
 **DO:** When the refusal appears, stop speaking for two full seconds.
 
@@ -265,8 +281,8 @@ Click **Approve and execute**.
 
 > Approved. And it still didn't happen.
 >
-> The executor read the tag again and refused. The audit keeps both truths: a human approved, and
-> the action did not execute.
+> The executor read today's governance, not yesterday's approval. The audit keeps both truths: a
+> human approved, and the action did not execute.
 >
 > Approval is a decision. It isn't a permanent permission slip.
 
@@ -301,7 +317,8 @@ fully visible.
 > Monday's queue now has an answer. Supplier handled. Replenishment returned with evidence.
 > Regulated action protected.
 >
-> You can test the boundary here. These buttons send real statements using a role that cannot act.
+> These buttons send real statements using a role that cannot act. A missing button would prove
+> nothing; a visible refusal proves the boundary.
 
 **DO:** Click. Pause while the response loads.
 
@@ -332,14 +349,31 @@ fully visible.
   keeping the fact and meaning intact.
 - Aim for calm confidence, not trailer voice. The product is interesting enough without hype.
 
+### If someone asks what it is, off-script
+
+Not spoken in the video, but have it ready for the description field and for any live question:
+
+> I built Warrant for the moment after an operations dashboard finds a problem. It uses Snowflake
+> procedures and AI reasoning to prepare a response, but it reads the live governance tag on the
+> affected data before doing anything. So supplier outreach can run, replenishment goes to a
+> person, and a regulated quality change is refused—even if someone approved it before the policy
+> changed.
+
 ## Cut list if the first take runs long
 
 Cut in this order:
 
-1. “This uses the executor's own resolver…” after the first CLI prompt.
+1. “Detection finds the exceptions; Cortex Search grounds the investigation.” The prompt on screen
+   already names both.
 2. “Measurement on the left…” in the reviewer section.
-3. “These tests assume the model obeyed it completely…” in the adversarial section.
-4. “You can test the boundary here…” in the close; keep the Monday resolution and final lines.
+3. “A reviewer can decide at ten o'clock, and governance can legitimately change at one past.”
+   before the approval click; keep “This was queued under the old policy. It's approved under the
+   new one.”
+4. “These tests assume the model obeyed it completely…” in the adversarial section.
+5. “A missing button would prove nothing…” in the close; keep the Monday resolution and final lines.
+
+Do not cut “No tool here accepts an authority tier” to save four seconds. It is the only spoken
+statement of the invariant the deck gives a whole panel to.
 
 Never cut:
 
