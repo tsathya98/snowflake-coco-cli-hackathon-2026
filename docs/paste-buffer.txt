@@ -1,14 +1,38 @@
 WARRANT DEMO — PASTE BUFFER
 Everything you paste during the take, in the order you paste it.
-Keep this window on a second desktop or minimised. It must never appear on camera.
+
+THIS FILE MUST NEVER APPEAR ON CAMERA. It contains the reset commands and the
+"Required before you press Record" checklist, and a viewer who reads that over your
+shoulder learns the demo was staged. Keep it on a second desktop or minimised.
+
+The notepad you DO open on camera is docs/private/on-camera-prompts.txt — the three
+prompts and two statements, nothing else. That is the file the script means when you
+say "let me grab my prompts out of notepad."
+
+No timings in here on purpose. They live in docs/video_script.md, which is what you
+read from; here they would only be a clock you cannot hit while pasting, and one more
+thing to fall out of sync. Work down this file in order — that is all it is for.
+
+The adversarial pytest beat has been cut from the running order.
 
 
 ================================================================
 BEFORE RECORDING — pre-flight (not on camera)
 ================================================================
 
+Run these four from the repo root, in order. Each one produces part of the checklist
+at the bottom. Nothing here goes on camera.
+
+
+STEP 1 of 4 — reset the account to the clean start
+Expect: every statement "executed successfully", 5 rows deleted from OPS_REQUESTS,
+both streams recreated, six tags set. No error text anywhere.
+
 snow sql -c warrant -f sql/90_reset.sql
 
+
+STEP 2 of 4 — read back the four counters
+This one query answers the first FOUR lines of the checklist, as named columns.
 
 snow sql -c warrant -q "
 SELECT (SELECT COUNT(*) FROM WARRANT.CORE.PENDING_ACTIONS WHERE decision='pending') AS pending,
@@ -16,24 +40,56 @@ SELECT (SELECT COUNT(*) FROM WARRANT.CORE.PENDING_ACTIONS WHERE decision='pendin
        (SELECT COUNT(*) FROM WARRANT.DATA.RUNBOOKS WHERE doc_id='RB-666')           AS attack_left,
        SYSTEM\$GET_TAG('WARRANT.CORE.SENSITIVITY','WARRANT.DATA.INVENTORY','TABLE')  AS inventory_tag;"
 
+Expect exactly:
+  +--------------------------------------------------+
+  | PENDING | FINDINGS | ATTACK_LEFT | INVENTORY_TAG |
+  | 0       | 0        | 0           | internal      |
+  +--------------------------------------------------+
+
+
+STEP 3 of 4 — confirm CoCo can see the MCP server
+This answers the fifth line of the checklist. Run it in WSL, not Windows.
 
 cortex mcp list
 
+Expect a "warrant:" block naming .venv-wsl/bin/python, args "-m, warrant_mcp.server",
+and env PYTHONPATH=<repo>/mcp. If the whole list is empty, see the recovery below.
 
-snow sql -c warrant -q "SHOW TASKS IN SCHEMA WARRANT.CORE;"
+
+STEP 4 of 4 — confirm both tasks are running
+This answers the last line. The bare SHOW TASKS output is 27 columns wide and
+unreadable in a terminal, so the second statement narrows it to three columns.
+
+snow sql -c warrant -q "SHOW TASKS IN SCHEMA WARRANT.CORE; SELECT \"name\", \"state\", \"schedule\" FROM TABLE(RESULT_SCAN(LAST_QUERY_ID()));"
+
+Expect:
+  | EXECUTE_ON_APPROVAL | started | 1 minute                 |
+  | SCAN_FOR_EXCEPTIONS | started | USING CRON 0 * * * * UTC |
 
 
 Required before you press Record:
-  pending = 0
-  findings = 0
-  attack_left = 0
-  inventory_tag = internal
-  warrant appears in cortex mcp list
-  both tasks show started
+  pending = 0                          <- step 2, PENDING column
+  findings = 0                         <- step 2, FINDINGS column
+  attack_left = 0                      <- step 2, ATTACK_LEFT column
+  inventory_tag = internal             <- step 2, INVENTORY_TAG column
+  warrant appears in cortex mcp list   <- step 3
+  both tasks show started              <- step 4, STATE column
+
+If any one of these is off, fix it before recording. Do not narrate around it.
+
+If warrant is missing from cortex mcp list, run this from the repo root:
+
+cortex mcp add warrant "$PWD/.venv-wsl/bin/python" -m warrant_mcp.server -t stdio -e PYTHONPATH="$PWD/mcp"
+
+Record within the hour of the reset. SCAN_FOR_EXCEPTIONS is an hourly cron running
+RUN_LOOP('AUTO'), so at the top of the hour it repopulates FINDINGS and PENDING_ACTIONS
+and the clean start is gone. If you overrun, re-run 90_reset.sql. Do not suspend the
+task — the script says the loop runs unattended, and a suspended task on screen
+contradicts that.
 
 
 ================================================================
-1:25 — TERMINAL — start CoCo
+TERMINAL — start CoCo
 ================================================================
 
 cortex mcp list
@@ -43,35 +99,35 @@ cortex
 
 
 ================================================================
-1:25 — PROMPT 1 of 3  (operate-warrant)
+PROMPT 1 of 3  (operate-warrant)
 ================================================================
 
 Use the operate-warrant skill. Call governance_posture and authority_manifest, then tell me what Warrant may do right now and which Snowflake tags make that true.
 
 
 ================================================================
-1:25 — PROMPT 2 of 3  (orchestrate-loop)  ** the end-to-end run **
+PROMPT 2 of 3  (orchestrate-loop)  ** the end-to-end run **
 ================================================================
 
 Using the orchestrate-loop skill, run one full AUTO pass against the live account. Summarise what detection, investigation, authority classification, routing, execution and audit did for each exception.
 
 
 ================================================================
-2:50 — PROMPT 3 of 3  (classify-authority)
+PROMPT 3 of 3  (classify-authority)
 ================================================================
 
 Use the classify-authority skill to compare raise_replenishment with open_supplier_case. Show the touched object, live tag, and final tier for each.
 
 
 ================================================================
-3:12 — SNOWSIGHT — the policy change
+SNOWSIGHT — the policy change
 ================================================================
 
 ALTER TABLE WARRANT.DATA.INVENTORY SET TAG WARRANT.CORE.SENSITIVITY = 'regulated';
 
 
 ================================================================
-3:12 — STREAMLIT CONSOLE — reviewer note, then Approve and execute
+STREAMLIT CONSOLE — reviewer note, then Approve and execute
 ================================================================
 
 Checked in-transit is zero and SKU-1003 is not on quality hold. Quantity restores to safety-stock minimum.
@@ -81,14 +137,7 @@ Checked in-transit is zero and SKU-1003 is not on quality hold. Quantity restore
 
 
 ================================================================
-3:57 — TERMINAL — the adversarial suite
-================================================================
-
-uv run pytest tests/test_adversarial.py -q
-
-
-================================================================
-4:23 — VERCEL VIEWER — no paste
+VERCEL VIEWER — no paste
 ================================================================
 
    -> Shortcut "The refusal that held", then "Approve and execute".

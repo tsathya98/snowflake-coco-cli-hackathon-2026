@@ -44,9 +44,14 @@ own and inherits the operator's identity.
 ```bash
 python3 -m venv .venv-wsl && .venv-wsl/bin/pip install -e ".[mcp]"
 
-cortex mcp add warrant "$PWD/.venv-wsl/bin/python -m warrant_mcp.server" -t stdio
+cortex mcp add warrant "$PWD/.venv-wsl/bin/python" -m warrant_mcp.server \
+  -t stdio -e PYTHONPATH="$PWD/mcp"
 cortex mcp list
 ```
+
+The `PYTHONPATH` is not optional. `pyproject.toml` ships only `src/warrant` as a wheel target, so
+the editable install brings in `fastmcp` but leaves `warrant_mcp` outside the interpreter's path —
+run from any directory, `-m warrant_mcp.server` alone raises `ModuleNotFoundError`.
 
 Inside a session the tools appear as `mcp__warrant__governance_posture` and so on. `/mcp-status`
 shows whether the server connected.
