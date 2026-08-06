@@ -62,6 +62,33 @@ connection.connect(async (error) => {
       `3. READ     ${counts.DETECTED} exceptions, ${counts.REFUSED} refusals, ${counts.LOGGED} audit rows`,
     );
 
+    // Every object the page reads, named individually.
+    //
+    // Not a nicety: CREATE OR REPLACE VIEW drops the grants on that view, so an
+    // unrelated redeploy of sql/40_orchestration.sql silently revoked WARRANT_PUBLIC's
+    // access to REFUSALS and APPROVAL_QUEUE and the deployed site 500'd. Nothing else
+    // in this probe would have noticed — the counts above read tables, not views.
+    for (const object of [
+      "WARRANT.CORE.APPROVAL_QUEUE",
+      "WARRANT.CORE.REFUSALS",
+      "WARRANT.DATA.QUALITY_HOLDS",
+      "WARRANT.CORE.EXCEPTIONS",
+      "WARRANT.CORE.FINDINGS",
+      "WARRANT.CORE.PENDING_ACTIONS",
+      "WARRANT.AUDIT.ACTION_AUDIT",
+    ]) {
+      await run(`SELECT 1 FROM ${object} LIMIT 1`);
+    }
+    console.log("   GRANTS   all 7 objects the page reads are readable");
+
+    for (const procedure of [
+      "CALL WARRANT.CORE.REPLAY_DECISIONS(NULL)",
+      "CALL WARRANT.CORE.TASK_ACTIVITY(1)",
+    ]) {
+      await run(procedure);
+    }
+    console.log("   PROCS    replay and task activity callable");
+
     const manifest = await run("CALL WARRANT.CORE.AUTHORITY_MANIFEST(NULL)");
     const payload = JSON.parse(String(Object.values(manifest[0])[0]));
     console.log(`   PROC     manifest returned ${payload.capabilities.length} capabilities`);

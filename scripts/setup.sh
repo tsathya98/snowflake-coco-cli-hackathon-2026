@@ -71,7 +71,11 @@ snow sql --connection "$CONNECTION" \
              AUTO_COMPRESS = FALSE OVERWRITE = TRUE" >/dev/null
 
 # 40 and 45 both import the packaged python, so they run after the upload above.
-for step in sql/40_orchestration.sql sql/45_review.sql sql/46_schedule.sql; do
+# 50 MUST come after 40. CREATE OR REPLACE VIEW drops every grant on the view, and
+# 40 replaces APPROVAL_QUEUE and REFUSALS — which WARRANT_PUBLIC reads. Running 40
+# alone, later, silently revokes them and the public viewer starts returning 500 with
+# nothing failing here. `npm run probe` in web/ asserts all seven objects are readable.
+for step in sql/40_orchestration.sql sql/45_review.sql sql/46_schedule.sql sql/50_public_viewer.sql; do
   echo "==> ${step}"
   snow sql --connection "$CONNECTION" --filename "$step" >/dev/null
 done

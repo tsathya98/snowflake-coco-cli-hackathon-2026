@@ -174,6 +174,20 @@ ALTER TASK SCAN_FOR_EXCEPTIONS SUSPEND;
 -- cannot answer that question, because a refusal leaves no trace. This view is
 -- the answer, and it is why ACTION_AUDIT records refusals as first-class rows.
 -- ---------------------------------------------------------------------------
+-- ---------------------------------------------------------------------------
+-- ⚠ CREATE OR REPLACE VIEW DROPS EVERY GRANT ON THE VIEW.
+--
+-- These two views are read by WARRANT_PUBLIC, the role behind the public web
+-- viewer. Replacing them silently revokes that access and the deployed site
+-- starts returning 500 — with no error here, because this script succeeded.
+--
+-- It has happened once already, during an unrelated redeploy.
+--
+-- So: after running this file, RUN sql/50_public_viewer.sql AGAIN. scripts/setup.sh
+-- already orders them that way; a manual re-run of this file alone does not.
+-- web/scripts/probe.mjs asserts both views are readable, which is how you find
+-- out in ten seconds rather than from a judge.
+-- ---------------------------------------------------------------------------
 CREATE OR REPLACE VIEW REFUSALS
   COMMENT = 'Every action the agent declined to take, with the classification that stopped it'
 AS
